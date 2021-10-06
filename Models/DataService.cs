@@ -215,6 +215,18 @@ namespace CampusLogicEvents.Web.Models
                             }
                         }
 
+                        // SponsoredScholar Events
+                        if (eventNotificationId >= 900 && eventNotificationId <= 999)
+                        {
+                            if (!eventData.PropertyValues[EventPropertyConstants.SpDonationId].IsNullOrEmpty())
+                            {
+                                var manager = new SponsorshipManager();
+                                var donationPostedInfo = manager.GetDonationPostedInfo(
+                                    eventData.PropertyValues[EventPropertyConstants.SpDonationId].Value<int>());
+                                eventData.DonationPostedInfoData = donationPostedInfo;
+                            }
+                        }
+
                         // populate PropertyValues with all the values that have been gathered
                         eventData.PopulatePropertyValues();
 
