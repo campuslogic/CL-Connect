@@ -532,6 +532,7 @@ namespace CampusLogicEvents.Web.WebAPI
                     appSettings.Settings["PmWebApiUrl"].Value = ApiUrlConstants.PM_API_URL_SANDBOX;
                     appSettings.Settings["SuWebApiUrl"].Value = ApiUrlConstants.SU_API_URL_SANDBOX;
                     appSettings.Settings["SaWebApiUrl"].Value = ApiUrlConstants.SA_API_URL_SANDBOX;
+                    appSettings.Settings["SpWebApiUrl"].Value = ApiUrlConstants.SP_API_URL_SANDBOX;
                 }
                 else
                 {
@@ -541,6 +542,7 @@ namespace CampusLogicEvents.Web.WebAPI
                     appSettings.Settings["PmWebApiUrl"].Value = ApiUrlConstants.PM_API_URL_PRODUCTION;
                     appSettings.Settings["SuWebApiUrl"].Value = ApiUrlConstants.SU_API_URL_PRODUCTION;
                     appSettings.Settings["SaWebApiUrl"].Value = ApiUrlConstants.SA_API_URL_PRODUCTION;
+                    appSettings.Settings["SpWebApiUrl"].Value = ApiUrlConstants.SP_API_URL_PRODUCTION;
                 }
 
                 ClearOldFileDefinitions(campusLogicSection);

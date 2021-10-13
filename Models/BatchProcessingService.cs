@@ -22,6 +22,7 @@ namespace CampusLogicEvents.Web.Models
         private static readonly CampusLogicSection campusLogicConfigSection = (CampusLogicSection)ConfigurationManager.GetSection(ConfigConstants.CampusLogicConfigurationSectionName);
 
         [AutomaticRetry(Attempts = 0)]
+        [DisableConcurrentExecution(60)]
         public static void RunBatchProcess(string type, string name, int size)
         {
 
