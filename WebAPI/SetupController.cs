@@ -221,6 +221,12 @@ namespace CampusLogicEvents.Web.WebAPI
                     appSettings.Add("SaWebApiUrl", "");
                 }
 
+                // Newer setting
+                if (!appSettings.ContainsKey("SpWebApiUrl"))
+                {
+                    appSettings.Add("SpWebApiUrl", "");
+                }
+
                 if (response.CampusLogicSection.EventNotifications.Count > 0)
                 {
                     response.CampusLogicSection.EventNotificationsEnabled = true;
