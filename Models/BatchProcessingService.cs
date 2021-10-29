@@ -3,7 +3,6 @@ using CampusLogicEvents.Implementation.Configurations;
 using CampusLogicEvents.Implementation.Models;
 using Hangfire;
 using log4net;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -11,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CampusLogicEvents.Implementation.Extensions;
 using Newtonsoft.Json.Linq;
+using CampusLogicEvents.Web.Filters;
 
 namespace CampusLogicEvents.Web.Models
 {
@@ -23,6 +23,7 @@ namespace CampusLogicEvents.Web.Models
 
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(60)]
+        [BatchProcessingFailure]
         public static void RunBatchProcess(string type, string name, int size)
         {
 
@@ -135,11 +136,13 @@ namespace CampusLogicEvents.Web.Models
                     {
                         logger.Error($"Inner exception: {ex.InnerException}");
                     }
+                    throw ex;
                 }
                 catch (Exception e)
                 {
                     //Something happened during processing. Update any records that may have been marked for processing back to null so that they can be re-processed.
                     logger.Error($"An error occured while attempting to execute the batch process: {e}");
+                    throw e;
                 }
                 finally
                 {
