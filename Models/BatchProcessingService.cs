@@ -49,7 +49,7 @@ namespace CampusLogicEvents.Web.Models
                                 var manager = new DocumentManager();
                                 Dictionary<int, Guid> recordIds = new Dictionary<int, Guid>();
 
-                                var recordList = dbContext.BatchProcessRecords.Where(b => b.ProcessGuid == processGuid).Select(b => b).ToList();
+                                var recordList = dbContext.BatchProcessRecords.Where(b => b.ProcessGuid == processGuid).ToList();
                                 // Get all records with this process guid
                                 foreach (var record in recordList)
                                 {
@@ -99,8 +99,9 @@ namespace CampusLogicEvents.Web.Models
                                         // Get event data for index file creation
                                         var recordIdList = string.Join(",", recordIds.Keys);
                                         var message = new EventNotificationData(JObject.Parse(dbContext.Database.SqlQuery<string>($"SELECT [Message] from [dbo].[BatchProcessRecord] WHERE [ProcessGuid] = '{processGuid}' and [Id] IN ({recordIdList})").First()));
-
-                                        var response = Task.Run(async ()=> await manager.GetBatchAwardLetterPdfFile(processGuid, recordIds.Values.ToList(), name, message)).ConfigureAwait(false).GetAwaiter().GetResult();
+                                        logger.Info($"{recordIds.Values.Count()} records found to return PDFs");
+                                        logger.Info($"{recordIds.Values.Distinct().Count()} distinct records found to return PDFs");
+                                        var response = Task.Run(async ()=> await manager.GetBatchAwardLetterPdfFile(processGuid, recordIds.Values.Distinct().ToList(), name, message)).ConfigureAwait(false).GetAwaiter().GetResult();
                                         //If the response was successful remove those records from the db so
                                         //we do not continue to process them if the file fails
                                         if (response.IsSuccessStatusCode)
@@ -116,7 +117,8 @@ namespace CampusLogicEvents.Web.Models
                                 {
                                     var recordIdList = string.Join(",", recordIds.Keys);
                                     var message = new EventNotificationData(JObject.Parse(dbContext.Database.SqlQuery<string>($"SELECT [Message] from [dbo].[BatchProcessRecord] WHERE [ProcessGuid] = '{processGuid}' and [Id] IN ({recordIdList})").First()));
-
+                                    logger.Info($"{recordIds.Values.Count()} records found to return PDFs");
+                                    logger.Info($"{recordIds.Values.Distinct().Count()} distinct records found to return PDFs");
                                     var response = Task.Run(async () => await manager.GetBatchAwardLetterPdfFile(processGuid, recordIds.Values.ToList(), name, message)).ConfigureAwait(false).GetAwaiter().GetResult();
                                     if (response.IsSuccessStatusCode)
                                     {
