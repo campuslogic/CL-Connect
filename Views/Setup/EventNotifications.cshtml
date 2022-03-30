@@ -11,16 +11,16 @@
     <hr>
     <div class="padding-top-twenty">
         <p>Events to respond to</p>
-        <div ng-repeat="event in vm.eventNotifications" class="form-group">
-            <div class="col-md-2">
+        <div ng-repeat="event in vm.eventNotifications" class="row form-group mb-3">
+            <div class="col-lg-2">
                 <input class="form-control" placeholder="Event ID" ng-model="event.eventNotificationId" ng-change="vm.checkForDuplicateEvent()" />
             </div>
-            <div class="col-md-2">
-                <select class="form-control" style="height: 100%;" kendo-drop-down-list ng-model="event.handleMethod" ng-change="vm.onConnectionStringTypeChange(); vm.handleMethodChange(event);">
+            <div class="col-lg-2">
+                <select class="form-control" kendo-drop-down-list ng-model="event.handleMethod" ng-change="vm.onConnectionStringTypeChange(); vm.handleMethodChange(event);">
                     <option ng-repeat="type in vm.eventNotificationTypes" value="{{type.eventNotificationTypeId}}">{{type.label}}</option>
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-lg-2">
                 <select class="form-control" style="height: 100%;" kendo-drop-down-list ng-show="vm.IsFileStoreEnabled($index)" ng-disabled="!vm.IsFileStoreEnabled($index)" ng-model="event.fileStoreType">
                     <option value="Shared">Shared</option>
                     <option value="Individual">Individual</option>
@@ -28,12 +28,12 @@
                 <input class="form-control" placeholder="Batch Name" ng-show="vm.IsBatchProcessingEnabled($index)" ng-disabled="!vm.IsBatchProcessingEnabled($index)" ng-model="event.batchName" ng-change="vm.checkForInvalidBatchName()" />
                 <input class="form-control" placeholder="Endpoint Name" ng-show="vm.IsApiIntegrationsEnabled($index)" ng-disabled="!vm.IsApiIntegrationsEnabled($index)" ng-model="event.apiEndpointName" ng-change="vm.hasInvalidApiEndpointName()" />
             </div>
-            <div class="col-md-5">
+            <div class="col-lg-5">
                 <input id="eventcommand{{$index}}" name="eventcommand{{$index}}" class="form-control" placeholder="Database Command" ng-model="event.dbCommandFieldValue" ng-disabled="!vm.IsCommandEnabled($index)" ng-required="vm.IsCommandEnabled($index)" />
                 <span class="field-validation-error" ng-show="(formEventNotifications.eventcommand{{$index}}.$dirty && formEventNotifications.eventcommand{{$index}}.$error.required) || (!event.dbCommandFieldValue && !vm.validationService.pageValidations.eventNotificationsValid && vm.IsCommandEnabled($index))">Required</span>
             </div>
-            <div class="col-md-1">
-                <button class="btn btn-default" ng-hide="vm.eventNotifications.length == 1" ng-click="vm.removeEventNotification($index)"><i class="fa fa-remove"></i></button>
+            <div class="col-lg-1">
+                <button class="btn btn-light" ng-hide="vm.eventNotifications.length == 1" ng-click="vm.removeEventNotification($index)"><i class="fa fa-remove"></i></button>
             </div>
         </div>
         <div>
@@ -54,9 +54,9 @@
     <div class="padding-top-twenty">
         <label>Database Connection</label>
         <p>Enter the connection details to use when executing database commands.</p>
-        <div class="form-group">
-            <label class="col-md-3 control-label">Connection Type</label>
-            <div class="col-md-9">
+        <div class="row form-group mb-3">
+            <label class="col-lg-3 control-label">Connection Type</label>
+            <div class="col-lg-9">
                 <select class="form-control" kendo-drop-down-list ng-model="vm.connectionStringType" style="height:100%;" ng-change="vm.onConnectionStringTypeChange()">
                     <option value="n">None</option>
                     <option value="c">Connection string</option>
@@ -66,42 +66,42 @@
         </div>
         <ng-switch on="vm.connectionStringType">
             <div ng-switch-when="c">
-                <div class="form-group">
-                    <label class="col-md-3 control-label">Connection String</label>
-                    <div class="col-md-9">
+                <div class="row form-group mb-3">
+                    <label class="col-lg-3 control-label">Connection String</label>
+                    <div class="col-lg-9">
                         <input type="text" class="form-control" id="inputConnectionString" placeholder="Connection string" ng-model="vm.clientDatabaseConnection.connectionString" />
                     </div>
                 </div>
             </div>
             <div ng-switch-when="d">
-                <div class="form-group">
-                    <label class="col-md-3 control-label">DSN Name</label>
-                    <div class="col-md-9">
+                <div class="row form-group mb-3">
+                    <label class="col-lg-3 control-label">DSN Name</label>
+                    <div class="col-lg-9">
                         <input type="text" class="form-control" placeholder="DSN Name" ng-model="vm.dsnName" ng-change="vm.onTextBoxChange()" />
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="col-md-3 control-label">DSN Username</label>
-                    <div class="col-md-9">
+                <div class="row form-group mb-3">
+                    <label class="col-lg-3 control-label">DSN Username</label>
+                    <div class="col-lg-9">
                         <input type="text" class="form-control" placeholder="DSN Username" ng-model="vm.dsnUser" ng-change="vm.onTextBoxChange()" />
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="col-md-3 control-label">DSN Password</label>
-                    <div class="col-md-9">
+                <div class="row form-group mb-3">
+                    <label class="col-lg-3 control-label">DSN Password</label>
+                    <div class="col-lg-9">
                         <input type="password" class="form-control" placeholder="DSN Password" ng-model="vm.dsnPassword" ng-change="vm.onTextBoxChange()" />
                     </div>
                 </div>
             </div>
         </ng-switch>
-        <div class="form-group" ng-hide="vm.connectionStringType == 'n'">
-            <div class="col-md-6 col-md-offset-3">
-                <button class="btn btn-default btn-lg full-width" ng-click="vm.testConnectionString(formEventNotifications)">Test database connection</button>
+        <div class="row form-group mb-3" ng-hide="vm.connectionStringType == 'n'">
+            <div class="col-lg-9 offset-lg-3">
+                <button class="btn btn-light btn-lg full-width" ng-click="vm.testConnectionString(formEventNotifications)">Test database connection</button>
                 <span class="alert alert-success" role="alert" ng-show="vm.validationService.pageValidations.connectionStringValid && vm.validationService.pageValidations.eventNotificationsConnectionTested">Test Successful</span>
                 <span class="alert alert-danger" role="alert" ng-show="!vm.validationService.pageValidations.connectionStringValid && vm.validationService.pageValidations.eventNotificationsConnectionTested">Error Testing Connection String</span>
             </div>
         </div>
-        <div class="col-md-6">
+        <div>
             <span class="alert alert-danger" role="alert" ng-show="(vm.usingDatabase && (!vm.clientDatabaseConnection.connectionString || vm.clientDatabaseConnection.connectionString === '') && (vm.connectionStringType === 'c' || vm.connectionStringType === 'n'))
                                                             || (vm.usingDatabase && vm.connectionStringType === 'd' && (!vm.dsnName || vm.dsnName === ''))">A connection string or DSN needs to be established.</span>
         </div>

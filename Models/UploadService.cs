@@ -6,14 +6,12 @@ using System.Net;
 using CampusLogicEvents.Implementation;
 using CampusLogicEvents.Implementation.Models;
 using Hangfire;
-using log4net;
 
 namespace CampusLogicEvents.Web.Models
 {
 	public static class UploadService
     {
-        private static readonly ILog logger = LogManager.GetLogger("AdoNetAppender");
-
+        
         /// <summary>
         /// File Upload - Run on a scheduled basis.  Configured in the Startup.cs and the web.config
         /// Checks specified folder to see if files are present, if so uploads and moves to archive
@@ -73,7 +71,7 @@ namespace CampusLogicEvents.Web.Models
                         if (result != HttpStatusCode.Accepted)
                         {
                             DataService.LogNotification(notificationManager.SendErrorNotification($"Automated {uploadSettings.UploadType} Upload Service", $"File upload attempt for filename {fileName} failed").Result);
-                            logger.ErrorFormat("File upload attempt for filename {0} failed", fileName);
+                            LogManager.ErrorLogFormat("File upload attempt for filename {0} failed", fileName);
                         }
                         //If there was an issue with the service, stop processing and try again 
                         //on next configured time
@@ -88,7 +86,7 @@ namespace CampusLogicEvents.Web.Models
             catch (Exception ex)
             {
                 DataService.LogNotification(notificationManager.SendErrorNotification($"Automated {uploadSettings.UploadType} Upload Service", ex).Result);
-                logger.ErrorFormat("UploadService Upload {1} Error: {0}", ex, uploadSettings.UploadType);
+                LogManager.ErrorLogFormat("UploadService Upload {1} Error: {0}", ex, uploadSettings.UploadType);
             }
 
         }

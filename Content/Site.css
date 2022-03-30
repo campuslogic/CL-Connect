@@ -66,6 +66,10 @@ h4, h5, h6 {
     padding-bottom: 0;
 }
 
+.blockUI h2 {
+    color: #fff;
+}
+
 h1 {
     font-size: 2em;
 }
@@ -214,10 +218,9 @@ ul#menu {
     border-radius: 16px !important;
 }
 
-.nav > li > a:hover, .nav > li > a:focus {
+.nav > a:hover, .nav > a:focus {
     background-color: #ff7f03 !important;
-    -ms-border-radius: 10px;
-    border-radius: 10px;
+    color: #fff;
 }
 
 .border-radius-10 {
@@ -227,10 +230,6 @@ ul#menu {
 
 .font-size-x-large {
     font-size: large !important;
-}
-
-a:hover, a:focus {
-    color: white !important;
 }
 
 .padding-top-twenty {
@@ -489,6 +488,11 @@ aside {
 
 #socialLoginList button {
     margin-bottom: 12px;
+}
+
+.btn-light:hover {
+    background-color: #e6e6e6;
+    border-color: #adadad;
 }
 
 #logoutForm {
@@ -907,5 +911,21 @@ tr.pager td {
 }
 
 .modal-wide .modal-dialog {
+    max-width: 90%;
     width: 90%;
+}
+
+.modal-medium .modal-dialog {
+    max-width: 600px;
+    width: 600px;
+}
+
+.control-label.text-left {
+    text-align: left;
+}
+
+@media (min-width: 992px) {
+    .control-label {
+        text-align: right;
+    }
 }

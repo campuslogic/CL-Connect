@@ -2,7 +2,6 @@
 using CampusLogicEvents.Implementation.Configurations;
 using CampusLogicEvents.Implementation.Models;
 using Hangfire;
-using log4net;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -16,7 +15,6 @@ namespace CampusLogicEvents.Web.Models
 {
     public static class BatchProcessingService
     {
-        private static readonly ILog logger = LogManager.GetLogger("AdoNetAppender");
         private static readonly int RETRY_MAX = 3;
         private static readonly NotificationManager notificationManager = new NotificationManager();
         private static readonly CampusLogicSection campusLogicConfigSection = (CampusLogicSection)ConfigurationManager.GetSection(ConfigConstants.CampusLogicConfigurationSectionName);
@@ -27,7 +25,7 @@ namespace CampusLogicEvents.Web.Models
         public static void RunBatchProcess(string type, string name, int size)
         {
 
-            logger.Info("enter batch processing");
+            LogManager.InfoLog("enter batch processing");
             Guid processGuid = Guid.NewGuid();
             using (var dbContext = new CampusLogicContext())
             {
@@ -74,13 +72,13 @@ namespace CampusLogicEvents.Web.Models
                                     if (eventData.PropertyValues[EventPropertyConstants.AlRecordId].IsNullOrEmpty())
                                     {
                                         SendErrorNotification("Batch AwardLetter process", $"This record has no AL-record-Id, record Id: {eventData.PropertyValues[EventPropertyConstants.Id].Value<string>()}. This likely means the notification event is not an AL event.  Please contact your CampusLogic contact for next steps.");
-                                        logger.Error($"Record for batch awardletter process has no AL-record-Id, with award letter record Id: {eventData.PropertyValues[EventPropertyConstants.Id].Value<string>()}.  This likely means the notification event is not an AL event");
+                                        LogManager.ErrorLog($"Record for batch awardletter process has no AL-record-Id, with award letter record Id: {eventData.PropertyValues[EventPropertyConstants.Id].Value<string>()}.  This likely means the notification event is not an AL event");
                                         dbContext.Database.ExecuteSqlCommand($"DELETE FROM [dbo].[BatchProcessRecord] WHERE [ProcessGuid] = '{processGuid}' and [Id] = {record.Id}");
                                     }
                                     else if (record.RetryCount > RETRY_MAX)
                                     {
                                         SendErrorNotification("Batch AwardLetter process", $"This record has reached it's maximum retry attempts, record Id: {record.Id}, AL-record-Id: {Guid.Parse(eventData.PropertyValues[EventPropertyConstants.AlRecordId].Value<string>())}. Please contact your CampusLogic contact for next steps.");
-                                        logger.Error($"Record for batch awardletter process has reached maximum retry attempts, with award letter record Id: {record.Id}, AL-record-Id: {Guid.Parse(eventData.PropertyValues[EventPropertyConstants.AlRecordId].Value<string>())}.");
+                                        LogManager.ErrorLog($"Record for batch awardletter process has reached maximum retry attempts, with award letter record Id: {record.Id}, AL-record-Id: {Guid.Parse(eventData.PropertyValues[EventPropertyConstants.AlRecordId].Value<string>())}.");
                                         dbContext.Database.ExecuteSqlCommand($"DELETE FROM [dbo].[BatchProcessRecord] WHERE [ProcessGuid] = '{processGuid}' and [Id] = {record.Id}");
                                     }
                                     else if (record.RetryCount == RETRY_MAX && retryTimeHasPassed)
@@ -99,8 +97,8 @@ namespace CampusLogicEvents.Web.Models
                                         // Get event data for index file creation
                                         var recordIdList = string.Join(",", recordIds.Keys);
                                         var message = new EventNotificationData(JObject.Parse(dbContext.Database.SqlQuery<string>($"SELECT [Message] from [dbo].[BatchProcessRecord] WHERE [ProcessGuid] = '{processGuid}' and [Id] IN ({recordIdList})").First()));
-                                        logger.Info($"{recordIds.Values.Count()} records found to return PDFs");
-                                        logger.Info($"{recordIds.Values.Distinct().Count()} distinct records found to return PDFs");
+                                        LogManager.InfoLog($"{recordIds.Values.Count()} records found to return PDFs");
+                                        LogManager.InfoLog($"{recordIds.Values.Distinct().Count()} distinct records found to return PDFs");
                                         var response = Task.Run(async ()=> await manager.GetBatchAwardLetterPdfFile(processGuid, recordIds.Values.Distinct().ToList(), name, message)).ConfigureAwait(false).GetAwaiter().GetResult();
                                         //If the response was successful remove those records from the db so
                                         //we do not continue to process them if the file fails
@@ -117,8 +115,8 @@ namespace CampusLogicEvents.Web.Models
                                 {
                                     var recordIdList = string.Join(",", recordIds.Keys);
                                     var message = new EventNotificationData(JObject.Parse(dbContext.Database.SqlQuery<string>($"SELECT [Message] from [dbo].[BatchProcessRecord] WHERE [ProcessGuid] = '{processGuid}' and [Id] IN ({recordIdList})").First()));
-                                    logger.Info($"{recordIds.Values.Count()} records found to return PDFs");
-                                    logger.Info($"{recordIds.Values.Distinct().Count()} distinct records found to return PDFs");
+                                    LogManager.InfoLog($"{recordIds.Values.Count()} records found to return PDFs");
+                                    LogManager.InfoLog($"{recordIds.Values.Distinct().Count()} distinct records found to return PDFs");
                                     var response = Task.Run(async () => await manager.GetBatchAwardLetterPdfFile(processGuid, recordIds.Values.ToList(), name, message)).ConfigureAwait(false).GetAwaiter().GetResult();
                                     if (response.IsSuccessStatusCode)
                                     {
@@ -133,17 +131,17 @@ namespace CampusLogicEvents.Web.Models
 
                 catch (TaskCanceledException ex)
                 {
-                    logger.Error($"The task was canceled: {ex}");
+                    LogManager.ErrorLog($"The task was canceled: {ex}");
                     if (ex.InnerException != null)
                     {
-                        logger.Error($"Inner exception: {ex.InnerException}");
+                        LogManager.ErrorLog($"Inner exception: {ex.InnerException}");
                     }
                     throw ex;
                 }
                 catch (Exception e)
                 {
                     //Something happened during processing. Update any records that may have been marked for processing back to null so that they can be re-processed.
-                    logger.Error($"An error occured while attempting to execute the batch process: {e}");
+                    LogManager.ErrorLog($"An error occured while attempting to execute the batch process: {e}");
                     throw e;
                 }
                 finally

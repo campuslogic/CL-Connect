@@ -7,7 +7,6 @@ using CampusLogicEvents.Implementation;
 using CampusLogicEvents.Implementation.Configurations;
 using CampusLogicEvents.Implementation.Models;
 using Hangfire;
-using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -15,7 +14,6 @@ namespace CampusLogicEvents.Web.Models
 {
     public static class FileStoreService
     {
-        private static readonly ILog logger = LogManager.GetLogger("AdoNetAppender");
         public const string Name = "File Storage";
         private static readonly CampusLogicSection campusLogicConfigSection = (CampusLogicSection)ConfigurationManager.GetSection(ConfigConstants.CampusLogicConfigurationSectionName);
 
@@ -111,7 +109,7 @@ namespace CampusLogicEvents.Web.Models
                 catch (Exception ex)
                 {
                     //Something happened during processing. Update any records that may have been marked for processing back to null so that they can be re-processed.
-                    logger.Error($"An error occured while attempting to process the event(s) for file store: {ex}");
+                    LogManager.ErrorLog($"An error occured while attempting to process the event(s) for file store: {ex}");
                     dbContext.Database.ExecuteSqlCommand($"UPDATE [dbo].[EventNotification] SET [ProcessGuid] = NULL WHERE [ProcessGuid] = '{processGuid}'");
                 }
             }

@@ -131,10 +131,10 @@ clConnectServices.factory("addfiledefinitionmodalcontroller", ["$modal",
                             {
                                 command: [
                                     {
-                                        template: kendo.template('<button class="btn btn-default" ng-click="moveUpFieldMappingItem(dataItem)"><i class="fa fa-arrow-up"></i></button>' +
-                                            '<button class="btn btn-default" ng-click="moveDownFieldMappingItem(dataItem)"><i class="fa fa-arrow-down"></i></button>' +
-                                            '<button class="btn btn-default" ng-click="editFieldMappingItem(dataItem)"><i class="fa fa-pencil"></i></button>' +
-                                            '<button class="btn btn-default" ng-click="deleteFieldMappingItem(dataItem)"><i class="fa fa-trash"></i></button>')
+                                        template: kendo.template('<button class="btn btn-light" ng-click="moveUpFieldMappingItem(dataItem)"><i class="fa fa-arrow-up"></i></button>' +
+                                            '<button class="btn btn-light" ng-click="moveDownFieldMappingItem(dataItem)"><i class="fa fa-arrow-down"></i></button>' +
+                                            '<button class="btn btn-light" ng-click="editFieldMappingItem(dataItem)"><i class="fa fa-pencil"></i></button>' +
+                                            '<button class="btn btn-light" ng-click="deleteFieldMappingItem(dataItem)"><i class="fa fa-trash"></i></button>')
                                     }
                                 ],
                                 width: "250px"
@@ -222,7 +222,7 @@ clConnectServices.factory("addfiledefinitionmodalcontroller", ["$modal",
                 var $modalInstance = $modal.open({
                     templateUrl: urlRoot + "/setup/template?templateName=AddFileDefinitionModal",
                     controller: service.modalController,
-                    windowClass: "modal-wide",
+                    windowClass: "modal-wide show",
                     resolve: {
                         modalParams: function () {
                             return {

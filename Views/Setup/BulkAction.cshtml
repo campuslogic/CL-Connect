@@ -10,13 +10,12 @@
 </p>
 <hr />
 <form class="padding-top-ten" novalidate="" name="vm.form">
-    <div class="row">
-        <div class="col-md-7 form-group">
-            <label class="col-md-3 control-label no-gutter"><span class="form-required" aria-hidden="true">* </span>Process Schedule</label>
-            <div class="col-md-7 no-gutter">
+    <div class="row form-group mb-3">
+            <label class="col-lg-3 control-label no-gutter"><span class="form-required" aria-hidden="true">* </span>Process Schedule</label>
+            <div class="col-lg-7 no-gutter">
                 <select required
                         kendo-drop-down-list
-                        class="form-control input-lg height-100"
+                        class="form-control input-lg"
                         ng-model="vm.settings.frequency"
                         style="margin-left: 14px; width: calc(100% - 14px)">
                     <option value="daily">Daily</option>
@@ -25,32 +24,25 @@
                     <option value="hourly">Hourly</option>
                 </select>
             </div>
+    </div>
+    <div class="row form-group mb-3">
+        <label class="col-lg-3 control-label no-gutter"><span class="form-required" aria-hidden="true">* </span>File Pickup Location</label>
+        <cl-folder-picker class="col-lg-7" isrequired="true" formvalid="vm.validationService.pageValidations.BulkActionUploadPath" uploadpath="vm.settings.bulkActionUploadPath"></cl-folder-picker>
+    </div>
+    <div class="row form-group mb-3">
+        <label class="col-lg-3 control-label no-gutter"><span class="form-required" aria-hidden="true">* </span>File Drop-off Location</label>
+        <cl-folder-picker class="col-lg-7" isrequired="true" formvalid="vm.validationService.pageValidations.BulkActionArchivePath" uploadpath="vm.settings.bulkActionArchivePath"></cl-folder-picker>
+    </div>
+    <div class="row form-group mb-3">
+        <div class="col-lg-3 control-label no-gutter">
+            <label> <span class="form-required" aria-hidden="true">* </span>Notification Email</label>
+        </div>
+        <div class="col-lg-7">
+            <input type="text" class="form-control" id="notificationEmail" name="notificationEmail" ng-model="vm.settings.notificationEmail" required />
         </div>
     </div>
     <div class="row">
-        <div class="col-md-7 form-group">
-            <label class="col-md-3 control-label no-gutter"><span class="form-required" aria-hidden="true">* </span>File Pickup Location</label>
-            <cl-folder-picker isrequired="true" formvalid="vm.validationService.pageValidations.BulkActionUploadPath" uploadpath="vm.settings.bulkActionUploadPath"></cl-folder-picker>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-7 form-group">
-            <label class="col-md-3 control-label no-gutter"><span class="form-required" aria-hidden="true">* </span>File Drop-off Location</label>
-            <cl-folder-picker isrequired="true" formvalid="vm.validationService.pageValidations.BulkActionArchivePath" uploadpath="vm.settings.bulkActionArchivePath"></cl-folder-picker>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-7 form-group">
-            <div class="col-md-3">
-                <label class="col-md-3no-gutter"> <span class="form-required" aria-hidden="true">* </span>Notification Email</label>
-            </div>
-            <div class="col-md-7">
-                <input type="text" class="form-control" id="notificationEmail" name="notificationEmail" ng-model="vm.settings.notificationEmail" required />
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <label class="col-md-5 control-label">
+        <label class="col-lg-5 control-label" style="text-align: left;">
             <input type="checkbox" ng-model="vm.settings.useSSN" /> File Uses Student Social Security Numbers
         </label>
     </div>

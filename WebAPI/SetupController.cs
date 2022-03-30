@@ -1,18 +1,20 @@
-﻿using CampusLogicEvents.Implementation.Configurations;
+﻿using CampusLogicEvents.Implementation;
+using CampusLogicEvents.Implementation.Configurations;
 using CampusLogicEvents.Implementation.Models;
 using CampusLogicEvents.Web.Filters;
 using CampusLogicEvents.Web.Models;
-using log4net;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data.Odbc;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Configuration;
 using System.Net.Http;
 using System.Reflection;
+using System.Threading;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Http;
@@ -22,8 +24,6 @@ namespace CampusLogicEvents.Web.WebAPI
     [LocalRequestOnly]
     public class SetupController : ApiController
     {
-        private static readonly ILog logger = LogManager.GetLogger("AdoNetAppender");
-
         public SetupController()
         {
 
@@ -306,7 +306,7 @@ namespace CampusLogicEvents.Web.WebAPI
             }
             catch (Exception ex)
             {
-                logger.ErrorFormat("SetupController GetCurrentConfigurations Error: {0}", ex);
+                LogManager.ErrorLogFormat("SetupController GetCurrentConfigurations Error: {0}", ex);
                 return Request.CreateResponse(HttpStatusCode.ExpectationFailed);
             }
         }
@@ -325,7 +325,7 @@ namespace CampusLogicEvents.Web.WebAPI
             }
             catch (Exception exception)
             {
-                logger.ErrorFormat("SetupController ArchiveWebConfig Error: {0}", exception);
+                LogManager.ErrorLogFormat("SetupController ArchiveWebConfig Error: {0}", exception);
                 return Request.CreateResponse(HttpStatusCode.ExpectationFailed);
             }
 
@@ -388,14 +388,14 @@ namespace CampusLogicEvents.Web.WebAPI
 
                     campusLogicSection.StoredProcedures.Add(storedProcedureElement);
                 }
-                
+
                 campusLogicSection.BatchProcessingTypes = configurationModel.CampusLogicSection.BatchProcessingTypes;
                 campusLogicSection.BatchProcessingTypes.BatchProcessingEnabled = configurationModel.CampusLogicSection.BatchProcessingEnabled;
                 foreach (BatchProcessingTypeDto batchProcessingType in configurationModel.CampusLogicSection.BatchProcessingTypesList)
                 {
                     BatchProcessingTypeElement batchProcessingTypeElement = new BatchProcessingTypeElement();
                     batchProcessingTypeElement.TypeName = batchProcessingType.TypeName;
-                    
+
                     foreach (BatchProcessDto batchProcess in batchProcessingType.BatchProcesses)
                     {
                         var batchProcessElement = new BatchProcessElement();
@@ -553,15 +553,15 @@ namespace CampusLogicEvents.Web.WebAPI
 
                 ClearOldFileDefinitions(campusLogicSection);
 
-                config.Save();
                 return Request.CreateResponse(HttpStatusCode.OK);
 
             }
             catch (Exception ex)
             {
-                logger.ErrorFormat("SetupController SaveConfigurations Error: {0}", ex);
-                return Request.CreateResponse(HttpStatusCode.ExpectationFailed);
+                LogManager.ErrorLogFormat("SetupController SaveConfigurations Error: {0}", ex);
             }
+
+            return Request.CreateResponse(HttpStatusCode.ExpectationFailed);
         }
 
         /// <summary>
@@ -581,9 +581,9 @@ namespace CampusLogicEvents.Web.WebAPI
                     ApplicationSettingsValid = true,
                     SMTPValid = true,
                     ISIRUploadValid = true,
-					BulkActionSettingsValid = true,
+                    BulkActionSettingsValid = true,
                     DataFileUploadValid = true,
-					AwardLetterUploadValid = true,
+                    AwardLetterUploadValid = true,
                     ISIRCorrectionsValid = true,
                     EventNotificationsValid = true,
                     ConnectionStringValid = true,
@@ -605,7 +605,7 @@ namespace CampusLogicEvents.Web.WebAPI
             }
             catch (Exception ex)
             {
-                logger.ErrorFormat("SetupController GetInitialConfigurationValidationModel Error: {0}", ex);
+                LogManager.ErrorLogFormat("SetupController GetInitialConfigurationValidationModel Error: {0}", ex);
                 return Request.CreateResponse(HttpStatusCode.ExpectationFailed);
             }
         }
@@ -630,7 +630,7 @@ namespace CampusLogicEvents.Web.WebAPI
             }
             catch (Exception ex)
             {
-                logger.ErrorFormat("SetupController Version Error: {0}", ex);
+                LogManager.ErrorLogFormat("SetupController Version Error: {0}", ex);
                 return Request.CreateResponse(HttpStatusCode.ExpectationFailed);
             }
         }
@@ -678,7 +678,7 @@ namespace CampusLogicEvents.Web.WebAPI
             }
             catch (Exception ex)
             {
-                logger.ErrorFormat("SetupController GetCurrentConfigurations Error: {0}", ex);
+                LogManager.ErrorLogFormat("SetupController GetCurrentConfigurations Error: {0}", ex);
                 return Request.CreateResponse(HttpStatusCode.ExpectationFailed);
             }
         }

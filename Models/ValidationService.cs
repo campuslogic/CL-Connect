@@ -8,15 +8,13 @@ using System.Net.Http;
 using CampusLogicEvents.Implementation;
 using CampusLogicEvents.Implementation.Configurations;
 using CampusLogicEvents.Implementation.Models;
-using log4net;
 using Microsoft.Ajax.Utilities;
 
 namespace CampusLogicEvents.Web.Models
 {
     public static class ValidationService
     {
-        private static readonly ILog logger = LogManager.GetLogger("AdoNetAppender");
-
+        
         /// <summary>
         /// Validate all of the enabled sections
         /// in the appropriate order
@@ -402,7 +400,7 @@ namespace CampusLogicEvents.Web.Models
             if (applicationAppSettingsSection["environment"] != EnvironmentConstants.SANDBOX
                 && applicationAppSettingsSection["environment"] != EnvironmentConstants.PRODUCTION)
             {
-                logger.Fatal($"Environment required to save new configurations, environment: {applicationAppSettingsSection["environment"] } is invalid");
+                LogManager.FatalLog($"Environment required to save new configurations, environment: {applicationAppSettingsSection["environment"] } is invalid");
                 return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
             }
 
@@ -463,7 +461,7 @@ namespace CampusLogicEvents.Web.Models
             var credentialsResponse = credentialsManager.GetAuthorizationToken(applicationAppSettingsSection["apiUsername"], applicationAppSettingsSection["apiPassword"], apiURL, stsUrl);
             if (!credentialsResponse.IsSuccessStatusCode)
             {
-                logger.Fatal($"API Credentials are not valid, username: {applicationAppSettingsSection["apiUsername"]}, password: {applicationAppSettingsSection["apiPassword"]}");
+                LogManager.FatalLog($"API Credentials are not valid, username: {applicationAppSettingsSection["apiUsername"]}, password: {applicationAppSettingsSection["apiPassword"]}");
                 return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
             }
 
@@ -492,7 +490,7 @@ namespace CampusLogicEvents.Web.Models
             }
             catch (Exception exception)
             {
-                logger.Fatal($"There was an error sending a test email to {settings.SendTo} from {smtpSection.From}", exception);
+                LogManager.FatalLog(string.Format("There was an error sending a test email to {0} from {1}: {2}", settings.SendTo, smtpSection.From, exception));
                 return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
             }
 
@@ -516,7 +514,7 @@ namespace CampusLogicEvents.Web.Models
             }
             catch (Exception ex)
             {
-                logger.ErrorFormat("TestWritePermissions Get Error: {0}", ex);
+                LogManager.ErrorLogFormat("TestWritePermissions Get Error: {0}", ex);
                 return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
             }
         }
@@ -538,7 +536,7 @@ namespace CampusLogicEvents.Web.Models
             }
             catch (Exception ex)
             {
-                logger.ErrorFormat("TestWritePermissions Get Error: {0}", ex);
+                LogManager.ErrorLogFormat("TestWritePermissions Get Error: {0}", ex);
                 return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
             }
         }
@@ -560,7 +558,7 @@ namespace CampusLogicEvents.Web.Models
             }
             catch (Exception ex)
             {
-                logger.ErrorFormat("TestWritePermissions Get Error: {0}", ex);
+                LogManager.ErrorLogFormat("TestWritePermissions Get Error: {0}", ex);
                 return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
             }
         }
@@ -582,7 +580,7 @@ namespace CampusLogicEvents.Web.Models
             }
             catch (Exception ex)
             {
-                logger.ErrorFormat("TestWritePermissions Get Error: {0}", ex);
+                LogManager.ErrorLogFormat("TestWritePermissions Get Error: {0}", ex);
                 return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
             }
         }
@@ -621,7 +619,7 @@ namespace CampusLogicEvents.Web.Models
             }
             catch (Exception ex)
             {
-                logger.ErrorFormat("TestWritePermissions Get Error: {0}", ex);
+                LogManager.ErrorLogFormat("TestWritePermissions Get Error: {0}", ex);
                 return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
             }
         }
@@ -706,7 +704,7 @@ namespace CampusLogicEvents.Web.Models
             }
             catch (Exception exception)
             {
-                logger.Error(exception);
+                LogManager.ErrorLog(exception);
                 return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
             }
 
@@ -742,7 +740,7 @@ namespace CampusLogicEvents.Web.Models
             }
             catch (Exception exception)
             {
-                logger.Error(exception);
+                LogManager.ErrorLog(exception);
                 return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
             }
 
@@ -782,7 +780,7 @@ namespace CampusLogicEvents.Web.Models
             }
             catch (Exception e)
             {
-                logger.Error(e);
+                LogManager.ErrorLog(e);
                 return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
             }
 
@@ -814,7 +812,7 @@ namespace CampusLogicEvents.Web.Models
             }
             catch (Exception exception)
             {
-                logger.Error(exception);
+                LogManager.ErrorLog(exception);
                 return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
             }
 
@@ -890,7 +888,7 @@ namespace CampusLogicEvents.Web.Models
             }
             catch (Exception e)
             {
-                logger.Error(e);
+                LogManager.ErrorLog(e);
                 return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
             }
 
@@ -992,7 +990,7 @@ namespace CampusLogicEvents.Web.Models
             }
             catch (Exception e)
             {
-                logger.Error(e);
+                LogManager.ErrorLog(e);
                 return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
             }
 

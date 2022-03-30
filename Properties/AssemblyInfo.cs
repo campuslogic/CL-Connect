@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("CampusLogicEvents.Web")]
-[assembly: AssemblyDescription("Build: 2.13.3.63706 - Commit: 29450")]
+[assembly: AssemblyDescription("Build: 2.13.3.397 - Commit: 30520")]
 [assembly: AssemblyConfiguration("release")]
 [assembly: AssemblyCompany("CampusLogic")]
 [assembly: AssemblyProduct("CL Connect")]
@@ -32,5 +32,4 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 [assembly: AssemblyVersion("2.13.3")]
 [assembly: AssemblyFileVersion("2.13.3.0")]
-[assembly: log4net.Config.XmlConfigurator]
 [assembly: AssemblyInformationalVersion("2.13.3.0")]

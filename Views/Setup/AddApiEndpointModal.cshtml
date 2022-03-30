@@ -2,29 +2,29 @@
 <div class="modal-body">
     <form>
         <div class="row padding-bottom-ten">
-            <div class="col-md-3 text-right">
+            <div class="col-lg-3 text-right">
                 <label class="control-label">Name</label>
             </div>
-            <div class="col-md-9">
+            <div class="col-lg-9">
                 <input type="text" class="form-control" id="name" name="name" ng-model="modelCopy.name" required />
                 <span class="field-validation-error" ng-show="endpointNameIsValid == false">Required</span>
                 <span class="field-validation-error" ng-show="endpointNameIsDuplicate == true">Name must be unique</span>
             </div>
         </div>
         <div class="row padding-bottom-ten">
-            <div class="col-md-3 text-right">
+            <div class="col-lg-3 text-right">
                 <label class="control-label">Endpoint</label>
             </div>
-            <div class="col-md-9">
+            <div class="col-lg-9">
                 <input type="text" class="form-control" id="endpoint" name="endpoint" ng-model="modelCopy.endpoint" required />
             </div>
         </div>
         <div class="row padding-bottom-ten">
-            <div class="col-md-3 text-right">
+            <div class="col-lg-3 text-right">
                 <label class="control-label">Method</label>
             </div>
-            <div class="col-md-9">
-                <select id="method" required kendo-drop-down-list class="form-control input-lg height-100" name="method" ng-model="modelCopy.method">
+            <div class="col-lg-9">
+                <select id="method" required kendo-drop-down-list class="form-control input-lg " name="method" ng-model="modelCopy.method">
                     <option value="GET">GET</option>
                     <option value="POST">POST</option>
                     <option value="PUT">PUT</option>
@@ -32,15 +32,15 @@
             </div>
         </div>
         <div class="row padding-bottom-ten" ng-if="modelCopy.method == 'POST' || modelCopy.method == 'PUT'">
-            <div class="col-md-3 text-right">
+            <div class="col-lg-3 text-right">
                 <label class="control-label">MIME Type</label>
             </div>
-            <div class="col-md-9">
+            <div class="col-lg-9">
                 <input type="text" class="form-control" id="mimeType" name="mimeType" ng-model="modelCopy.mimeType" required />
                 <span class="field-validation-error" ng-show="mimeTypeIsValid == false">Required</span>
             </div>
         </div>
-        <div class="row"><div class="col-md-12"><hr /></div></div>
+        <div class="row"><div class="col-lg-12"><hr /></div></div>
         <table style="width:100%;margin-top:0;">
             <tr>
                 <th>Parameter Mappings</th>
@@ -49,22 +49,22 @@
                 <td>
                     <div><hr /></div>
                     <div class="row padding-bottom-ten">
-                        <div class="col-md-3 text-right">
+                        <div class="col-lg-3 text-right">
                             <label class="control-label">Parameter</label>
                         </div>
-                        <div class="col-md-7">
+                        <div class="col-lg-7">
                             <input type="text" class="form-control" ng-model="parameterMapping.parameter" ng-change="newParameterMapping()" ng-blur="newParameterMapping()" />
                         </div>
-                        <div class="col-md-2">
-                            <button class="btn btn-default pull-right" title="Delete" ng-hide="$first" ng-click="deleteParameterMapping($index)"><i class="fa fa-close"></i></button>
+                        <div class="col-lg-2">
+                            <button class="btn btn-light pull-right" title="Delete" ng-hide="$first" ng-click="deleteParameterMapping($index)"><i class="fa fa-close"></i></button>
                         </div>
                     </div>
                     <div class="row padding-bottom-ten">
-                        <div class="col-md-3 text-right">
+                        <div class="col-lg-3 text-right">
                             <label class="control-label">Maps To</label>
                         </div>
-                        <div class="col-md-7">
-                            <select required kendo-drop-down-list class="form-control input-lg height-100" name="eventData" ng-model="parameterMapping.eventData">
+                        <div class="col-lg-7">
+                            <select required kendo-drop-down-list class="form-control input-lg " name="eventData" ng-model="parameterMapping.eventData">
                                 <option ng-repeat="value in dropdown.eventPropertyValues" value="{{value}}">{{value}}</option>
                             </select>
                         </div>
@@ -76,6 +76,6 @@
     </form>
 </div>
 <div class="modal-footer">
-    <input type="button" id="button-field-search-cancel" class="btn btn-default" value="Cancel" ng-click="$dismiss()" />
+    <input type="button" id="button-field-search-cancel" class="btn btn-light" value="Cancel" ng-click="$dismiss()" />
     <input type="button" id="button-field-search-save" class="btn btn-primary" value="Save" ng-click="save()" />
 </div>

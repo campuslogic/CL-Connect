@@ -10,10 +10,10 @@
         Examples include creating index files for document imaging, or for file store operations.
         File Definitions may be used multiple times. For additional information see <a href="https://campuslogicinc.freshdesk.com/" target="_blank">File Definitions help.</a>
     </section>
-    <button class="btn btn-default btn-lg pull-right" ng-click="vm.addFileDefinition()">Add</button>
-    <div class="row"><div class="col-md-12"><hr /></div></div>
+    <button class="btn btn-light btn-lg pull-right" ng-click="vm.addFileDefinition()">Add</button>
+    <div class="row"><div class="col-lg-12"><hr /></div></div>
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-lg-12">
             <div id="file-definitions-grid" kendo-grid
                  data-role="grid"
                  data-editable="false"
@@ -26,6 +26,6 @@
 </div>
 
 <script id="file-definitions-template" type="text/x-kendo-template">
-    <button class="btn btn-default" ng-click="vm.edit(dataItem)" title="Edit"><i class="fa fa-pencil"></i></button>
-    <button class="btn btn-default" ng-click="vm.delete(dataItem.name)" title="Delete"><i class="fa fa-trash"></i></button>
+    <button class="btn btn-light" ng-click="vm.edit(dataItem)" title="Edit"><i class="fa fa-pencil"></i></button>
+    <button class="btn btn-light" ng-click="vm.delete(dataItem.name)" title="Delete"><i class="fa fa-trash"></i></button>
 </script>

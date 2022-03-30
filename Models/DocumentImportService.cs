@@ -7,18 +7,15 @@ using CampusLogicEvents.Implementation;
 using CampusLogicEvents.Implementation.Models;
 using CsvHelper;
 using Hangfire;
-using log4net;
 using Newtonsoft.Json.Linq;
 using CampusLogicEvents.Web.Results;
 using System.Threading.Tasks;
-using log4net.Core;
 
 namespace CampusLogicEvents.Web.Models
 {
 	public static class DocumentImportService
 	{
 		public const string Name = "Document Import"; // Used for logging purposes and also to identify the Hangfire recurring job.
-		private static readonly ILog logger = LogManager.GetLogger("AdoNetAppender");
 		private static readonly NotificationManager notificationManager = new NotificationManager();
 
 
@@ -39,7 +36,7 @@ namespace CampusLogicEvents.Web.Models
 				!manager.ValidateDirectory(importSettings.ArchiveDirectory))
 			{
 				NotificationService.ErrorNotification(Name, $"{Name} does not authorize read and write updates");
-				logger.Error($"{Name} does not authorize read and write updates");
+				LogManager.ErrorLog($"{Name} does not authorize read and write updates");
 				throw new Exception($"{Name} does not authorize read and write updates");
 			}
 
@@ -91,7 +88,7 @@ namespace CampusLogicEvents.Web.Models
 						if (result.IsSuccessStatusCode)
 						{
 							// Archive the document once we are done with it.
-							ArchiveFile(record.FilePath, importSettings.ArchiveDirectory, logger);
+							ArchiveFile(record.FilePath, importSettings.ArchiveDirectory);
 						}
 						else
 						{
@@ -126,7 +123,7 @@ namespace CampusLogicEvents.Web.Models
 				}
 
 				// Done.  Now archive the file and create a failures file, if necessary.
-				ArchiveFile(filePath, importSettings.ArchiveDirectory, logger);
+				ArchiveFile(filePath, importSettings.ArchiveDirectory);
 				CreateFailuresFile(importSettings.ArchiveDirectory, filePath, failedRecords: failedRecords);
 			}
 		}
@@ -142,7 +139,7 @@ namespace CampusLogicEvents.Web.Models
 
             try
             {
-                logger.BulkActionInfo("ProcessBulkAction enter");
+                LogManager.BulkActionInfo("ProcessBulkAction enter");
 
                 DocumentManager manager = new DocumentManager();
 
@@ -151,12 +148,12 @@ namespace CampusLogicEvents.Web.Models
                     !manager.ValidateDirectory(bulkActionUpload.FileArchiveDirectory))
                 {
                     NotificationService.ErrorNotification("Bulk Action", $"{bulkActionUpload.FileUploadDirectory} does not authorize read and write updates");
-                    logger.BulkActionError($"{bulkActionUpload.FileUploadDirectory} does not authorize read and write updates");
+                    LogManager.BulkActionError($"{bulkActionUpload.FileUploadDirectory} does not authorize read and write updates");
                     throw new Exception($"{bulkActionUpload.FileUploadDirectory} does not authorize read and write updates");
                 }
 
 
-                logger.BulkActionInfo($"Loading files from \"{bulkActionUpload.FileUploadDirectory}\"");// Get all files to process.
+                LogManager.BulkActionInfo($"Loading files from \"{bulkActionUpload.FileUploadDirectory}\"");// Get all files to process.
                 string[] filesToProcess =
                     Directory.GetFiles(bulkActionUpload.FileUploadDirectory) 
                         .Select(fileName => Path.Combine(bulkActionUpload.FileUploadDirectory, fileName))
@@ -165,7 +162,7 @@ namespace CampusLogicEvents.Web.Models
                 foreach (string f in filesToProcess)
                 {
                     var filePath = f;
-                    logger.BulkActionInfo($"Processing file \"{filePath}\"");
+                    LogManager.BulkActionInfo($"Processing file \"{filePath}\"");
 
                     try
                     {
@@ -185,19 +182,19 @@ namespace CampusLogicEvents.Web.Models
                         {
                             //This can happen if the server reset before we had an opportunity to fully upload the file.
                             //Let's just reprocess.
-                            logger.Info($"Encountered a working file.  Reprocessing: \"{filePath}\"");
+                            LogManager.InfoLog($"Encountered a working file.  Reprocessing: \"{filePath}\"");
                         }
                         else if (prefix.EndsWith(BulkActionConstants.Complete, StringComparison.InvariantCultureIgnoreCase)
                             || prefix.EndsWith(BulkActionConstants.Failed, StringComparison.InvariantCultureIgnoreCase))
                         {
                             try
                             {
-                                logger.BulkActionInfo($"Encountered an already-processed file \"{filePath}\", attempting to archive");
-                                ArchiveFile(filePath, bulkActionUpload.FileArchiveDirectory, logger);
+                                LogManager.BulkActionInfo($"Encountered an already-processed file \"{filePath}\", attempting to archive");
+                                ArchiveFile(filePath, bulkActionUpload.FileArchiveDirectory);
                             }
                             catch (Exception ex)
                             {
-                                logger.BulkActionError(ex);
+                                LogManager.BulkActionError(ex);
                             }
 
                             //At this point, we're done processing the completed file - either with success or failure.  Let's 
@@ -213,7 +210,7 @@ namespace CampusLogicEvents.Web.Models
 
                         HttpResponseMessage result = Task.Run(() => manager.UploadBulkAction(bulkActionUpload, filePath)).Result;
 
-                        logger.BulkActionInfo($"Bulk action upload completed with {result.StatusCode}");
+                        LogManager.BulkActionInfo($"Bulk action upload completed with {result.StatusCode}");
 
                         if (result.IsSuccessStatusCode)
                         {
@@ -241,34 +238,34 @@ namespace CampusLogicEvents.Web.Models
                     }
                     catch (Exception ex)
                     {
-                        logger.BulkActionError(ex);
+                        LogManager.BulkActionError(ex);
 
                         try
                         {
-                            logger.BulkActionInfo($"Attempting to send notification email to: \"{bulkActionUpload.NotificationEmail}\"");
+                            LogManager.BulkActionInfo($"Attempting to send notification email to: \"{bulkActionUpload.NotificationEmail}\"");
                             // what to do if a file fails...
                             var response = Task.Run(() => notificationManager.SendErrorNotification("ProcessBulkAction", ex.Message, bulkActionUpload.NotificationEmail)).Result;
 
                             if (response.SendCompleted.HasValue)
                             {
-                                logger.BulkActionInfo("Send notification email completed without error");
+                                LogManager.BulkActionInfo("Send notification email completed without error");
                             }
                             else
                             {
-                                logger.BulkActionInfo("Send notification email failed");
+                                LogManager.BulkActionInfo("Send notification email failed");
                             }
                             
                         }
                         catch (Exception ex2)
                         {
-                            logger.BulkActionError($"Send notification email failed with error: \"{ex2.Message}\"");
+                            LogManager.BulkActionError($"Send notification email failed with error: \"{ex2.Message}\"");
                         }
                     }
                 }
             }
             finally
             {
-                logger.BulkActionInfo("ProcessBulkAction exit");
+                LogManager.BulkActionInfo("ProcessBulkAction exit");
             }
 		}
 
@@ -278,7 +275,7 @@ namespace CampusLogicEvents.Web.Models
             {
                 var newFilePath = $"{prefix}{suffix}{extension}";
 
-                logger.BulkActionInfo($"Attempting to rename file: \"{filePath}\" --> \"{newFilePath}\"");
+                LogManager.BulkActionInfo($"Attempting to rename file: \"{filePath}\" --> \"{newFilePath}\"");
 
                 File.Move(filePath, newFilePath);
                 filePath = newFilePath;
@@ -303,16 +300,16 @@ namespace CampusLogicEvents.Web.Models
             }
             catch (Exception ex)
             {
-                logger.BulkActionError($"Upload succeeded, but failed to rename file: {ex.Message}");
+                LogManager.BulkActionError($"Upload succeeded, but failed to rename file: {ex.Message}");
             }
 
             try
             {
-                ArchiveFile(filePath, bulkActionUpload.FileArchiveDirectory, logger);
+                ArchiveFile(filePath, bulkActionUpload.FileArchiveDirectory);
             }
             catch (Exception ex)
             {
-                logger.BulkActionError($"Upload succeeded, but failed to archive file: {ex.Message}");
+                LogManager.BulkActionError($"Upload succeeded, but failed to archive file: {ex.Message}");
             }
         }
 
@@ -332,7 +329,7 @@ namespace CampusLogicEvents.Web.Models
 		/// </summary>
 		/// <param name="filePath">Path of the file to archive.</param>
 		/// <param name="archiveDirectory">Directory to move the file to.</param>
-		private static void ArchiveFile(string filePath, string archiveDirectory, ILog log)
+		private static void ArchiveFile(string filePath, string archiveDirectory)
 		{
 			// Validate args
 			if (string.IsNullOrWhiteSpace(filePath) || string.IsNullOrWhiteSpace(archiveDirectory))
@@ -370,7 +367,7 @@ namespace CampusLogicEvents.Web.Models
                 while (File.Exists(archiveFilePath))
                     archiveFilePath = $"{archiveFilePathPrefix} ({n++}){fileExtension}";
 
-                log.Info($"Moving file \"{filePath}\" --> \"{archiveFilePath}\"");
+                LogManager.InfoLog($"Moving file \"{filePath}\" --> \"{archiveFilePath}\"");
 
 				File.Move(filePath, archiveFilePath);
 

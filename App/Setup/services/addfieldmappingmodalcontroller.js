@@ -146,8 +146,8 @@ clConnectServices.factory("addfieldmappingmodalcontroller", ["$modal",
                             };
                         }
                     },
-                    backdrop: 'static'//,
-                    //windowClass: "full-screen-modal"
+                    backdrop: 'static',
+                    windowClass: "show"
                 });
 
                 //Done

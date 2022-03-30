@@ -12,15 +12,15 @@
     </section>
     <hr>
     <div class="row padding-bottom-ten">
-        <div class="col-md-8">
-            <div class="form-group">
+        <div class="col-lg-8">
+            <div class="row form-group mb-3">
                 <label>Document Storage File Path</label>
                 <cl-folder-picker isrequired="vm.service.configurationModel.campusLogicSection.documentSettings.indexFileEnabled" formvalid="validationService.pageValidations.documentSettingsValid" uploadpath="vm.service.configurationModel.campusLogicSection.documentSettings.documentStorageFilePath"></cl-folder-picker>
             </div>
         </div>
     </div>
     <div class="row padding-bottom-ten">
-        <div class="col-md-5">
+        <div class="col-lg-5">
             <label class="control-label">Index File Enabled</label><br />
             <input type="radio" ng-value="true" ng-model="vm.service.configurationModel.campusLogicSection.documentSettings.indexFileEnabled" style="width: 20px">True
             <input type="radio" ng-value="false" ng-model="vm.service.configurationModel.campusLogicSection.documentSettings.indexFileEnabled" style="width: 20px">False
@@ -28,8 +28,8 @@
     </div>
     <div ng-if="vm.service.configurationModel.campusLogicSection.documentSettings.indexFileEnabled">
         <div class="row padding-bottom-ten">
-            <div class="col-md-5">
-                <div class="form-group">
+            <div class="col-lg-5">
+                <div class="row form-group mb-3">
                     <label class="control-label" for="fileDefinitionName">*File Definition Name</label>
                     <input type="text" class="form-control" id="fileDefinitionName" name="fileDefinitionName" ng-model="vm.service.configurationModel.campusLogicSection.documentSettings.fileDefinitionName" required />
                     <span class="field-validation-error" ng-show="(vm.documentForm.fileDefinitionName.$dirty || vm.documentSettingsValid == false) && vm.documentForm.fileDefinitionName.$error.required">Required</span>

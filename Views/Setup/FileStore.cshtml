@@ -12,15 +12,15 @@
     </section>
     <hr>
     <div class="row padding-bottom-ten">
-        <div class="col-md-8">
+        <div class="col-lg-8">
             <div class="form-group">
                 <label><span class="form-required" aria-hidden="true">*</span>File Store Path</label>
-                <cl-folder-picker isrequired="true" formvalid="validationService.pageValidations.fileStoreSettingsValid" uploadpath="vm.service.configurationModel.campusLogicSection.fileStoreSettings.fileStorePath"></cl-folder-picker>
+                <cl-folder-picker class="col-lg-7" isrequired="true" formvalid="validationService.pageValidations.fileStoreSettingsValid" uploadpath="vm.service.configurationModel.campusLogicSection.fileStoreSettings.fileStorePath"></cl-folder-picker>
             </div>
         </div>
     </div>
     <div class="row padding-bottom-ten">
-        <div class="col-md-8">
+        <div class="col-lg-8">
             <label class="control-label" for="fileStoreMinutes"><span class="form-required" aria-hidden="true">*</span>File Store Minutes</label><br />
             <input type="text" id="fileStoreMinutes" name="fileStoreMinutes" kendo-numeric-text-box k-format="'n0'" k-min="1" ng-model="vm.service.configurationModel.campusLogicSection.fileStoreSettings.fileStoreMinutes" required /><br />
             <span class="field-validation-error" ng-show="(vm.fileStoreForm.fileStoreMinutes.$dirty || vm.service.pageValidations.fileStoreSettingsValid == false) && vm.fileStoreForm.fileStoreMinutes.$error.required">Required</span>
@@ -28,7 +28,7 @@
     </div>
     <div class="row padding-bottom-ten"></div>
     <div class="row padding-bottom-ten">
-        <div class="col-md-8">
+        <div class="col-lg-8">
             <label class="control-label" for="fileDefinitionName"><span class="form-required" aria-hidden="true">*</span>File Definition Name</label><br />
             <input type="text" id="fileDefinitionName" name="fileDefinitionName" ng-model="vm.service.configurationModel.campusLogicSection.fileStoreSettings.fileDefinitionName" required /><br />
             <span class="field-validation-error" ng-show="(vm.fileStoreForm.fileDefinitionName.$dirty || vm.fileStoreSettingsValid == false) && vm.fileStoreForm.fileDefinitionName.$error.required">Required</span>

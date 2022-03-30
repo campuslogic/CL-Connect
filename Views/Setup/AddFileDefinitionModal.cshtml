@@ -2,29 +2,29 @@
 <div class="modal-body">
     <form>
         <div class="row padding-bottom-ten">
-            <div class="col-md-4 text-right">
+            <div class="col-lg-4 text-right">
                 <label class="control-label">*Name</label>
             </div>
-            <div class="col-md-8">
+            <div class="col-lg-8">
                 <input type="text" class="form-control" id="name" name="name" ng-model="modelCopy.name" required />
                 <span class="field-validation-error" ng-show="nameIsValid == false">Required</span>
                 <span class="field-validation-error" ng-show="nameIsDuplicate == true">Name must be unique</span>
             </div>
         </div>
         <div class="row padding-bottom-ten">
-            <div class="col-md-4 text-right">
+            <div class="col-lg-4 text-right">
                 <label class="control-label">*File Name Format</label>
             </div>
-            <div class="col-md-8">
+            <div class="col-lg-8">
                 <input type="text" class="form-control" id="fileNameFormat" name="fileNameFormat" ng-model="modelCopy.fileNameFormat" required />
                 <span class="field-validation-error" ng-show="fileNameFormatIsValid == false">Required</span>
             </div>
         </div>
         <div class="row padding-bottom-ten">
-            <div class="col-md-4 text-right">
+            <div class="col-lg-4 text-right">
                 <label class="control-label">*Include Header Record</label>
             </div>
-            <div class="col-md-8">
+            <div class="col-lg-8">
                 <input type="radio" ng-value="true" ng-model="modelCopy.includeHeaderRecord" style="width: 20px">True
                 <input type="radio" ng-value="false" ng-model="modelCopy.includeHeaderRecord" style="width: 20px">False
                 <br />
@@ -32,19 +32,19 @@
             </div>
         </div>
         <div class="row padding-bottom-ten">
-            <div class="col-md-4 text-right">
+            <div class="col-lg-4 text-right">
                 <label class="control-label">*File Extension</label>
             </div>
-            <div class="col-md-8">
+            <div class="col-lg-8">
                 <input type="text" class="form-control" id="fileExtension" name="fileExtension" ng-model="modelCopy.fileExtension" required />
                 <span class="field-validation-error" ng-show="fileExtensionIsValid == false">Required</span>
             </div>
         </div>
         <div class="row padding-bottom-ten">
-            <div class="col-md-4 text-right">
+            <div class="col-lg-4 text-right">
                 <label class="control-label">File Format</label>
             </div>
-            <div class="col-md-8">
+            <div class="col-lg-8">
                 <select id="fileFormat" required kendo-drop-down-list name="fileFormat" ng-model="modelCopy.fileFormat" ng-change="updateFileFormat()">
                     <option value="csv">CSV</option>
                     <option value="csvnoquotes">CSV No Quotes</option>
@@ -55,10 +55,10 @@
             </div>
         </div>
         <div class="row padding-bottom-ten">
-            <label class="control-label col-md-5">Field Mapping Collection</label>
+            <label class="control-label text-left col-lg-5">Field Mapping Collection</label>
         </div>
         <div class="row padding-bottom-ten">
-            <div class="col-md-12">
+            <div class="col-lg-12">
                 <div id="field-mappings-grid" kendo-grid k-options="fieldMappingCollectionGridOptions"></div>
                 <span class="field-validation-error" ng-show="fieldMappingLengthIsValid == false">There must be at least one field mapping</span>
                 <span class="field-validation-error" ng-show="xmlFieldNamesAreValid == false">Field Name does not allow spaces with XML formatting</span>
@@ -66,13 +66,13 @@
             </div>
         </div>
         <div class="row padding-bottom-ten">
-            <div class="col-md-12">
-                <button type="button" class="btn btn-default" ng-click="addFieldMapping()">Add</button>
+            <div class="col-lg-12">
+                <button type="button" class="btn btn-light" ng-click="addFieldMapping()">Add</button>
             </div>
         </div>
     </form>
 </div>
 <div class="modal-footer">
-    <input type="button" id="button-field-search-cancel" class="btn btn-default" value="Cancel" ng-click="$dismiss()" />
+    <input type="button" id="button-field-search-cancel" class="btn btn-light" value="Cancel" ng-click="$dismiss()" />
     <input type="button" id="button-field-search-save" class="btn btn-primary" value="Save" ng-click="save()" />
 </div>

@@ -134,7 +134,8 @@ clConnectServices.factory("addapiintegrationmodalcontroller", ["$modal",
                             };
                         }
                     },
-                    backdrop: 'static'
+                    backdrop: 'static',
+                    windowClass: "show"
                 });
 
                 return $modalInstance;

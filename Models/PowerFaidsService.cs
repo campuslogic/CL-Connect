@@ -2,7 +2,6 @@
 using CampusLogicEvents.Implementation.Configurations;
 using CampusLogicEvents.Implementation.Models;
 using Hangfire;
-using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -17,7 +16,6 @@ namespace CampusLogicEvents.Web.Models
 {
     public static class PowerFaidsService
     {
-        private static readonly ILog logger = LogManager.GetLogger("AdoNetAppender");
         private static readonly NotificationManager notificationManager = new NotificationManager();
         private static readonly CampusLogicSection campusLogicConfigSection = (CampusLogicSection)ConfigurationManager.GetSection(ConfigConstants.CampusLogicConfigurationSectionName);
         

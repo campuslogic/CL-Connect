@@ -122,7 +122,8 @@ clConnectServices.factory("addbatchprocessmodalcontroller", ["$modal",
                             };
                         }
                     },
-                    backdrop: 'static'
+                    backdrop: 'static',
+                    windowClass: "show modal-medium"
                 });
 
                 return $modalInstance;

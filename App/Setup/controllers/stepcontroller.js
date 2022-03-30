@@ -42,7 +42,7 @@
         function goToNextEnabledStep() {
             var activeStepListLinks = [];
             var nextStepLink = '';
-            $('#stepList li a').each(function () {
+            $('#stepList a').each(function () {
                 activeStepListLinks.push($(this).attr('cl-link-to'));
             });
 
