@@ -553,6 +553,7 @@ namespace CampusLogicEvents.Web.WebAPI
 
                 ClearOldFileDefinitions(campusLogicSection);
 
+                config.Save();
                 return Request.CreateResponse(HttpStatusCode.OK);
 
             }
