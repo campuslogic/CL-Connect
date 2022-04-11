@@ -108,7 +108,7 @@
                                     <a class="btn btn-light btn-lg next" ng-click="validateStep(); goNext();">Continue</a>
                                 </div>
                                 <div ng-if="activeStep === '/saveConfigurations'" style="text-align: right;" class="col-md-12 padding-top-twenty">
-                                    <a class="btn btn-light btn-lg next" ng-disabled="invalidPages().length > 0 || disableSave" ng-click="saveConfigurations();">Save</a>
+                                    <a class="btn btn-light btn-lg next" ng-class="{disabled: invalidPages().length > 0 || disableSave}" ng-click="saveConfigurations();">Save</a>
                                 </div>
                             </div>
                             <div class="col-md-12" ng-if="invalidPages().length > 0 && activeStep === '/saveConfigurations'">

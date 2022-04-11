@@ -21,7 +21,7 @@
                 </select>
             </div>
             <div class="col-lg-2">
-                <select class="form-control" style="height: 100%;" kendo-drop-down-list ng-show="vm.IsFileStoreEnabled($index)" ng-disabled="!vm.IsFileStoreEnabled($index)" ng-model="event.fileStoreType">
+                <select class="form-control" kendo-drop-down-list ng-show="vm.IsFileStoreEnabled($index)" ng-disabled="!vm.IsFileStoreEnabled($index)" ng-model="event.fileStoreType">
                     <option value="Shared">Shared</option>
                     <option value="Individual">Individual</option>
                 </select>
@@ -57,7 +57,7 @@
         <div class="row form-group mb-3">
             <label class="col-lg-3 control-label">Connection Type</label>
             <div class="col-lg-9">
-                <select class="form-control" kendo-drop-down-list ng-model="vm.connectionStringType" style="height:100%;" ng-change="vm.onConnectionStringTypeChange()">
+                <select class="form-control" kendo-drop-down-list ng-model="vm.connectionStringType" ng-change="vm.onConnectionStringTypeChange()">
                     <option value="n">None</option>
                     <option value="c">Connection string</option>
                     <option value="d">DSN</option>
