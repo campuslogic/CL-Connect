@@ -310,7 +310,7 @@
 
             if (uploadpath) {
                 var matches = $.grep(filePathValues, function (filePath) {
-                    return uploadpath.toUpperCase() === filePath.toUpperCase();
+                    return filePath && uploadpath.toUpperCase() === filePath.toUpperCase();
                 });
                 if (matches.length > 1) {
                     return false;
