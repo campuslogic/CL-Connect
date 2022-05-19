@@ -1,5 +1,4 @@
 ﻿using CampusLogicEvents.Implementation;
-using log4net;
 using System;
 using System.Configuration;
 using System.Linq;
@@ -10,7 +9,6 @@ namespace CampusLogicEvents.Web.Models
 {
     public static class ISIRService
     {
-        private static readonly ILog logger = LogManager.GetLogger("AdoNetAppender");
         private static readonly CampusLogicSection campusLogicConfigSection = (CampusLogicSection)ConfigurationManager.GetSection(ConfigConstants.CampusLogicConfigurationSectionName);
 
 
@@ -48,7 +46,7 @@ namespace CampusLogicEvents.Web.Models
             catch (Exception ex)
             {
                 NotificationService.ErrorNotification("Automated ISIR Corrections Process", ex);
-                logger.ErrorFormat("ISIRService ISIR Correction Error: {0}", ex);
+                LogManager.ErrorLogFormat("ISIRService ISIR Correction Error: {0}", ex);
             }
 
         }

@@ -2,37 +2,37 @@
 <div class="modal-body">
     <form name="fieldItemForm">
         <div class="row padding-bottom-ten">
-            <div class="col-md-4 text-right">
+            <div class="col-lg-4 text-right">
                 <label class="control-label">Field Size</label>
             </div>
-            <div class="col-md-8">
+            <div class="col-lg-8">
                 <input type="number" class="form-control" id="inputFieldSize" name="inputFieldSize" ng-model="modelCopy.fieldSize" required/>
                 <span class="field-validation-error" ng-show="fieldSizeValidation == true">Required</span>
             </div>
         </div>
         <div class="row padding-bottom-ten">
-            <div class="col-md-4 text-right">
+            <div class="col-lg-4 text-right">
                 <label class="control-label">Data Type</label>
             </div>
-            <div class="col-md-8">
+            <div class="col-lg-8">
                 <input type="text" class="form-control" id="inputDataType" name="inputDataType" ng-model="modelCopy.dataType" required ng-readonly="true"/>
                 <span class="field-validation-error" ng-show="dataTypeValidation == true">Required</span>
             </div>
         </div>
         <div class="row padding-bottom-ten">
-            <div class="col-md-4 text-right">
+            <div class="col-lg-4 text-right">
                 <label class="control-label">Field Name</label>
             </div>
-            <div class="col-md-8">
+            <div class="col-lg-8">
                 <input type="text" class="form-control" id="inputFileFieldName" name="inputFileFieldName" ng-model="modelCopy.fileFieldName" required/>
                 <span class="field-validation-error" ng-show="fileFieldNameValidation == true">Required</span>
             </div>
         </div>
         <div class="row padding-bottom-ten">
-            <div class="col-md-4 text-right">
+            <div class="col-lg-4 text-right">
                 <label class="control-label">Value Type</label>
             </div>
-            <div class="col-md-8">
+            <div class="col-lg-8">
                 <select style="width: 100%;" id="inputValueType" required kendo-drop-down-list name="inputValueType" ng-model="selectedValueType" ng-change="onSelectedValueType(value)">
                     <option value="">No Value</option>
                     <option ng-repeat="value in valueType.valueTypes" value="{{value}}">{{value}}</option>
@@ -40,10 +40,10 @@
             </div>
         </div>
         <div class="row padding-bottom-ten" ng-if="selectedValueType === 'Basic Property Value'">
-            <div class="col-md-4 text-right">
+            <div class="col-lg-4 text-right">
                 <label class="control-label">Basic Property Value</label>
             </div>
-            <div class="col-md-8">
+            <div class="col-lg-8">
                 <!--Changing to a type ahead so that we can adjust the value simply if need be, by pre-pending or appending values-->
                 <input placeholder="'Enter Event Property Value...'" style="width: 100%;" id="inputPropertyFieldValue" required kendo-auto-complete ng-model="modelCopy.propertyFieldValue" k-data-source="dropdown.eventPropertyValueAvailableProperties"/>
                 @*<select style="width: 100%;" id="inputPropertyFieldValue" required kendo-auto-complete name="inputPropertyFieldValue" ng-model="modelCopy.propertyFieldValue">
@@ -52,32 +52,32 @@
             </div>
         </div>
         <div class="row padding-bottom-ten" ng-if="selectedValueType === 'Constant Value'">
-            <div class="col-md-4 text-right">
+            <div class="col-lg-4 text-right">
                 <label class="control-label">Constant Value</label>
             </div>
-            <div class="col-md-8">
+            <div class="col-lg-8">
                 <input type="text" class="form-control" id="inputConstantFieldValue" name="inputConstantFieldValue" ng-model="modelCopy.constantFieldValue"/>
             </div>
         </div>
         <div class="row padding-bottom-ten" ng-if="selectedValueType === 'Database Command'">
-            <div class="col-md-4 text-right">
+            <div class="col-lg-4 text-right">
                 <label class="control-label">Database Command</label>
             </div>
-            <div class="col-md-8">
+            <div class="col-lg-8">
                 <textarea class="form-control" id="inputDbCommandFieldValue" name="inputDbCommandFieldValue" ng-model="modelCopy.dbCommandFieldValue"/>
             </div>
         </div>
         <div class="row padding-bottom-ten" ng-if="selectedValueType === 'Dynamic Field Value'">
-            <div class="col-md-4 text-right">
+            <div class="col-lg-4 text-right">
                 <label class="control-label">Dynamic Value</label>
             </div>
-            <div class="col-md-8">
+            <div class="col-lg-8">
                 <textarea class="form-control" id="inputDynamicFieldValue" name="inputDynamicFieldValue" ng-model="modelCopy.dynamicFieldValue"/>
             </div>
         </div>
     </form>
 </div>
 <div class="modal-footer">
-    <input type="button" id="button-field-search-cancel" class="btn btn-default" value="Cancel" ng-click="$dismiss()"/>
+    <input type="button" id="button-field-search-cancel" class="btn btn-light" value="Cancel" ng-click="$dismiss()"/>
     <input type="button" id="button-field-search-save" class="btn btn-primary" value="Save" ng-click="save()"/>
 </div>

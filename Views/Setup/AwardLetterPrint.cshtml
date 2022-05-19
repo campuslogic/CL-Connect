@@ -11,19 +11,19 @@
     <hr>
 
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-lg-3">
             <label><span class="form-required" aria-hidden="true">* </span>Upload Path</label>
         </div>
-        <div class="col-md-7">
-            <cl-folder-picker isrequired="true" formvalid="validationService.pageValidations.awardLetterPrintValid" uploadpath="vm.service.configurationModel.campusLogicSection.awardLetterPrintSettings.awardLetterPrintFilePath"></cl-folder-picker>
+        <div class="col-lg-7">
+            <cl-folder-picker class="col-lg-7" isrequired="true" formvalid="validationService.pageValidations.awardLetterPrintValid" uploadpath="vm.service.configurationModel.campusLogicSection.awardLetterPrintSettings.awardLetterPrintFilePath"></cl-folder-picker>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-lg-3">
             <label for="printNameFormat"><span aria-hidden="true"></span>File Name Format</label>
         </div>
-        <div class="col-md-4">
+        <div class="col-lg-4">
             <input type="text" class="form-control" id="printNameFormat" name="printNameFormat" ng-model="vm.service.configurationModel.campusLogicSection.awardLetterPrintSettings.awardLetterPrintFileName" />
         </div>
     </div>

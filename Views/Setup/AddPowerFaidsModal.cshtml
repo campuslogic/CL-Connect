@@ -3,7 +3,7 @@
     <div class="modal-body">
         <div class="row">
             <!-- Event -->
-            <div class="col-md-4">
+            <div class="col-lg-4">
                 <label class="control-label">Event</label>
                 <input name="event"
                        id="event"
@@ -13,7 +13,7 @@
                 <span class="field-validation-error" ng-show="(submitted || powerFaidsModalForm.event.$dirty) && powerFaidsModalForm.event.$error.required">Required</span>
             </div>
             <!-- Transaction Category -->
-            <div class="col-md-6">
+            <div class="col-lg-6">
                 <label class="control-label">Transaction Category</label>
                 <input name="transactionCategory"
                        id="transactionCategory"
@@ -23,11 +23,11 @@
         </div>
         <!-- Outcome -->
         <div class="row" style="margin-top:16px;">
-            <div class="col-md-12">
+            <div class="col-lg-12">
                 <label class="control-label">Outcome</label>
                 <select id="outcome"
                         kendo-drop-down-list
-                        class="form-control input-lg height-100"
+                        class="form-control input-lg "
                         name="outcome"
                         ng-model="modelCopy.outcome"
                         required>
@@ -42,7 +42,7 @@
         <!-- Document Or Both -->
         <div ng-if="modelCopy.outcome === 'documents' || modelCopy.outcome === 'both'">
             <div class="row" style="margin-top:16px">
-                <div class="col-md-12">
+                <div class="col-lg-12">
                     <label class="control-label">Short Name</label>
                     <input name="shortName"
                            id="shortName"
@@ -53,12 +53,12 @@
                 </div>
             </div>
             <div class="row" style="margin-top:16px">
-                <div class="col-md-12">
+                <div class="col-lg-12">
                     <label class="control-label">Required For</label>
                     <select id="requiredFor"
                             ng-required="true"
                             kendo-drop-down-list
-                            class="form-control input-lg height-100"
+                            class="form-control input-lg "
                             name="requiredFor"
                             ng-model="modelCopy.requiredFor">
                         <option value="">Select an option...</option>
@@ -69,12 +69,12 @@
                 </div>
             </div>
             <div class="row" style="margin-top:16px;">
-                <div class="col-md-12">
+                <div class="col-lg-12">
                     <label class="control-label">Status</label>
                     <select id="status"
                             required
                             kendo-drop-down-list
-                            class="form-control input-lg height-100"
+                            class="form-control input-lg "
                             name="status"
                             ng-model="modelCopy.status">
                         <option value="">Select a status...</option>
@@ -90,12 +90,12 @@
                 </div>
             </div>
             <div class="row" style="margin-top:16px;">
-                <div class="col-md-12">
+                <div class="col-lg-12">
                     <label class="control-label">Document Lock</label>
                     <select id="documentLock"
                             required
                             kendo-drop-down-list
-                            class="form-control input-lg height-100"
+                            class="form-control input-lg "
                             name="documentLock"
                             ng-model="modelCopy.documentLock">
                         <option value="">Select an option...</option>
@@ -109,12 +109,12 @@
         <!-- Verification or Both -->
         <div ng-if="modelCopy.outcome === 'verification' || modelCopy.outcome === 'both'">
             <div class="row" style="margin-top:16px">
-                <div class="col-md-12">
+                <div class="col-lg-12">
                     <label class="control-label">Verification Outcome</label>
                     <select id="verificationOutcome"
                             required
                             kendo-drop-down-list
-                            class="form-control input-lg height-100"
+                            class="form-control input-lg "
                             name="verificationOutcome"
                             ng-model="modelCopy.verificationOutcome">
                         <option value="">Select an option...</option>
@@ -127,12 +127,12 @@
                 </div>
             </div>
             <div class="row" style="margin-top:16px;">
-                <div class="col-md-12">
+                <div class="col-lg-12">
                     <label class="control-label">Verification Outcome Lock</label>
                     <select id="verificationOutcomeLock"
                             required
                             kendo-drop-down-list
-                            class="form-control input-lg height-100"
+                            class="form-control input-lg "
                             name="verificationOutcomeLock"
                             ng-model="modelCopy.verificationOutcomeLock">
                         <option value="">Select an option...</option>
@@ -145,7 +145,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <input type="button" class="btn btn-default" value="Cancel" ng-click="closeModal()" />
+        <input type="button" class="btn btn-light" value="Cancel" ng-click="closeModal()" />
         <input type="submit" class="btn btn-primary" value="Save" ng-click="submitted = true" />
     </div>
 </form>

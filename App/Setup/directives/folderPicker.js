@@ -116,7 +116,7 @@
                                 }
                             },
                             backdrop: 'static',
-                            windowClass: "full-screen-modal"
+                            windowClass: "full-screen-modal show"
                         });
                         //Done
                         return $modalInstance;

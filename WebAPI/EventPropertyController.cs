@@ -6,15 +6,13 @@ using System.Web.Http;
 using CampusLogicEvents.Implementation;
 using CampusLogicEvents.Web.Filters;
 using CampusLogicEvents.Web.Models;
-using log4net;
 
 namespace CampusLogicEvents.Web.WebAPI
 {
     [LocalRequestOnly]
     public class EventPropertyController : ApiController
     {
-        private static readonly ILog logger = LogManager.GetLogger("AdoNetAppender");
-
+        
         /// <summary>
         /// Get the latest EventProperties from PM and backup to CL local db.
         /// If PM is unavailable, use the values in the CL local db.
@@ -30,7 +28,7 @@ namespace CampusLogicEvents.Web.WebAPI
             }
             catch (Exception e)
             {
-                logger.ErrorFormat("EventPropertyController UpdateEventProperties Error: {0}", e);
+                LogManager.ErrorLogFormat("EventPropertyController UpdateEventProperties Error: {0}", e);
                 return Request.CreateResponse(HttpStatusCode.ExpectationFailed);
             }
         }
@@ -55,7 +53,7 @@ namespace CampusLogicEvents.Web.WebAPI
             }
             catch (Exception e)
             {
-                logger.ErrorFormat("EventPropertyController UpdateEventPropertiesWithCredentials Error: {0}", e);
+                LogManager.ErrorLogFormat("EventPropertyController UpdateEventPropertiesWithCredentials Error: {0}", e);
                 return Request.CreateResponse(HttpStatusCode.ExpectationFailed);
             }
         }
@@ -74,7 +72,7 @@ namespace CampusLogicEvents.Web.WebAPI
             }
             catch (Exception e)
             {
-                logger.ErrorFormat("EventPropertyController GetEventProperties Error: {0}", e);
+                LogManager.ErrorLogFormat("EventPropertyController GetEventProperties Error: {0}", e);
                 return Request.CreateResponse(HttpStatusCode.ExpectationFailed);
             }
         }

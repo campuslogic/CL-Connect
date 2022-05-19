@@ -3,8 +3,8 @@ using CampusLogicEvents.Implementation.Configurations;
 using CampusLogicEvents.Implementation.Models;
 using CampusLogicEvents.Web.Models;
 using Hangfire;
+using Hangfire.Logging;
 using Hangfire.Storage;
-using log4net;
 using Microsoft.Owin;
 using Owin;
 using System;
@@ -26,7 +26,6 @@ namespace CampusLogicEvents.Web
     /*IMPORTANT: Hangfire uses NCronTab syntax. Be careful when using online cron expression builders */
     public class Startup
     {
-        private static readonly ILog logger = LogManager.GetLogger("AdoNetAppender");
         private static readonly CampusLogicSection campusLogicSection = (CampusLogicSection)ConfigurationManager.GetSection(ConfigConstants.CampusLogicConfigurationSectionName);
         private static readonly NotificationManager notificationManager = new NotificationManager();
         private const string ISIR_INCORRECT_FORMAT_ERROR = "ISIR corrections DaysToRun is in an incorrect format";
@@ -41,8 +40,11 @@ namespace CampusLogicEvents.Web
             var workerRetryAttempts = ConfigurationManager.AppSettings["BackgroundWorkerRetryAttempts"];
 
             //Hangfire configurations
-            GlobalConfiguration.Configuration.UseSqlServerStorage("CampusLogicConnection");
+            GlobalConfiguration.Configuration
+                .UseSqlServerStorage("CampusLogicConnection");
             GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = string.IsNullOrWhiteSpace(workerRetryAttempts) ? 10 : Convert.ToInt32(workerRetryAttempts) });
+
+            LogProvider.SetCurrentLogProvider(new CustomLogProvider());
 
             var options = new BackgroundJobServerOptions { WorkerCount = string.IsNullOrWhiteSpace(workerCount) ? Environment.ProcessorCount : Convert.ToInt32(workerCount) };
 
@@ -120,7 +122,7 @@ namespace CampusLogicEvents.Web
             }
             catch (Exception exc)
             {
-                logger.Error($"Unhandled exception performing automatic update, please update manually: {exc}.");
+                LogManager.ErrorLog($"Unhandled exception performing automatic update, please update manually: {exc}.");
             }
         }
 
@@ -164,35 +166,35 @@ namespace CampusLogicEvents.Web
             var smtpSection = (SmtpSection)ConfigurationManager.GetSection("system.net/mailSettings/smtp");
             if (campusLogicSection.SMTPSettings == null)
             {
-                logger.Error("SMTP settings are missing");
+                LogManager.ErrorLog("SMTP settings are missing");
                 return;
             }
             if (!IsValidEmail(smtpSection.From))
             {
-                logger.Error("SMTP from email address is not a valid email address");
+                LogManager.ErrorLog("SMTP from email address is not a valid email address");
                 return;
             }
             foreach (var email in campusLogicSection.SMTPSettings.SendTo.Split(Convert.ToChar(",")).Where(email => !IsValidEmail(email.Trim())))
             {
-                logger.Error($"SMTP to email address {email} is not a valid email address");
+                LogManager.ErrorLog($"SMTP to email address {email} is not a valid email address");
                 return;
             }
             if (smtpSection.DeliveryMethod != SmtpDeliveryMethod.Network && smtpSection.DeliveryMethod != SmtpDeliveryMethod.SpecifiedPickupDirectory && smtpSection.DeliveryMethod != SmtpDeliveryMethod.PickupDirectoryFromIis)
             {
-                logger.Error($"SMTP delivery method {smtpSection.DeliveryMethod} is not a valid delivery method");
+                LogManager.ErrorLog($"SMTP delivery method {smtpSection.DeliveryMethod} is not a valid delivery method");
                 return;
             }
             if (smtpSection.DeliveryMethod == SmtpDeliveryMethod.Network)
             {
                 if (!smtpSection.Network.DefaultCredentials && (string.IsNullOrEmpty(smtpSection.Network.UserName.Trim()) || string.IsNullOrEmpty(smtpSection.Network.Password.Trim())))
                 {
-                    logger.Error("SMTP network credentials (username or password) are missing");
+                    LogManager.ErrorLog("SMTP network credentials (username or password) are missing");
                     return;
                 }
             }
             if (smtpSection.DeliveryMethod == SmtpDeliveryMethod.SpecifiedPickupDirectory && string.IsNullOrEmpty(smtpSection.SpecifiedPickupDirectory.PickupDirectoryLocation))
             {
-                logger.Error("Specified Pickup Directory was indicated as the delivery method for SMTP but no pickup directory location was specified ");
+                LogManager.ErrorLog("Specified Pickup Directory was indicated as the delivery method for SMTP but no pickup directory location was specified ");
             }
         }
 
@@ -252,7 +254,7 @@ namespace CampusLogicEvents.Web
             if (campusLogicSection.ISIRUploadSettings == null)
             {
                 NotificationService.ErrorNotification("Automated ISIR Upload", "ISIR Upload settings are missing from the config file");
-                logger.Error("ISIR Upload settings are missing");
+                LogManager.ErrorLog("ISIR Upload settings are missing");
                 return;
             }
 
@@ -277,7 +279,7 @@ namespace CampusLogicEvents.Web
             if (campusLogicSection.AwardLetterUploadSettings == null)
             {
                 NotificationService.ErrorNotification("Automated AwardLetter Upload", "The award letter upload settings are missing");
-                logger.Error("Award Letter Upload settings are missing");
+                LogManager.ErrorLog("Award Letter Upload settings are missing");
                 return;
             }
 
@@ -304,7 +306,7 @@ namespace CampusLogicEvents.Web
             if (campusLogicSection.FileMappingUploadSettings == null)
             {
                 NotificationService.ErrorNotification("Automated AwardLetter File Mapping Upload", "The award letter file mapping settings are missing");
-                logger.Error("Award Letter File Mapping Upload settings are missing");
+                LogManager.ErrorLog("Award Letter File Mapping Upload settings are missing");
                 return;
             }
 
@@ -329,7 +331,7 @@ namespace CampusLogicEvents.Web
             if (campusLogicSection.DataFileUploadSettings == null)
             {
                 NotificationService.ErrorNotification("Automated Data File Mapping Upload", "The data file settings are missing");
-                logger.Error("Data File Upload settings are missing");
+                LogManager.ErrorLog("Data File Upload settings are missing");
                 return;
             }
 
@@ -358,7 +360,7 @@ namespace CampusLogicEvents.Web
             if (bulkActionSettings == null)
             {
                 NotificationService.ErrorNotification(serviceName, "Bulk Action settings are missing from the config file");
-                logger.Error("Bulk Action settings are missing from the config file");
+                LogManager.ErrorLog("Bulk Action settings are missing from the config file");
                 return;
             }
             if (bulkActionSettings.BulkActionEnabled)
@@ -408,7 +410,7 @@ namespace CampusLogicEvents.Web
             if (campusLogicSection.ISIRCorrectionsSettings == null)
             {
                 NotificationService.ErrorNotification("Automated ISIR Corrections Batch Processing", "ISIR Corrections settings are missing");
-                logger.Error("ISIR Corrections settings are missing");
+                LogManager.ErrorLog("ISIR Corrections settings are missing");
                 return;
             }
 
@@ -417,21 +419,21 @@ namespace CampusLogicEvents.Web
                 //    if (!IsValidFilePathFormat(campusLogicSection.ISIRCorrectionsSettings.CorrectionsFilePath))
                 //    {
                 //        NotificationService.ErrorNotification("Automated ISIR Corrections Batch Processing", "Corrections file path is in incorrect format");
-                //        logger.Error("Corrections file path is in incorrect format");
+                //        LogManager.ErrorLog("Corrections file path is in incorrect format");
                 //        return;
                 //    }
 
                 if (string.IsNullOrEmpty(campusLogicSection.ISIRCorrectionsSettings.TimeToRun))
                 {
                     NotificationService.ErrorNotification("Automated ISIR Corrections Batch Processing", "ISIR corrections enabled but TimeToRun is empty");
-                    logger.Error("ISIR corrections enabled but TimeToRun is empty");
+                    LogManager.ErrorLog("ISIR corrections enabled but TimeToRun is empty");
                     return;
                 }
 
                 if (campusLogicSection.ISIRCorrectionsSettings.DaysToRun.Split(Convert.ToChar(",")).Any(day => !_acceptedDaysToRun.Contains(day.ToUpperInvariant().Trim())))
                 {
                     NotificationService.ErrorNotification("Automated ISIR Corrections Batch Processing", ISIR_INCORRECT_FORMAT_ERROR);
-                    logger.Error(ISIR_INCORRECT_FORMAT_ERROR);
+                    LogManager.ErrorLog(ISIR_INCORRECT_FORMAT_ERROR);
                     return;
                 }
 
@@ -439,7 +441,7 @@ namespace CampusLogicEvents.Web
                 if (!Regex.IsMatch(campusLogicSection.ISIRCorrectionsSettings.TimeToRun, @"^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]+(AM|PM|am|pm)$"))
                 {
                     NotificationService.ErrorNotification("Automated ISIR Corrections Batch Processing", ISIR_INCORRECT_FORMAT_ERROR);
-                    logger.Error(ISIR_INCORRECT_FORMAT_ERROR);
+                    LogManager.ErrorLog(ISIR_INCORRECT_FORMAT_ERROR);
                     return;
                 }
 
@@ -447,14 +449,14 @@ namespace CampusLogicEvents.Web
                 if (amOrPm != "AM" && amOrPm != "PM")
                 {
                     NotificationService.ErrorNotification("Automated ISIR Corrections Batch Processing", ISIR_INCORRECT_FORMAT_ERROR);
-                    logger.Error(ISIR_INCORRECT_FORMAT_ERROR);
+                    LogManager.ErrorLog(ISIR_INCORRECT_FORMAT_ERROR);
                     return;
                 }
 
                 if (campusLogicSection.ISIRCorrectionsSettings.FileExtension != "txt" && campusLogicSection.ISIRCorrectionsSettings.FileExtension != "dat" && campusLogicSection.ISIRCorrectionsSettings.FileExtension != "")
                 {
                     NotificationService.ErrorNotification("Automated ISIR Corrections Batch Processing", "ISIR corrections enabled but file extension invalid format, valid formats are txt or dat");
-                    logger.Error(ISIR_INCORRECT_FORMAT_ERROR);
+                    LogManager.ErrorLog(ISIR_INCORRECT_FORMAT_ERROR);
                     return;
                 }
 
@@ -465,7 +467,7 @@ namespace CampusLogicEvents.Web
                 if (!IsDigitsOnly(hour) || !IsDigitsOnly(minutes))
                 {
                     NotificationService.ErrorNotification("Automated ISIR Corrections Batch Processing", "ISIR corrections enabled but TimeToRun invalid format");
-                    logger.Error("ISIR corrections enabled but TimeToRun invalid format");
+                    LogManager.ErrorLog("ISIR corrections enabled but TimeToRun invalid format");
                     return;
                 }
 
@@ -493,34 +495,34 @@ namespace CampusLogicEvents.Web
                     && uploadSettings.UploadType != UploadSettings.FileMapping && uploadSettings.UploadType != UploadSettings.DataFile)
                 {
                     NotificationService.ErrorNotification($"Automated {uploadSettings.UploadType} Upload", $"The upload type of {uploadSettings.UploadType} is not a valid upload type");
-                    logger.Error($"{uploadSettings.UploadType} is not a valid upload type");
+                    LogManager.ErrorLog($"{uploadSettings.UploadType} is not a valid upload type");
                     return;
                 }
                 if (string.IsNullOrEmpty(uploadSettings.ArchiveFilePath))
                 {
                     NotificationService.ErrorNotification($"Automated {uploadSettings.UploadType} Upload", $"{uploadSettings.UploadType} Upload archive file path is missing");
-                    logger.Error($"{uploadSettings.UploadType} Upload archive file path is missing");
+                    LogManager.ErrorLog($"{uploadSettings.UploadType} Upload archive file path is missing");
                     return;
                 }
 
                 if (string.IsNullOrEmpty(uploadSettings.UploadFilePath))
                 {
                     NotificationService.ErrorNotification($"Automated {uploadSettings.UploadType} Upload", $"{uploadSettings.UploadType} Upload upload file path is missing");
-                    logger.Error($"{uploadSettings.UploadType} Upload upload file path is missing");
+                    LogManager.ErrorLog($"{uploadSettings.UploadType} Upload upload file path is missing");
                     return;
                 }
 
                 //if (!IsValidFilePathFormat(uploadSettings.ArchiveFilePath))
                 //{
                 //    NotificationService.ErrorNotification($"Automated {uploadSettings.UploadType} Upload", $"{uploadSettings.UploadType} Upload archive file path is in incorrect format");
-                //    logger.Error($"{uploadSettings.UploadType} Archive file path is in incorrect format");
+                //    LogManager.ErrorLog($"{uploadSettings.UploadType} Archive file path is in incorrect format");
                 //    return;
                 //}
 
                 //if (!IsValidFilePathFormat(uploadSettings.UploadFilePath))
                 //{
                 //    NotificationService.ErrorNotification($"Automated {uploadSettings.UploadType} Upload", $"{uploadSettings.UploadType} Upload upload file path is in incorrect format");
-                //    logger.Error($"{uploadSettings.UploadType} Upload file path is in incorrect format");
+                //    LogManager.ErrorLog($"{uploadSettings.UploadType} Upload file path is in incorrect format");
                 //    return;
                 //}
 
@@ -528,14 +530,14 @@ namespace CampusLogicEvents.Web
                 if (!acceptedUploadFrequencies.Contains(uploadSettings.UploadFrequencyType))
                 {
                     NotificationService.ErrorNotification($"Automated {uploadSettings.UploadType} Upload", $"{uploadSettings.UploadType} Upload frequency type is not in correct format");
-                    logger.Error($"{uploadSettings.UploadType} Upload frequency type is not in correct format");
+                    LogManager.ErrorLog($"{uploadSettings.UploadType} Upload frequency type is not in correct format");
                     return;
                 }
 
                 if (uploadSettings.DaysToRun.Split(Convert.ToChar(",")).Any(day => !_acceptedDaysToRun.Contains(day.ToUpperInvariant().Trim())))
                 {
                     NotificationService.ErrorNotification($"Automated {uploadSettings.UploadType} Upload", $"{uploadSettings.UploadType} Days to Run is not in correct format");
-                    logger.Error($"{uploadSettings.UploadType} Days to Run is not in correct format");
+                    LogManager.ErrorLog($"{uploadSettings.UploadType} Days to Run is not in correct format");
                     return;
                 }
 
@@ -579,7 +581,7 @@ namespace CampusLogicEvents.Web
             if (config == null)
             {
                 NotificationService.ErrorNotification(serviceName, $"The {serviceName} settings are missing");
-                logger.Error($"The {serviceName} settings are missing");
+                LogManager.ErrorLog($"The {serviceName} settings are missing");
                 return;
             }
 
@@ -588,14 +590,14 @@ namespace CampusLogicEvents.Web
                 if (string.IsNullOrEmpty(config.ArchiveDirectory))
                 {
                     NotificationService.ErrorNotification(serviceName, $"{serviceName} archive directory empty");
-                    logger.Error($"{serviceName} archive directory empty");
+                    LogManager.ErrorLog($"{serviceName} archive directory empty");
                     return;
                 }
 
                 if (string.IsNullOrEmpty(config.FileDirectory))
                 {
                     NotificationService.ErrorNotification(serviceName, $"{serviceName} file directory empty");
-                    logger.Error($"{serviceName} file directory path empty");
+                    LogManager.ErrorLog($"{serviceName} file directory path empty");
                     return;
                 }
 
@@ -603,7 +605,7 @@ namespace CampusLogicEvents.Web
                 if (!acceptedUploadFrequencies.Contains(config.Frequency))
                 {
                     NotificationService.ErrorNotification(serviceName, $"{serviceName} frequency not valid");
-                    logger.Error($"{serviceName} frequency not valid");
+                    LogManager.ErrorLog($"{serviceName} frequency not valid");
                     return;
                 }
 
@@ -799,7 +801,7 @@ namespace CampusLogicEvents.Web
                 }
                 catch (Exception ex)
                 {
-                    logger.Error($"There was an issue with validating and/or creating the EventNotification table in LocalDB: {ex}");
+                    LogManager.ErrorLog($"There was an issue with validating and/or creating the EventNotification table in LocalDB: {ex}");
                 }
             }
         }
@@ -827,7 +829,7 @@ namespace CampusLogicEvents.Web
                 }
                 catch (Exception ex)
                 {
-                    logger.Error($"There was an issue with validating and/or creating the BatchProcessRecord table in LocalDB: {ex}");
+                    LogManager.ErrorLog($"There was an issue with validating and/or creating the BatchProcessRecord table in LocalDB: {ex}");
                 }
             }
         }
@@ -850,7 +852,7 @@ namespace CampusLogicEvents.Web
                 }
                 catch (Exception ex)
                 {
-                    logger.Error($"There was an issue with validating and/or creating the new columns for the BatchProcessRecord table in LocalDB: {ex}");
+                    LogManager.ErrorLog($"There was an issue with validating and/or creating the new columns for the BatchProcessRecord table in LocalDB: {ex}");
                 }
             }
         }
@@ -874,7 +876,7 @@ namespace CampusLogicEvents.Web
                 }
                 catch (Exception ex)
                 {
-                    logger.Error($"There was an issue with validating and/or creating the PowerFaidsRecord table in LocalDB: {ex}");
+                    LogManager.ErrorLog($"There was an issue with validating and/or creating the PowerFaidsRecord table in LocalDB: {ex}");
                 }
             }
         }
@@ -900,7 +902,7 @@ namespace CampusLogicEvents.Web
                 }
                 catch (Exception ex)
                 {
-                    logger.Error($"There was an issue with validating and/or creating the EventProperty table in LocalDB: {ex}");
+                    LogManager.ErrorLog($"There was an issue with validating and/or creating the EventProperty table in LocalDB: {ex}");
                 }
             }
         }

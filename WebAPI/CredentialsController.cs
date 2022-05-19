@@ -1,5 +1,4 @@
-﻿using log4net;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Web.Http;
 using CampusLogicEvents.Implementation;
 using System;
@@ -16,7 +15,6 @@ namespace CampusLogicEvents.Web.WebAPI
     public class CredentialsController : ApiController
     {
 
-        private static readonly ILog logger = LogManager.GetLogger("AdoNetAppender");
 
         public CredentialsController()
         {
@@ -78,7 +76,7 @@ namespace CampusLogicEvents.Web.WebAPI
             }
             catch (Exception ex)
             {
-                logger.ErrorFormat("TestAPICredentials Get Error: {0}", ex);
+                LogManager.ErrorLogFormat("TestAPICredentials Get Error: {0}", ex);
                 return Request.CreateResponse(HttpStatusCode.ExpectationFailed);
             }
         }

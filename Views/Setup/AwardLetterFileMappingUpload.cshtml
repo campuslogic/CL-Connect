@@ -12,12 +12,12 @@
         @*For further detail on the Award Letter Upload section please click <a href="https://campuslogicinc.freshdesk.com/support/solutions/articles/5000706487-award-letter-upload/" target="_blank">AwardLetter Upload Details.</a>*@
     </section>
     <hr>
-    <div class="col-md-12 padding-top-ten">
-        <div class="col-md-5">
-            <div class="form-group">
-                <label class="col-md-5 control-label"><span class="form-required" aria-hidden="true">* </span>Upload Frequency</label>
-                <div class="col-md-7 no-gutter">
-                    <select required kendo-drop-down-list class="form-control input-lg height-100" name="uploadFrequencyType" ng-model="vm.service.configurationModel.campusLogicSection.fileMappingUploadSettings.fileMappingUploadFrequencyType">
+    <div class="row padding-top-ten">
+        <div class="col-lg-5">
+            <div class="row form-group mb-3">
+                <label class="col-lg-5 control-label"><span class="form-required" aria-hidden="true">* </span>Upload Frequency</label>
+                <div class="col-lg-7 ">
+                    <select required kendo-drop-down-list class="form-control input-lg " name="uploadFrequencyType" ng-model="vm.service.configurationModel.campusLogicSection.fileMappingUploadSettings.fileMappingUploadFrequencyType">
                         <option value="daily">Daily</option>
                         <option value="weekly">Weekly</option>
                         <option value="minutes">Minutely</option>
@@ -25,22 +25,22 @@
                     </select>
                 </div>
             </div>
-            <div class="form-group padding-top-one-hundred">
-                <label class="col-md-5 control-label"><span class="form-required" aria-hidden="true">* </span>Days to Run</label>
-                <div class="col-md-7 no-gutter">
+            <div class="row form-group mb-3 padding-top-one-hundred">
+                <label class="col-lg-5 control-label"><span class="form-required" aria-hidden="true">* </span>Days to Run</label>
+                <div class="col-lg-7 ">
                     <select kendo-multi-select k-options="vm.daysToRunOptions" k-ng-model="vm.service.configurationModel.campusLogicSection.fileMappingUploadSettings.fileMappingUploadDaysToRun"></select>
                     <span class="field-validation-error" ng-show="vm.service.configurationModel.campusLogicSection.fileMappingUploadSettings.fileMappingUploadDaysToRun.length <= 0">Required</span>
                 </div>
             </div>
         </div>
-        <div class="col-md-7">
-            <div class="form-group">
-                <label class="col-md-3 control-label no-gutter"><span class="form-required" aria-hidden="true">* </span>Upload Path</label>
-                <cl-folder-picker isrequired="true" formvalid="validationService.pageValidations.fileMappingUploadValid" uploadpath="vm.service.configurationModel.campusLogicSection.fileMappingUploadSettings.fileMappingUploadFilePath"></cl-folder-picker>
+        <div class="col-lg-7">
+            <div class="row form-group mb-3">
+                <label class="col-lg-3 control-label "><span class="form-required" aria-hidden="true">* </span>Upload Path</label>
+                <cl-folder-picker class="col-lg-7" isrequired="true" formvalid="validationService.pageValidations.fileMappingUploadValid" uploadpath="vm.service.configurationModel.campusLogicSection.fileMappingUploadSettings.fileMappingUploadFilePath"></cl-folder-picker>
             </div>
-            <div class="form-group">
-                <label class="col-md-3 control-label no-gutter"><span class="form-required" aria-hidden="true">* </span>Archive Path</label>
-                <cl-folder-picker isrequired="true" formvalid="validationService.pageValidations.fileMappingUploadValid" uploadpath="vm.service.configurationModel.campusLogicSection.fileMappingUploadSettings.fileMappingArchiveFilePath"></cl-folder-picker>
+            <div class="row form-group mb-3">
+                <label class="col-lg-3 control-label "><span class="form-required" aria-hidden="true">* </span>Archive Path</label>
+                <cl-folder-picker class="col-lg-7" isrequired="true" formvalid="validationService.pageValidations.fileMappingUploadValid" uploadpath="vm.service.configurationModel.campusLogicSection.fileMappingUploadSettings.fileMappingArchiveFilePath"></cl-folder-picker>
             </div>
         </div>
     </div>

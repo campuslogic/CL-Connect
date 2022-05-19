@@ -164,7 +164,8 @@ clConnectServices.factory("addapiendpointmodalcontroller", ["$modal",
                             };
                         }
                     },
-                    backdrop: 'static'
+                    backdrop: 'static',
+                    windowClass: "show"
                 });
 
                 return $modalInstance;

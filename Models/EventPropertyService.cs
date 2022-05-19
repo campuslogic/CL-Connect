@@ -1,14 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using CampusLogicEvents.Implementation;
-using log4net;
+using CampusLogicEvents.Implementation.Models;
 
 namespace CampusLogicEvents.Web.Models
 {
     public static class EventPropertyService
     {
-        private static readonly ILog logger = LogManager.GetLogger("AdoNetAppender");
 
         /// <summary>
         /// Get EventProperty data from PM and save to local DB instance
@@ -62,22 +62,26 @@ namespace CampusLogicEvents.Web.Models
                         catch (Exception e)
                         {
                             tran.Rollback();
-                            logger.Error($"EventPropertyService UpdateData Error: {e}");
+                            LogManager.ErrorLog($"EventPropertyService UpdateData Error: {e}");
                         }
                     }
                 }
                 // else, use the local CL Connect data
                 else
                 {
-                    IQueryable<Implementation.Models.EventProperty> properties = dbContext.EventProperty.Select(p =>
-                        new Implementation.Models.EventProperty
+                    List<EventProperty> properties = new List<EventProperty>();
+                    foreach(var item in dbContext.EventProperty)
+                    {
+                        properties.Add(new EventProperty()
                         {
-                            Id = p.Id,
-                            Name = p.Name,
-                            DisplayName = p.DisplayName,
-                            DisplayFormula = p.DisplayFormula
+                            Id = item.Id,
+                            Name = item.Name,
+                            DisplayName = item.DisplayName,
+                            DisplayFormula = item.DisplayFormula
                         });
-                    EventPropertyManager.Instance.EventProperties = properties.ToList();
+                    }
+
+                    EventPropertyManager.Instance.EventProperties = properties;
                 }
             }
         }

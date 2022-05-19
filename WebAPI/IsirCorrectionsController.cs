@@ -1,5 +1,4 @@
-﻿using log4net;
-using System.Web.Http;
+﻿using System.Web.Http;
 using System.Net.Http;
 using CampusLogicEvents.Web.Filters;
 
@@ -8,7 +7,6 @@ namespace CampusLogicEvents.Web.WebAPI
     [LocalRequestOnly]
     public class IsirCorrectionsController : FolderPickerController
     {
-        private static readonly ILog logger = LogManager.GetLogger("AdoNetAppender");
 
         /// <summary>
         /// Constructor for the AwardLetterUploadController

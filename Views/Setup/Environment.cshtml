@@ -9,99 +9,101 @@
     </p>
     <hr>
     <div class="col-md-12 padding-top-ten">
-        <div class="col-md-6">
-            <h4>
-                <span class="form-required" aria-hidden="true">*</span>
-                <b> What environment would you like to set up?</b>
-            </h4>
-            <div class="col-md-10">
-                <select id="environmentdropdown" name="environmentdropdown" kendo-drop-down-list required class="form-control input-lg height-100" k-on-change="environmentDropDownChangeEvent(kendoEvent)" ng-model="service.configurationModel.appSettingsSection.environment">
-                    <option value="">Select one..</option>
-                    
-                    <option value="{{service.configurationModel.appSettingsSection.environment}}" ng-if="disableAutoUpdate">
-                        {{service.configurationModel.appSettingsSection.environment}}
-                    </option>
-                    
-                    <option value="sandbox">Sandbox</option>
-                    <option value="production">Production</option>
-                </select>
+        <div class="row">
+            <div class="col-md-6">
+                <h4>
+                    <span class="form-required" aria-hidden="true">*</span>
+                    <b> What environment would you like to set up?</b>
+                </h4>
+                <div class="col-md-10">
+                    <select id="environmentdropdown" name="environmentdropdown" kendo-drop-down-list required class="form-control input-lg height-100" k-on-change="environmentDropDownChangeEvent(kendoEvent)" ng-model="service.configurationModel.appSettingsSection.environment">
+                        <option value="">Select one..</option>
+
+                        <option value="{{service.configurationModel.appSettingsSection.environment}}" ng-if="disableAutoUpdate">
+                            {{service.configurationModel.appSettingsSection.environment}}
+                        </option>
+
+                        <option value="sandbox">Sandbox</option>
+                        <option value="production">Production</option>
+                    </select>
+                </div>
+                <div class="col-md-10">
+                    <span class="field-validation-error" ng-show="(environmentForm.environmentdropdown.$dirty && environmentForm.environmentdropdown.$error.required) || !validationService.pageValidations.environmentValid">Required</span>
+                </div>
             </div>
-            <div class="col-md-10">
-                <span class="field-validation-error" ng-show="(environmentForm.environmentdropdown.$dirty && environmentForm.environmentdropdown.$error.required) || !validationService.pageValidations.environmentValid">Required</span>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <h4>
-                <span class="form-required" aria-hidden="true">*</span>
-                <b>Which configurations would you like to enable?</b>
-            </h4>
-            <div class="col-md-12">
-                <div class="padding-five">
-                    <input type="checkbox" id="smtp" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.smtpSettings.notificationsEnabled, 'smtpValid');" ng-model="service.configurationModel.campusLogicSection.smtpSettings.notificationsEnabled">
-                    <label class="k-checkbox-label" for="smtp" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables emails to be sent for automation errors">SMTP</label>
-                </div>
-                <div class="padding-five">
-                    <input type="checkbox" id="isirUpload" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.isirUploadSettings.isirUploadEnabled, 'isirUploadValid');" ng-model="service.configurationModel.campusLogicSection.isirUploadSettings.isirUploadEnabled">
-                    <label class="k-checkbox-label" for="isirUpload" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Automates ISIR upload">ISIR Uploads</label>
-                </div>
-                <div class="padding-five">
-                    <input type="checkbox" id="bulkActions" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.bulkActionSettings.bulkActionEnabled, 'bulkActionsValid');" ng-model="service.configurationModel.campusLogicSection.bulkActionSettings.bulkActionEnabled"/>
-                    <label class="k-checkbox-label" for="bulkActions" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables Bulk Actions">Bulk Actions</label>
-                </div>
-                <div class="padding-five">
-                    <input type="checkbox" id="awardLetterUpload" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.awardLetterUploadSettings.awardLetterUploadEnabled, 'awardLetterUploadValid');" ng-model="service.configurationModel.campusLogicSection.awardLetterUploadSettings.awardLetterUploadEnabled">
-                    <label class="k-checkbox-label" for="awardLetterUpload" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Automates Award Letter data file upload">AwardLetter Uploads</label>
-                </div>
-                <div class="padding-five">
-                    <input type="checkbox" id="fileMappingUpload" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.fileMappingUploadSettings.fileMappingUploadEnabled, 'fileMappingUploadValid');" ng-model="service.configurationModel.campusLogicSection.fileMappingUploadSettings.fileMappingUploadEnabled">
-                    <label class="k-checkbox-label" for="fileMappingUpload" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Automates Award Letter file mapping upload">AwardLetter File Mapping Uploads</label>
-                </div>
-                <div class="padding-five">
-                    <input type="checkbox" id="dataFileUpload" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.dataFileUploadSettings.dataFileUploadEnabled, 'dataFileUploadValid');" ng-model="service.configurationModel.campusLogicSection.dataFileUploadSettings.dataFileUploadEnabled">
-                    <label class="k-checkbox-label" for="dataFileUpload" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Automates Data File (SIS, scholarship, etc) uploads">DataFile Uploads</label>
-                </div>
-                <div class="padding-five">
-                    <input type="checkbox" id="documentImports" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.documentImportSettings.enabled, 'documentImportsValid');" ng-model="service.configurationModel.campusLogicSection.documentImportSettings.enabled">
-                    <label class="k-checkbox-label" for="documentImports" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables ability to import student documents into StudentVerification">Document Imports</label>
-                </div>
-                <div class="padding-five">
-                    <input type="checkbox" id="isirBatchCorrections" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.isirCorrectionsSettings.correctionsEnabled, 'isirCorrectionsValid');" ng-model="service.configurationModel.campusLogicSection.isirCorrectionsSettings.correctionsEnabled">
-                    <label class="k-checkbox-label" for="isirBatchCorrections" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Automates ISIR Batch Corrections">ISIR Batch Corrections</label>
-                </div>
-                <div class="padding-five">
-                    <input type="checkbox" id="eventNotifications" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.eventNotificationsEnabled, 'eventNotificationsValid'); setDocumentSettings();" ng-model="service.configurationModel.campusLogicSection.eventNotificationsEnabled">
-                    <label class="k-checkbox-label" for="eventNotifications" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables notifications and processing of events(task completed, document submitted etc.)">Event Notifications</label>
-                    <div class="sub-check-box">
-                        <input type="checkbox" id="documentImaging" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.documentSettings.documentsEnabled, 'documentSettingsValid');" ng-model="service.configurationModel.campusLogicSection.documentSettings.documentsEnabled" ng-disabled="!service.configurationModel.campusLogicSection.eventNotificationsEnabled">
-                        <label class="k-checkbox-label" for="documentImaging" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables document specific notifications and processing">Documents</label>
+            <div class="col-md-6">
+                <h4>
+                    <span class="form-required" aria-hidden="true">*</span>
+                    <b>Which configurations would you like to enable?</b>
+                </h4>
+                <div class="col-md-12">
+                    <div class="padding-five">
+                        <input type="checkbox" id="smtp" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.smtpSettings.notificationsEnabled, 'smtpValid');" ng-model="service.configurationModel.campusLogicSection.smtpSettings.notificationsEnabled">
+                        <label class="k-checkbox-label" for="smtp" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables emails to be sent for automation errors">SMTP</label>
                     </div>
-                    <div class="sub-check-box">
-                        <input type="checkbox" id="storedProcedure" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.storedProceduresEnabled, 'storedProcedureValid');" ng-model="service.configurationModel.campusLogicSection.storedProceduresEnabled" ng-disabled="!service.configurationModel.campusLogicSection.eventNotificationsEnabled" />
-                        <label class="k-checkbox-label" for="storedProcedure" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables configurable procedure">Stored Procedure</label>
+                    <div class="padding-five">
+                        <input type="checkbox" id="isirUpload" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.isirUploadSettings.isirUploadEnabled, 'isirUploadValid');" ng-model="service.configurationModel.campusLogicSection.isirUploadSettings.isirUploadEnabled">
+                        <label class="k-checkbox-label" for="isirUpload" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Automates ISIR upload">ISIR Uploads</label>
                     </div>
-                    <div class="sub-check-box">
-                        <input type="checkbox" id="fileStore" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.fileStoreSettings.fileStoreEnabled, 'fileStoreSettingsValid');" ng-model="service.configurationModel.campusLogicSection.fileStoreSettings.fileStoreEnabled" ng-disabled="!service.configurationModel.campusLogicSection.eventNotificationsEnabled" />
-                        <label class="k-checkbox-label" for="fileStore" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables file store configuration">File Store</label>
+                    <div class="padding-five">
+                        <input type="checkbox" id="bulkActions" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.bulkActionSettings.bulkActionEnabled, 'bulkActionsValid');" ng-model="service.configurationModel.campusLogicSection.bulkActionSettings.bulkActionEnabled" />
+                        <label class="k-checkbox-label" for="bulkActions" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables Bulk Actions">Bulk Actions</label>
                     </div>
-                    <div class="sub-check-box">
-                        <input type="checkbox" id="awardLetterPrint" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.awardLetterPrintSettings.awardLetterPrintEnabled, 'awardLetterPrintSettingsValid');" ng-model="service.configurationModel.campusLogicSection.awardLetterPrintSettings.awardLetterPrintEnabled" ng-disabled="!service.configurationModel.campusLogicSection.eventNotificationsEnabled" />
-                        <label class="k-checkbox-label" for="awardLetterPrint" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables print configuration for Award Letters">Award Letter Print</label>
+                    <div class="padding-five">
+                        <input type="checkbox" id="awardLetterUpload" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.awardLetterUploadSettings.awardLetterUploadEnabled, 'awardLetterUploadValid');" ng-model="service.configurationModel.campusLogicSection.awardLetterUploadSettings.awardLetterUploadEnabled">
+                        <label class="k-checkbox-label" for="awardLetterUpload" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Automates Award Letter data file upload">AwardLetter Uploads</label>
                     </div>
-                    <div class="sub-check-box">
-                        <input type="checkbox" id="batchProcessing" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.batchProcessingEnabled, 'batchProcessingSettingsValid');" ng-model="service.configurationModel.campusLogicSection.batchProcessingEnabled" ng-disabled="!service.configurationModel.campusLogicSection.eventNotificationsEnabled" />
-                        <label class="k-checkbox-label" for="batchProcessing" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables batch processing handling for multiple events">Batch Processing</label>
+                    <div class="padding-five">
+                        <input type="checkbox" id="fileMappingUpload" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.fileMappingUploadSettings.fileMappingUploadEnabled, 'fileMappingUploadValid');" ng-model="service.configurationModel.campusLogicSection.fileMappingUploadSettings.fileMappingUploadEnabled">
+                        <label class="k-checkbox-label" for="fileMappingUpload" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Automates Award Letter file mapping upload">AwardLetter File Mapping Uploads</label>
                     </div>
-                    <div class="sub-check-box">
-                        <input type="checkbox" id="apiIntegration" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.apiIntegrationsEnabled, 'apiIntegrationsValid');" ng-model="service.configurationModel.campusLogicSection.apiIntegrationsEnabled" ng-disabled="!service.configurationModel.campusLogicSection.eventNotificationsEnabled" />
-                        <label class="k-checkbox-label" for="apiIntegration" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables API integration">API Integration</label>
+                    <div class="padding-five">
+                        <input type="checkbox" id="dataFileUpload" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.dataFileUploadSettings.dataFileUploadEnabled, 'dataFileUploadValid');" ng-model="service.configurationModel.campusLogicSection.dataFileUploadSettings.dataFileUploadEnabled">
+                        <label class="k-checkbox-label" for="dataFileUpload" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Automates Data File (SIS, scholarship, etc) uploads">DataFile Uploads</label>
                     </div>
-                    <div class="sub-check-box">
-                        <input type="checkbox" id="fileDefinitions" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.fileDefinitionsEnabled, 'fileDefinitionSettingsValid');" ng-model="service.configurationModel.campusLogicSection.fileDefinitionsEnabled" ng-disabled="!service.configurationModel.campusLogicSection.eventNotificationsEnabled" />
-                        <label class="k-checkbox-label" for="fileDefinitions" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables File Definitions">File Definitions</label>
+                    <div class="padding-five">
+                        <input type="checkbox" id="documentImports" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.documentImportSettings.enabled, 'documentImportsValid');" ng-model="service.configurationModel.campusLogicSection.documentImportSettings.enabled">
+                        <label class="k-checkbox-label" for="documentImports" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables ability to import student documents into StudentVerification">Document Imports</label>
                     </div>
-                    <div class="sub-check-box">
-                        <input type="checkbox" id="powerFaids" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.powerFaidsEnabled, 'powerFaidsSettingsValid');" ng-model="service.configurationModel.campusLogicSection.powerFaidsEnabled" ng-disabled="!service.configurationModel.campusLogicSection.eventNotificationsEnabled" />
-                        <label class="k-checkbox-label" for="powerFaids" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables PowerFAIDS">PowerFAIDS</label>
+                    <div class="padding-five">
+                        <input type="checkbox" id="isirBatchCorrections" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.isirCorrectionsSettings.correctionsEnabled, 'isirCorrectionsValid');" ng-model="service.configurationModel.campusLogicSection.isirCorrectionsSettings.correctionsEnabled">
+                        <label class="k-checkbox-label" for="isirBatchCorrections" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Automates ISIR Batch Corrections">ISIR Batch Corrections</label>
+                    </div>
+                    <div class="padding-five">
+                        <input type="checkbox" id="eventNotifications" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.eventNotificationsEnabled, 'eventNotificationsValid'); setDocumentSettings();" ng-model="service.configurationModel.campusLogicSection.eventNotificationsEnabled">
+                        <label class="k-checkbox-label" for="eventNotifications" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables notifications and processing of events(task completed, document submitted etc.)">Event Notifications</label>
+                        <div class="sub-check-box">
+                            <input type="checkbox" id="documentImaging" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.documentSettings.documentsEnabled, 'documentSettingsValid');" ng-model="service.configurationModel.campusLogicSection.documentSettings.documentsEnabled" ng-disabled="!service.configurationModel.campusLogicSection.eventNotificationsEnabled">
+                            <label class="k-checkbox-label" for="documentImaging" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables document specific notifications and processing">Documents</label>
+                        </div>
+                        <div class="sub-check-box">
+                            <input type="checkbox" id="storedProcedure" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.storedProceduresEnabled, 'storedProcedureValid');" ng-model="service.configurationModel.campusLogicSection.storedProceduresEnabled" ng-disabled="!service.configurationModel.campusLogicSection.eventNotificationsEnabled" />
+                            <label class="k-checkbox-label" for="storedProcedure" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables configurable procedure">Stored Procedure</label>
+                        </div>
+                        <div class="sub-check-box">
+                            <input type="checkbox" id="fileStore" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.fileStoreSettings.fileStoreEnabled, 'fileStoreSettingsValid');" ng-model="service.configurationModel.campusLogicSection.fileStoreSettings.fileStoreEnabled" ng-disabled="!service.configurationModel.campusLogicSection.eventNotificationsEnabled" />
+                            <label class="k-checkbox-label" for="fileStore" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables file store configuration">File Store</label>
+                        </div>
+                        <div class="sub-check-box">
+                            <input type="checkbox" id="awardLetterPrint" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.awardLetterPrintSettings.awardLetterPrintEnabled, 'awardLetterPrintSettingsValid');" ng-model="service.configurationModel.campusLogicSection.awardLetterPrintSettings.awardLetterPrintEnabled" ng-disabled="!service.configurationModel.campusLogicSection.eventNotificationsEnabled" />
+                            <label class="k-checkbox-label" for="awardLetterPrint" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables print configuration for Award Letters">Award Letter Print</label>
+                        </div>
+                        <div class="sub-check-box">
+                            <input type="checkbox" id="batchProcessing" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.batchProcessingEnabled, 'batchProcessingSettingsValid');" ng-model="service.configurationModel.campusLogicSection.batchProcessingEnabled" ng-disabled="!service.configurationModel.campusLogicSection.eventNotificationsEnabled" />
+                            <label class="k-checkbox-label" for="batchProcessing" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables batch processing handling for multiple events">Batch Processing</label>
+                        </div>
+                        <div class="sub-check-box">
+                            <input type="checkbox" id="apiIntegration" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.apiIntegrationsEnabled, 'apiIntegrationsValid');" ng-model="service.configurationModel.campusLogicSection.apiIntegrationsEnabled" ng-disabled="!service.configurationModel.campusLogicSection.eventNotificationsEnabled" />
+                            <label class="k-checkbox-label" for="apiIntegration" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables API integration">API Integration</label>
+                        </div>
+                        <div class="sub-check-box">
+                            <input type="checkbox" id="fileDefinitions" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.fileDefinitionsEnabled, 'fileDefinitionSettingsValid');" ng-model="service.configurationModel.campusLogicSection.fileDefinitionsEnabled" ng-disabled="!service.configurationModel.campusLogicSection.eventNotificationsEnabled" />
+                            <label class="k-checkbox-label" for="fileDefinitions" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables File Definitions">File Definitions</label>
+                        </div>
+                        <div class="sub-check-box">
+                            <input type="checkbox" id="powerFaids" class="k-checkbox" ng-click="addRemovePageFromValidation(service.configurationModel.campusLogicSection.powerFaidsEnabled, 'powerFaidsSettingsValid');" ng-model="service.configurationModel.campusLogicSection.powerFaidsEnabled" ng-disabled="!service.configurationModel.campusLogicSection.eventNotificationsEnabled" />
+                            <label class="k-checkbox-label" for="powerFaids" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Enables PowerFAIDS">PowerFAIDS</label>
+                        </div>
                     </div>
                 </div>
             </div>

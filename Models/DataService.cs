@@ -7,7 +7,6 @@ using CampusLogicEvents.Implementation;
 using CampusLogicEvents.Implementation.Configurations;
 using CampusLogicEvents.Implementation.Models;
 using Hangfire;
-using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
@@ -26,7 +25,6 @@ namespace CampusLogicEvents.Web.Models
 {
     public static class DataService
     {
-        private static readonly ILog logger = LogManager.GetLogger("AdoNetAppender");
         private static readonly CampusLogicSection campusLogicConfigSection = (CampusLogicSection)ConfigurationManager.GetSection(ConfigConstants.CampusLogicConfigurationSectionName);
 
         /// <summary>
@@ -265,12 +263,12 @@ namespace CampusLogicEvents.Web.Models
                         }
                         else if (eventHandler.HandleMethod == "AwardLetterPrint")
                         {
-                            logger.Info("detect this is the AwardLetterPrint");
+                            LogManager.InfoLog("detect this is the AwardLetterPrint");
                             AwardLetterDocumentRetrievalHandler(eventData);
                         }
                         else if (eventHandler.HandleMethod == "BatchProcessingAwardLetterPrint")
                         {
-                            logger.Info("detect this is the BatchProcessingAwardLetterPrint");
+                            LogManager.InfoLog("detect this is the BatchProcessingAwardLetterPrint");
                             BatchProcessRetrievalHandler(ConfigConstants.AwardLetterPrintBatchType, eventHandler.BatchName, eventData);
                         }
                         else if (eventHandler.HandleMethod == "ApiIntegration")
@@ -296,7 +294,7 @@ namespace CampusLogicEvents.Web.Models
             catch (Exception ex)
             {
                 //Log here any exceptions
-                logger.ErrorFormat("DataService ProcessPostedEvent Error: {0}", ex);
+                LogManager.ErrorLogFormat("DataService ProcessPostedEvent Error: {0}", ex);
                 throw;
             }
         }
@@ -407,7 +405,7 @@ namespace CampusLogicEvents.Web.Models
                     storedProcedureSettings.GetParameters().Select(p => ParseParameter(p, eventData)).ToList();
                 
                 //Adding logging in case client experiences weird argument error, we can better determine what we are trying to pass
-                //logger.Info($"Parameters to be pass into database: { String.Join(", ", parameters.Select(x => x.ParameterName + ": " + x.Value.ToString() + " - DataType: " + Enum.GetName(typeof(OdbcType), x.OdbcType)))}");
+                //LogManager.InfoLog($"Parameters to be pass into database: { String.Join(", ", parameters.Select(x => x.ParameterName + ": " + x.Value.ToString() + " - DataType: " + Enum.GetName(typeof(OdbcType), x.OdbcType)))}");
 
                 // For each parameter, need to add a placeholder "?" in the sql command.  
                 // This is just part of the ODBC syntax.
@@ -420,7 +418,7 @@ namespace CampusLogicEvents.Web.Models
                 // Final output should look like this: {CALL sproc_name (?, ?, ?)}
                 string command = $"{{CALL {storedProcedureSettings.Name}{placeholders}}}";
 
-                //logger.Info(command);
+                //LogManager.InfoLog(command);
                 ClientDatabaseManager.ExecuteDatabaseStoredProcedure(command, parameters);
             }
             else
@@ -477,7 +475,7 @@ namespace CampusLogicEvents.Web.Models
 
             if (eventData.PropertyValues[EventPropertyConstants.SvDocumentId].IsNullOrEmpty())
             {
-                logger.ErrorFormat("DataService ProcessPostedEvent Missing Document Id for Event Id: {0}", eventData.PropertyValues[EventPropertyConstants.Id].Value<string>());
+                LogManager.ErrorLogFormat("DataService ProcessPostedEvent Missing Document Id for Event Id: {0}", eventData.PropertyValues[EventPropertyConstants.Id].Value<string>());
                 return;
             }
 
@@ -524,7 +522,7 @@ namespace CampusLogicEvents.Web.Models
 
             if (eventData.PropertyValues[EventPropertyConstants.AlRecordId].IsNullOrEmpty())
             {
-                logger.ErrorFormat("DataService ProcessPostedEvent Missing Record Id for Event Id: {0}", eventData.PropertyValues[EventPropertyConstants.Id].Value<string>());
+                LogManager.ErrorLogFormat("DataService ProcessPostedEvent Missing Record Id for Event Id: {0}", eventData.PropertyValues[EventPropertyConstants.Id].Value<string>());
                 return;
             }
 
@@ -548,7 +546,7 @@ namespace CampusLogicEvents.Web.Models
             }
             catch (Exception ex)
             {
-                logger.Error($"An error occured when attempting to handle the event data for file store: {ex}");
+                LogManager.ErrorLog($"An error occured when attempting to handle the event data for file store: {ex}");
             }
         }
 
@@ -603,7 +601,7 @@ namespace CampusLogicEvents.Web.Models
             }
             catch (Exception ex)
             {
-                logger.ErrorFormat("DataService GetOauth2TokenAsync Error: {0}", ex);
+                LogManager.ErrorLogFormat("DataService GetOauth2TokenAsync Error: {0}", ex);
                 throw;
             }
         }
@@ -646,7 +644,7 @@ namespace CampusLogicEvents.Web.Models
             }
             catch (Exception ex)
             {
-                logger.ErrorFormat("DataService GetOauthWrapTokenAsync Error: {0}", ex);
+                LogManager.ErrorLogFormat("DataService GetOauthWrapTokenAsync Error: {0}", ex);
                 throw;
             }
         }
@@ -655,7 +653,7 @@ namespace CampusLogicEvents.Web.Models
         {
             string request = $"{response.RequestMessage.Method} {response.RequestMessage.RequestUri} Status Code: {(int)response.StatusCode}, Version: {response.Version}, Data: {GetJsonFromNameValueCollection(data)}, Headers: {{ {response.RequestMessage.Headers} }}";
 
-            logger.InfoFormat("API Integration - Request: {0}", request);
+            LogManager.InfoLog(string.Format("API Integration - Request: {0}", request));
         }
 
         /// <summary>
@@ -718,7 +716,7 @@ namespace CampusLogicEvents.Web.Models
                     }
                     catch (Exception)
                     {
-                        logger.Error("apiEndpoint.ParameterMappings could not be parsed");
+                        LogManager.ErrorLog("apiEndpoint.ParameterMappings could not be parsed");
 
                         throw;
                     }
@@ -795,7 +793,7 @@ namespace CampusLogicEvents.Web.Models
             }
             catch (Exception e)
             {
-                logger.ErrorFormat("DataService ApiIntegrationsHandler Error: {0}", e);
+                LogManager.ErrorLogFormat("DataService ApiIntegrationsHandler Error: {0}", e);
                 throw;
             }
         }
@@ -829,7 +827,7 @@ namespace CampusLogicEvents.Web.Models
             }
             catch (Exception ex)
             {
-                logger.ErrorFormat("DataService DataCleanup Error: {0}", ex);
+                LogManager.ErrorLogFormat("DataService DataCleanup Error: {0}", ex);
             }
 
         }
@@ -887,7 +885,7 @@ namespace CampusLogicEvents.Web.Models
             catch (Exception ex)
             {
                 //Log here any exceptions
-                logger.ErrorFormat("DataService LogNotification Error logging recently sent email: {0}", ex);
+                LogManager.ErrorLogFormat("DataService LogNotification Error logging recently sent email: {0}", ex);
             }
         }
     }

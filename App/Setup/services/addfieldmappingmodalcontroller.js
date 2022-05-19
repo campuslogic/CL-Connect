@@ -131,7 +131,6 @@ clConnectServices.factory("addfieldmappingmodalcontroller", ["$modal",
                 }],
 
             open: function (theItem, fieldPosition, theList, eventPropertyValueAvailableProperties) {
-
                 //Open modal
                 var $modalInstance = $modal.open({
                     templateUrl: urlRoot + "/setup/template?templateName=AddFieldMappingModal",
@@ -142,12 +141,12 @@ clConnectServices.factory("addfieldmappingmodalcontroller", ["$modal",
                                 theItem: theItem,
                                 fieldPosition: fieldPosition,
                                 theList: theList,
-                                eventPropertyValueAvailableProperties: eventPropertyValueAvailableProperties
+                                eventPropertyValueAvailableProperties: eventPropertyValueAvailableProperties.sort()
                             };
                         }
                     },
-                    backdrop: 'static'//,
-                    //windowClass: "full-screen-modal"
+                    backdrop: 'static',
+                    windowClass: "show"
                 });
 
                 //Done

@@ -12,48 +12,48 @@
         For further detail on the SMTP section please click <a href="https://campuslogicinc.freshdesk.com/support/solutions/articles/5000706486-smtp" target="_blank">SMTP Settings Help</a>.
     </p>
     <hr>
-    <div class="col-md-12 padding-top-ten">
-        <div class="col-md-6">
-            <div class="form-group">
-                <label class="col-md-4 control-label"><span class="form-required" aria-hidden="true">* </span>Delivery Method</label>
-                <div class="col-md-8">
-                    <select required kendo-drop-down-list class="form-control input-lg height-100" name="deliveryMethod" ng-model="service.configurationModel.smtpSection.deliveryMethod">
+    <div class="row padding-top-ten">
+        <div class="col-lg-6">
+            <div class="row form-group mb-3">
+                <label class="col-lg-4 control-label"><span class="form-required" aria-hidden="true">* </span>Delivery Method</label>
+                <div class="col-lg-8">
+                    <select required kendo-drop-down-list class="form-control input-lg" name="deliveryMethod" ng-model="service.configurationModel.smtpSection.deliveryMethod">
                         <option value="Network">Network</option>
                         <option value="PickupDirectoryFromIis">Pickup Directory From IIS</option>
                         <option value="SpecifiedPickupDirectory">Specified Pickup Directory</option>
                     </select>
                 </div>
             </div>
-            <div class="form-group">
-                <label class="col-md-4 control-label"><span class="form-required" aria-hidden="true">*</span> From</label>
-                <div class="col-md-8">
+            <div class="row form-group mb-3">
+                <label class="col-lg-4 control-label"><span class="form-required" aria-hidden="true">*</span> From</label>
+                <div class="col-lg-8">
                     <input required id="from" name="from" type="email" ng-model="service.configurationModel.smtpSection.from" class="form-control">
                     <span class="field-validation-error" ng-show="(smtpForm.from.$dirty && smtpForm.from.$error.required) || (!validationService.pageValidations.smtpValid && (service.configurationModel.smtpSection.from === '' || !service.configurationModel.smtpSection.from))">Required</span>
                 </div>
             </div>
-            <div class="form-group">
-                <label class="col-md-4 control-label"><span class="form-required" aria-hidden="true">*</span> Send To</label>
-                <div class="col-md-8">
+            <div class="row form-group mb-3">
+                <label class="col-lg-4 control-label"><span class="form-required" aria-hidden="true">*</span> Send To</label>
+                <div class="col-lg-8">
                     <input required name="sendto" type="text" ng-model="service.configurationModel.campusLogicSection.smtpSettings.sendTo" class="form-control">
                     <span class="field-validation-error" ng-show="(smtpForm.sendto.$dirty && smtpForm.sendto.$error.required) || (!validationService.pageValidations.smtpValid && (service.configurationModel.campusLogicSection.smtpSettings.sendTo === '' || !service.configurationModel.campusLogicSection.smtpSettings.sendTo))">Required</span>
                 </div>
             </div>
             <div ng-if="service.configurationModel.smtpSection.deliveryMethod=='Network'||service.configurationModel.smtpSection.deliveryMethod==0">
-                <div class="form-group">
-                    <label class="col-md-4 control-label">Client Domain</label>
-                    <div class="col-md-8">
+                <div class="row form-group mb-3">
+                    <label class="col-lg-4 control-label">Client Domain</label>
+                    <div class="col-lg-8">
                         <input name="clientDomain" type="text" ng-model="service.configurationModel.smtpSection.network.clientDomain" class="form-control">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="col-md-4 control-label">Target Name</label>
-                    <div class="col-md-8">
+                <div class="row form-group mb-3">
+                    <label class="col-lg-4 control-label">Target Name</label>
+                    <div class="col-lg-8">
                         <input name="targetName" type="text" ng-model="service.configurationModel.smtpSection.network.targetName" class="form-control">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="col-md-4 control-label">Enable SSL</label>
-                    <div class="col-md-8 padding-top-seven">
+                <div class="row form-group mb-3">
+                    <label class="col-lg-4 control-label">Enable SSL</label>
+                    <div class="col-lg-8 padding-top-seven">
                         <span>
                             <label><input type="radio" ng-value="true" ng-model="service.configurationModel.smtpSection.network.enableSsl" style="width: 20px">True</label>
                             <label><input type="radio" ng-value="false" ng-model="service.configurationModel.smtpSection.network.enableSsl" style="width: 20px">False</label>
@@ -62,57 +62,55 @@
                 </div>
             </div>
         </div>
-        <div class="form-group" ng-if="service.configurationModel.smtpSection.deliveryMethod=='SpecifiedPickupDirectory'">
-            <label class="col-md-2 control-label"><span class="form-required" aria-hidden="true">*</span> Pick Up Directory Location</label>
-            <div class="col-md-4">
+        <div class="row form-group mb-3" ng-if="service.configurationModel.smtpSection.deliveryMethod=='SpecifiedPickupDirectory'">
+            <label class="col-lg-2 control-label"><span class="form-required" aria-hidden="true">*</span> Pick Up Directory Location</label>
+            <div class="col-lg-4">
                 <input required id="pickupDirectoryLocation" name="pickupDirectoryLocation" type="text" ng-model="service.configurationModel.smtpSection.specifiedPickupDirectory.pickupDirectoryLocation" class="form-control">
                 <span class="field-validation-error" ng-show="(smtpForm.pickupDirectoryLocation.$dirty && smtpForm.pickupDirectoryLocation.$error.required) || (!validationService.pageValidations.smtpValid && (service.configurationModel.smtpSection.specifiedPickupDirectory.pickupDirectoryLocation === '' || !service.configurationModel.smtpSection.specifiedPickupDirectory.pickupDirectoryLocation))">Required</span>
             </div>
         </div>
-        <div ng-if="service.configurationModel.smtpSection.deliveryMethod=='Network'||service.configurationModel.smtpSection.deliveryMethod==0">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label class="col-md-4 control-label"><span class="form-required" aria-hidden="true">*</span> Host</label>
-                    <div class="col-md-8">
-                        <input required name="host" type="text" ng-model="service.configurationModel.smtpSection.network.host" class="form-control">
-                        <span class="field-validation-error" ng-show="(smtpForm.host.$dirty && smtpForm.host.$error.required) || (!validationService.pageValidations.smtpValid && (service.configurationModel.smtpSection.network.host === '' || !service.configurationModel.smtpSection.network.host))">Required</span>
+        <div class="col-lg-6" ng-if="service.configurationModel.smtpSection.deliveryMethod=='Network'||service.configurationModel.smtpSection.deliveryMethod==0">
+            <div class="row form-group mb-3">
+                <label class="col-lg-4 control-label"><span class="form-required" aria-hidden="true">*</span> Host</label>
+                <div class="col-lg-8">
+                    <input required name="host" type="text" ng-model="service.configurationModel.smtpSection.network.host" class="form-control">
+                    <span class="field-validation-error" ng-show="(smtpForm.host.$dirty && smtpForm.host.$error.required) || (!validationService.pageValidations.smtpValid && (service.configurationModel.smtpSection.network.host === '' || !service.configurationModel.smtpSection.network.host))">Required</span>
+                </div>
+            </div>
+            <div class="row form-group mb-3">
+                <label class="col-lg-4 control-label"><span class="form-required" aria-hidden="true">*</span> Port</label>
+                <div class="col-lg-8">
+                    <input required name="port" type="text" ng-model="service.configurationModel.smtpSection.network.port" class="form-control">
+                    <span class="field-validation-error" ng-show="(smtpForm.port.$dirty && smtpForm.port.$error.required) || (!validationService.pageValidations.smtpValid && (service.configurationModel.smtpSection.network.port === '' || !service.configurationModel.smtpSection.network.port))">Required</span>
+                </div>
+            </div>
+            <div class="row form-group mb-3">
+                <label class="col-lg-4 control-label"> <span class="form-required" aria-hidden="true">*</span> Default Credentials</label>
+                <div class="col-lg-8 padding-top-seven">
+                    <span>
+                        <label><input type="radio" ng-value="true" ng-model="service.configurationModel.smtpSection.network.defaultCredentials" style="width: 20px">True</label>
+                        <label><input type="radio" ng-value="false" ng-model="service.configurationModel.smtpSection.network.defaultCredentials" style="width: 20px">False</label>
+                    </span>
+                </div>
+            </div>
+            <div ng-if="service.configurationModel.smtpSection.network.defaultCredentials==false">
+                <div class="row form-group mb-3">
+                    <label class="col-lg-4 control-label"><span class="form-required" aria-hidden="true"></span> User Name</label>
+                    <div class="col-lg-8">
+                        <input name="userName" type="text" ng-model="service.configurationModel.smtpSection.network.userName" class="form-control">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="col-md-4 control-label"><span class="form-required" aria-hidden="true">*</span> Port</label>
-                    <div class="col-md-8">
-                        <input required name="port" type="text" ng-model="service.configurationModel.smtpSection.network.port" class="form-control">
-                        <span class="field-validation-error" ng-show="(smtpForm.port.$dirty && smtpForm.port.$error.required) || (!validationService.pageValidations.smtpValid && (service.configurationModel.smtpSection.network.port === '' || !service.configurationModel.smtpSection.network.port))">Required</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-4 control-label"> <span class="form-required" aria-hidden="true">*</span> Default Credentials</label>
-                    <div class="col-md-8 padding-top-seven">
-                        <span>
-                            <label><input type="radio" ng-value="true" ng-model="service.configurationModel.smtpSection.network.defaultCredentials" style="width: 20px">True</label>
-                            <label><input type="radio" ng-value="false" ng-model="service.configurationModel.smtpSection.network.defaultCredentials" style="width: 20px">False</label>
-                        </span>
-                    </div>
-                </div>
-                <div ng-if="service.configurationModel.smtpSection.network.defaultCredentials==false">
-                    <div class="form-group">
-                        <label class="col-md-4 control-label"><span class="form-required" aria-hidden="true"></span> User Name</label>
-                        <div class="col-md-8">
-                            <input name="userName" type="text" ng-model="service.configurationModel.smtpSection.network.userName" class="form-control">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label"><span class="form-required" aria-hidden="true"></span> Password</label>
-                        <div class="col-md-8">
-                            <input name="password" type="password" ng-model="service.configurationModel.smtpSection.network.password" class="form-control">
-                        </div>
+                <div class="row form-group mb-3">
+                    <label class="col-lg-4 control-label"><span class="form-required" aria-hidden="true"></span> Password</label>
+                    <div class="col-lg-8">
+                        <input name="password" type="password" ng-model="service.configurationModel.smtpSection.network.password" class="form-control">
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-12 padding-top-twenty">
-        <button class="btn btn-default btn-lg next" ng-click="smtpForm.$valid && testSMTP(smtpForm)">Test</button>
+    <div class="col-lg-12 padding-top-twenty">
+        <button class="btn btn-light btn-lg next" ng-click="smtpForm.$valid && testSMTP(smtpForm)">Test</button>
         <span class="alert alert-success" role="alert" ng-show="validationService.pageValidations.smtpValid && validationService.pageValidations.issmtpTested">Email sent successfully</span>
         <span class="alert alert-danger" role="alert" ng-show="!validationService.pageValidations.smtpValid && validationService.pageValidations.issmtpTested">Invalid smtp information</span>
     </div>

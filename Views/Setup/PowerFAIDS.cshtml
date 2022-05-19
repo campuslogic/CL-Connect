@@ -12,17 +12,17 @@
             The file can either be generated per student or as a batch process to contain multiple students in one file.
             For additional information, see <a href="https://campuslogicinc.freshdesk.com/" target="_blank">PowerFAIDS help.</a>
         </section>
-        <div class="row"><div class="col-md-12"><hr /></div></div>
+        <div class="row"><div class="col-lg-12"><hr /></div></div>
         <!-- File Path -->
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-lg-12">
                 <label class="control-label">File Path</label>
-                <cl-folder-picker isrequired="true" formvalid="vm.pageValid" uploadpath="vm.powerFaidsSettings.filePath"></cl-folder-picker>
+                <cl-folder-picker class="col-lg-7" isrequired="true" formvalid="vm.pageValid" uploadpath="vm.powerFaidsSettings.filePath"></cl-folder-picker>
             </div>
         </div>
         <!-- File type -->
         <div class="row" style="margin-top:16px;">
-            <div class="col-md-4">
+            <div class="col-lg-4">
                 <label class="control-label">Student(s) per file: </label><br />
                 <label class="control-label">
                     <input type="radio" name="isBatch" required ng-value="false" ng-model="vm.powerFaidsSettings.isBatch" style="width: 20px">One
@@ -35,7 +35,7 @@
         </div>
         <!-- Batch Execution Minutes -->
         <div class="row" ng-if="vm.powerFaidsSettings.isBatch" style="margin-top:16px;">
-            <div class="col-md-4">
+            <div class="col-lg-4">
                 <label class="control-label">Batch Execution Minutes:</label>
                 <input id="batchExecutionMinutes"
                        name="batchExecutionMinutes"
@@ -47,9 +47,9 @@
                 <span class="field-validation-error" ng-show="(!vm.pageValid || powerFaidsForm.batchExecutionMinutes.$dirty) && powerFaidsForm.batchExecutionMinutes.$error.required">Required</span>
             </div>
         </div>
-        <div class="row"><div class="col-md-12"><hr /></div></div>
+        <div class="row"><div class="col-lg-12"><hr /></div></div>
         <div class="row" style="margin-top:16px;">
-            <div class="col-md-12">
+            <div class="col-lg-12">
                 <div id="powerfaids-grid" kendo-grid
                      data-role="grid"
                      data-editable="false"
@@ -59,14 +59,14 @@
                 <span class="field-validation-error" ng-show="!vm.pageValid && (!vm.powerFaidsList || vm.powerFaidsList.length == 0)">At least one record is requried.</span>
                 <span class="field-validation-error" ng-show="!vm.pageValid && vm.powerFaidsList.length > 0">Please ensure all Event/Transaction Category pairings are defined and unique and Events are accounted for in Event Notifications.</span>
             </div>
-            <div class="col-md-12" style="margin-top:8px;">
-                <button class="btn btn-default" ng-click="vm.addPowerFaidsRecord()">Add</button>
+            <div class="col-lg-12" style="margin-top:8px;">
+                <button class="btn btn-light" ng-click="vm.addPowerFaidsRecord()">Add</button>
             </div>
         </div>
     </div>
 
     <script id="powerfaids-collection-template" type="text/x-kendo-template">
-        <button class="btn btn-default" ng-click="vm.editPowerFaidsRecord(dataItem)" title="Edit"><i class="fa fa-pencil"></i></button>
-        <button class="btn btn-default" ng-click="vm.deletePowerFaidsRecord(dataItem)" title="Delete"><i class="fa fa-trash"></i></button>
+        <button class="btn btn-light" ng-click="vm.editPowerFaidsRecord(dataItem)" title="Edit"><i class="fa fa-pencil"></i></button>
+        <button class="btn btn-light" ng-click="vm.deletePowerFaidsRecord(dataItem)" title="Delete"><i class="fa fa-trash"></i></button>
     </script>
 </form>
