@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Configuration;
 using System.Net.Http;
+using System.Threading.Tasks;
 using CampusLogicEvents.Implementation;
 using CampusLogicEvents.Implementation.Configurations;
 using CampusLogicEvents.Implementation.Models;
@@ -24,13 +25,14 @@ namespace CampusLogicEvents.Web.Models
         /// </summary>
         /// <param name="configurationModel"></param>
         /// <returns></returns>
-        public static ConfigurationValidationModel ValidateAll(ConfigurationModel configurationModel)
+        public static async Task<ConfigurationValidationModel> ValidateAll(ConfigurationModel configurationModel)
         {
             var response = new ConfigurationValidationModel();
             response.EnvironmentValid = ValidateEnvironment(configurationModel.AppSettingsSection).IsSuccessStatusCode;
             if (response.EnvironmentValid)
             {
-                response.ApiCredentialsValid = ValidateApiCredentials(configurationModel.AppSettingsSection, configurationModel.CampusLogicSection.AwardLetterUploadSettings.AwardLetterUploadEnabled ?? false).IsSuccessStatusCode;
+                HttpResponseMessage validatedResponse = await ValidateApiCredentials(configurationModel.AppSettingsSection, configurationModel.CampusLogicSection.AwardLetterUploadSettings.AwardLetterUploadEnabled ?? false);
+                response.ApiCredentialsValid = validatedResponse.IsSuccessStatusCode;
                 if (configurationModel.CampusLogicSection.AwardLetterUploadSettings.AwardLetterUploadEnabled ?? false)
                 {
                     response.AwardLetterUploadValid = ValidateAwardLetterUploadSettings(configurationModel.CampusLogicSection.AwardLetterUploadSettings.AwardLetterUploadFilePath).IsSuccessStatusCode;
@@ -412,53 +414,12 @@ namespace CampusLogicEvents.Web.Models
         /// </summary>
         /// <param name="applicationAppSettingsSection"></param>
         /// <param name="awardLetterUploadEnabled"></param>
-        public static HttpResponseMessage ValidateApiCredentials(Dictionary<string, string> applicationAppSettingsSection, bool awardLetterUploadEnabled = false)
+        public static async Task<HttpResponseMessage> ValidateApiCredentials(Dictionary<string, string> applicationAppSettingsSection, bool awardLetterUploadEnabled = false)
         {
-            string stsUrl;
-            string apiURL;
-
-            // if DisableAutoUpdate, use the API endpoint from web.config
-            if (string.Equals(ConfigurationManager.AppSettings["DisableAutoUpdate"], "true", StringComparison.InvariantCultureIgnoreCase))
-            {
-                stsUrl = ConfigurationManager.AppSettings["StsUrl"];
-                string pmApiUrl = ConfigurationManager.AppSettings["PmWebApiUrl"];
-
-                if (pmApiUrl.IsNullOrWhiteSpace())
-                {
-                    throw new Exception("App setting 'PmWebApiUrl' not found");
-                }
-
-                apiURL = pmApiUrl;
-            }
-            // else, normal check
-            else
-            {
-                switch (applicationAppSettingsSection["environment"])
-                {
-                    case EnvironmentConstants.SANDBOX:
-                    {
-                        apiURL = ApiUrlConstants.PM_API_URL_SANDBOX;
-                        stsUrl = ApiUrlConstants.STS_URL_SANDBOX;
-                        break;
-                    }
-                    case EnvironmentConstants.PRODUCTION:
-                    {
-                        apiURL = ApiUrlConstants.PM_API_URL_PRODUCTION;
-                        stsUrl = ApiUrlConstants.STS_URL_PRODUCTION;
-                        break;
-                    }
-                    default:
-                    {
-                        apiURL = ApiUrlConstants.PM_API_URL_SANDBOX;
-                        stsUrl = ApiUrlConstants.STS_URL_SANDBOX;
-                        break;
-                    }
-                }
-            }
-            CredentialsManager credentialsManager = new CredentialsManager();
+            string apiURL = GatewayInfoManager.GetApiUrl(ProductIdConstants.PM_PRODUCT_ID);
 
             //Ensure Credentials are valid
-            var credentialsResponse = credentialsManager.GetAuthorizationToken(applicationAppSettingsSection["apiUsername"], applicationAppSettingsSection["apiPassword"], apiURL, stsUrl);
+            var credentialsResponse = await CredentialsManager.GetOAuth2TokenAsync(applicationAppSettingsSection["apiUsername"], applicationAppSettingsSection["apiPassword"], apiURL);
             if (!credentialsResponse.IsSuccessStatusCode)
             {
                 LogManager.FatalLog($"API Credentials are not valid, username: {applicationAppSettingsSection["apiUsername"]}, password: {applicationAppSettingsSection["apiPassword"]}");
