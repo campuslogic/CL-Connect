@@ -97,17 +97,6 @@ namespace CampusLogicEvents.Web
                 var hasChanges = false;
                 var config = WebConfigurationManager.OpenWebConfiguration(HostingEnvironment.ApplicationVirtualPath);
 
-                // Get the current STS and the expected STS
-                var currentSts = ConfigurationManager.AppSettings["StsUrl"];
-                var expectedSts = string.Equals(EnvironmentConstants.SANDBOX, environment, StringComparison.InvariantCultureIgnoreCase)
-                    ? ApiUrlConstants.STS_URL_SANDBOX : ApiUrlConstants.STS_URL_PRODUCTION;
-                if (!string.Equals(expectedSts, currentSts, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    // STS update needed
-                    config.AppSettings.Settings["StsUrl"].Value = expectedSts;
-                    hasChanges = true;
-                }
-
                 // Save if needed
                 if(hasChanges)
                 {
@@ -135,6 +124,7 @@ namespace CampusLogicEvents.Web
             VerifyEventNotificationTableExists();
             //Does the EventProperty table exist? If not, create it.
             VerifyEventPropertyTableExists();
+            VerifyEventPropertyNewColumnsExist();
 
             bool? filestoreEnabled = campusLogicSection.FileStoreSettings.FileStoreEnabled;
 
@@ -903,6 +893,25 @@ namespace CampusLogicEvents.Web
                 catch (Exception ex)
                 {
                     LogManager.ErrorLog($"There was an issue with validating and/or creating the EventProperty table in LocalDB: {ex}");
+                }
+            }
+        }
+
+        private static void VerifyEventPropertyNewColumnsExist()
+        {
+            using (var dbContext = new CampusLogicContext())
+            {
+                try
+                {
+                    dbContext.Database.ExecuteSqlCommand(
+                        "IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE name = N'CallbackEndpoint' and object_id = OBJECT_ID(N'[dbo].[EventProperty]'))" +
+                        "BEGIN ALTER TABLE [dbo].[EventProperty]" +
+                        "ADD [CallbackEndpoint] NVARCHAR(500) NULL" +
+                        ",[CallbackFileEndpoint] NVARCHAR(500) NULL; END");
+                }
+                catch (Exception ex)
+                {
+                    LogManager.ErrorLog($"There was an issue with validating and/or creating the new columns for the BatchProcessRecord table in LocalDB: {ex}");
                 }
             }
         }

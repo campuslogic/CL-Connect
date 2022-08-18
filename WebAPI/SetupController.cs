@@ -15,6 +15,7 @@ using System.Net.Configuration;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Http;
@@ -54,6 +55,21 @@ namespace CampusLogicEvents.Web.WebAPI
                 documentSettings.IndexFileFormat = null;
                 documentSettings.FieldMappingCollectionConfig = null;
             }
+        }
+        /// <summary>
+        /// Deletes Old API Urls that were previously hardcoded in web.config. Now they 
+        /// are retrieved from gateway
+        /// </summary>
+        /// <param name="appSettings"></param>
+        private void DeleteOldApiUrls(AppSettingsSection appSettings)
+        {
+            appSettings.Settings.Remove("StsUrl");
+            appSettings.Settings.Remove("SvWebApiUrl");
+            appSettings.Settings.Remove("AwardLetterWebApiUrl");
+            appSettings.Settings.Remove("PmWebApiUrl");
+            appSettings.Settings.Remove("SuWebApiUrl");
+            appSettings.Settings.Remove("SaWebApiUrl");
+            appSettings.Settings.Remove("SpWebApiUrl");
         }
 
         /// <summary>
@@ -203,28 +219,10 @@ namespace CampusLogicEvents.Web.WebAPI
                     }
                 }
 
-                //PMWebApiUrl is a newer setting that's needed for use with some newer datafile integrations
-                if (!appSettings.ContainsKey("PmWebApiUrl"))
+                // Used to retrieve API endpoints and eventProperty data
+                if (!appSettings.ContainsKey("GwWebApiUrl"))
                 {
-                    appSettings.Add("PmWebApiUrl", "");
-                }
-
-                //SUWebApiUrl is a newer setting that's needed for use with some newer datafile integrations
-                if (!appSettings.ContainsKey("SuWebApiUrl"))
-                {
-                    appSettings.Add("SuWebApiUrl", "");
-                }
-
-                // Newer setting
-                if (!appSettings.ContainsKey("SaWebApiUrl"))
-                {
-                    appSettings.Add("SaWebApiUrl", "");
-                }
-
-                // Newer setting
-                if (!appSettings.ContainsKey("SpWebApiUrl"))
-                {
-                    appSettings.Add("SpWebApiUrl", "");
+                    appSettings.Add("GwWebApiUrl", "");
                 }
 
                 if (response.CampusLogicSection.EventNotifications.Count > 0)
@@ -523,35 +521,8 @@ namespace CampusLogicEvents.Web.WebAPI
                 appSettings.Settings["ClientValidationEnabled"].Value = "true";
                 appSettings.Settings["UnobtrusiveJavaScriptEnabled"].Value = "true";
 
-                // Check if disabled
-                string value = ConfigurationManager.AppSettings["DisableAutoUpdate"] ?? "false";
-                bool.TryParse(value, out bool isDisabled);
-                if (isDisabled)
-                {
-                    // Skip it
-                }
-                else if (appSettings.Settings["Environment"].Value == EnvironmentConstants.SANDBOX)
-                {
-                    appSettings.Settings["StsUrl"].Value = ApiUrlConstants.STS_URL_SANDBOX;
-                    appSettings.Settings["SvWebApiUrl"].Value = ApiUrlConstants.SV_API_URL_SANDBOX;
-                    appSettings.Settings["AwardLetterWebApiUrl"].Value = ApiUrlConstants.AL_API_URL_SANDBOX;
-                    appSettings.Settings["PmWebApiUrl"].Value = ApiUrlConstants.PM_API_URL_SANDBOX;
-                    appSettings.Settings["SuWebApiUrl"].Value = ApiUrlConstants.SU_API_URL_SANDBOX;
-                    appSettings.Settings["SaWebApiUrl"].Value = ApiUrlConstants.SA_API_URL_SANDBOX;
-                    appSettings.Settings["SpWebApiUrl"].Value = ApiUrlConstants.SP_API_URL_SANDBOX;
-                }
-                else
-                {
-                    appSettings.Settings["StsUrl"].Value = ApiUrlConstants.STS_URL_PRODUCTION;
-                    appSettings.Settings["SvWebApiUrl"].Value = ApiUrlConstants.SV_API_URL_PRODUCTION;
-                    appSettings.Settings["AwardLetterWebApiUrl"].Value = ApiUrlConstants.AL_API_URL_PRODUCTION;
-                    appSettings.Settings["PmWebApiUrl"].Value = ApiUrlConstants.PM_API_URL_PRODUCTION;
-                    appSettings.Settings["SuWebApiUrl"].Value = ApiUrlConstants.SU_API_URL_PRODUCTION;
-                    appSettings.Settings["SaWebApiUrl"].Value = ApiUrlConstants.SA_API_URL_PRODUCTION;
-                    appSettings.Settings["SpWebApiUrl"].Value = ApiUrlConstants.SP_API_URL_PRODUCTION;
-                }
-
                 ClearOldFileDefinitions(campusLogicSection);
+                DeleteOldApiUrls(appSettings);
 
                 config.Save();
                 return Request.CreateResponse(HttpStatusCode.OK);
@@ -644,11 +615,11 @@ namespace CampusLogicEvents.Web.WebAPI
         /// <param name="configurationModel"></param>
         /// <returns></returns>
         [HttpPost]
-        public HttpResponseMessage ValidateConfigurations(ConfigurationModel configurationModel)
+        public async Task<HttpResponseMessage> ValidateConfigurations(ConfigurationModel configurationModel)
         {
             try
             {
-                var response = ValidationService.ValidateAll(configurationModel);
+                var response = await ValidationService.ValidateAll(configurationModel);
                 if (response.DuplicateEvent || response.DuplicatePath
                     || !response.EnvironmentValid
                     || !response.ApiCredentialsValid

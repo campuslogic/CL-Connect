@@ -53,7 +53,9 @@ namespace CampusLogicEvents.Web.Models
                                     Id = p.Id,
                                     Name = p.Name,
                                     DisplayName = p.DisplayName,
-                                    DisplayFormula = p.DisplayFormula
+                                    DisplayFormula = p.DisplayFormula,
+                                    CallbackEndpoint = p.CallbackEndpoint,
+                                    CallbackFileEndpoint = p.CallbackFileEndpoint
                                 }));
 
                             tran.Commit();
@@ -77,7 +79,9 @@ namespace CampusLogicEvents.Web.Models
                             Id = item.Id,
                             Name = item.Name,
                             DisplayName = item.DisplayName,
-                            DisplayFormula = item.DisplayFormula
+                            DisplayFormula = item.DisplayFormula,
+                            CallbackEndpoint = item.CallbackEndpoint,
+                            CallbackFileEndpoint = item.CallbackFileEndpoint
                         });
                     }
 

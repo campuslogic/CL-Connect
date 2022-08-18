@@ -606,49 +606,6 @@ namespace CampusLogicEvents.Web.Models
             }
         }
 
-        /// <summary>
-        /// Retrieves an access token via OAuth WRAP protocol.
-        /// </summary>
-        /// <param name="apiIntegration"></param>
-        /// <returns></returns>
-        private static async Task<string> GetOauthWrapTokenAsync(ApiIntegrationElement apiIntegration)
-        {
-            try
-            {
-                // Make the Web API call
-                using (var client = new System.Net.Http.HttpClient())
-                {
-                    // Build the form body that will be posted
-                    var body = string.Format("wrap_name={0}&wrap_password={1}&wrap_scope={2}",
-                        HttpUtility.UrlEncode(apiIntegration.Username),
-                        HttpUtility.UrlEncode(apiIntegration.Password),
-                        apiIntegration.Root);
-
-                    StringContent theContent = new StringContent(body, Encoding.UTF8, "application/x-www-form-urlencoded");
-
-                    // Call the API and post the form data to request the token
-                    HttpResponseMessage response = await client.PostAsync(new Uri(apiIntegration.TokenService), theContent).ConfigureAwait(false);  //ConfigureAwait is required when use with ASP.NET because of SynchronizationContext.
-                    if (response.IsSuccessStatusCode)
-                    {
-                        // Pull the content of the response, decode the response, strip off certain parts of the access token and return just the token part for use
-                        var accessToken = await response.Content.ReadAsStringAsync();
-                        var wrapAccessPart = HttpUtility.UrlDecode(accessToken).Split('&').FirstOrDefault(x => x.Contains("wrap_access_token_expires_in"));
-                        return HttpUtility.UrlDecode(accessToken).Replace("wrap_access_token=", string.Empty).Replace("&" + wrapAccessPart, string.Empty);
-                    }
-                    else
-                    {
-                        // Handle invalid responses here
-                        throw new Exception("Invalid Response.");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                LogManager.ErrorLogFormat("DataService GetOauthWrapTokenAsync Error: {0}", ex);
-                throw;
-            }
-        }
-
         private static void LogRequest(HttpResponseMessage response, NameValueCollection data)
         {
             string request = $"{response.RequestMessage.Method} {response.RequestMessage.RequestUri} Status Code: {(int)response.StatusCode}, Version: {response.Version}, Data: {GetJsonFromNameValueCollection(data)}, Headers: {{ {response.RequestMessage.Headers} }}";
@@ -661,7 +618,7 @@ namespace CampusLogicEvents.Web.Models
         /// </summary>
         /// <param name="endpointName"></param>
         /// <param name="eventData"></param>
-        private static void ApiIntegrationsHandler(string endpointName, EventNotificationData eventData)
+        private static async void ApiIntegrationsHandler(string endpointName, EventNotificationData eventData)
         {
             try
             {
@@ -697,11 +654,11 @@ namespace CampusLogicEvents.Web.Models
                                         $"{apiIntegration.Username}:{apiIntegration.Password}")));
                             break;
                         case ConfigConstants.OAuth2:
-                            var oauth2Token = GetOauth2TokenAsync(apiIntegration).Result;
+                            var oauth2Token = await GetOauth2TokenAsync(apiIntegration);
                             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", oauth2Token);
                             break;
                         case ConfigConstants.OAuth_WRAP:
-                            var oauthwrapToken = GetOauthWrapTokenAsync(apiIntegration).Result;
+                            var oauthwrapToken = await CredentialsManager.GetOauthWrapTokenAsync(apiIntegration);
                             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("WRAP", "access_token=\"" + oauthwrapToken + "\"");
                             break;
                         default:
@@ -770,14 +727,14 @@ namespace CampusLogicEvents.Web.Models
 
                             string[] array = list.ToArray();
                             endpoint += "?" + string.Join("&", array);
-                            response = httpClient.GetAsync(endpoint).Result;
+                            response = await httpClient.GetAsync(endpoint);
 
                             break;
                         case WebRequestMethods.Http.Post:
-                            response = httpClient.PostAsync(endpoint, GetHttpContent(eventParams, apiEndpoint.MimeType)).Result;
+                            response = await httpClient.PostAsync(endpoint, GetHttpContent(eventParams, apiEndpoint.MimeType));
                             break;
                         case WebRequestMethods.Http.Put:
-                            response = httpClient.PutAsync(endpoint, GetHttpContent(eventParams, apiEndpoint.MimeType)).Result;
+                            response = await httpClient.PutAsync(endpoint, GetHttpContent(eventParams, apiEndpoint.MimeType));
                             break;
                         default:
                             break;
