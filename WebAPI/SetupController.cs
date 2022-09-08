@@ -521,6 +521,21 @@ namespace CampusLogicEvents.Web.WebAPI
                 appSettings.Settings["ClientValidationEnabled"].Value = "true";
                 appSettings.Settings["UnobtrusiveJavaScriptEnabled"].Value = "true";
 
+                // Check if disabled
+                string value = ConfigurationManager.AppSettings["DisableAutoUpdate"] ?? "false";
+                bool.TryParse(value, out bool isDisabled);
+                if (!isDisabled)
+                {
+                    if (appSettings.Settings["Environment"].Value == EnvironmentConstants.SANDBOX)
+                    {
+                        appSettings.Settings["GwWebApiUrl"].Value = ApiUrlConstants.GW_URL_SANDBOX;
+                    }
+                    else
+                    {
+                        appSettings.Settings["GwWebApiUrl"].Value = ApiUrlConstants.GW_URL_PROD;
+                    }
+                }
+
                 ClearOldFileDefinitions(campusLogicSection);
                 DeleteOldApiUrls(appSettings);
 
