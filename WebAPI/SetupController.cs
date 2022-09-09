@@ -526,13 +526,13 @@ namespace CampusLogicEvents.Web.WebAPI
                 bool.TryParse(value, out bool isDisabled);
                 if (!isDisabled)
                 {
-                    if (appSettings.Settings["Environment"].Value == EnvironmentConstants.SANDBOX)
+                    if (appSettings.Settings["Environment"].Value == EnvironmentConstants.PRODUCTION)
                     {
-                        appSettings.Settings["GwWebApiUrl"].Value = ApiUrlConstants.GW_URL_SANDBOX;
+                        appSettings.Settings["GwWebApiUrl"].Value = ApiUrlConstants.GW_URL_PROD;
                     }
                     else
                     {
-                        appSettings.Settings["GwWebApiUrl"].Value = ApiUrlConstants.GW_URL_PROD;
+                        appSettings.Settings["GwWebApiUrl"].Value = ApiUrlConstants.GW_URL_SANDBOX;
                     }
                 }
 
