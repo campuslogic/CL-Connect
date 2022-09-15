@@ -15,19 +15,17 @@ namespace CampusLogicEvents.Web.WebAPI
     [LocalRequestOnly]
     public class CredentialsController : ApiController
     {
-
-
         public CredentialsController()
         {
         }
 
         [HttpGet]
-        public async Task<HttpResponseMessage> TestAPICredentials(string username, string password, string environment, bool awardLetterUploadEnabled = false)
+        public async Task<HttpResponseMessage> TestAPICredentials(string username, string password, string environment)
         {
             try
             {
-                string apiURL = GatewayInfoManager.GetApiUrl(ProductIdConstants.PM_PRODUCT_ID);
-                HttpResponseMessage response = await CredentialsManager.GetOAuth2TokenAsync(username, password, apiURL);
+                string apiURL = CredentialsManager.GetGwApiUrl(environment);
+                HttpResponseMessage response = await CredentialsManager.GetOAuth2TokenAsync(username, password, apiURL, environment);
 
                 return response;
             }

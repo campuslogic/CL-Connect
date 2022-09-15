@@ -416,13 +416,13 @@ namespace CampusLogicEvents.Web.Models
         /// <param name="awardLetterUploadEnabled"></param>
         public static async Task<HttpResponseMessage> ValidateApiCredentials(Dictionary<string, string> applicationAppSettingsSection, bool awardLetterUploadEnabled = false)
         {
-            string apiURL = GatewayInfoManager.GetApiUrl(ProductIdConstants.PM_PRODUCT_ID);
+            string apiURL = CredentialsManager.GetGwApiUrl(applicationAppSettingsSection["environment"]);
 
             //Ensure Credentials are valid
-            var credentialsResponse = await CredentialsManager.GetOAuth2TokenAsync(applicationAppSettingsSection["apiUsername"], applicationAppSettingsSection["apiPassword"], apiURL);
+            var credentialsResponse = await CredentialsManager.GetOAuth2TokenAsync(applicationAppSettingsSection["apiUsername"], applicationAppSettingsSection["apiPassword"], apiURL, applicationAppSettingsSection["environment"]);
             if (!credentialsResponse.IsSuccessStatusCode)
             {
-                LogManager.FatalLog($"API Credentials are not valid, username: {applicationAppSettingsSection["apiUsername"]}, password: {applicationAppSettingsSection["apiPassword"]}");
+                LogManager.FatalLog($"API Credentials are not valid, username: {applicationAppSettingsSection["apiUsername"]}, password: {applicationAppSettingsSection["apiPassword"]}, environment: {applicationAppSettingsSection["environment"]}");
                 return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
             }
 
