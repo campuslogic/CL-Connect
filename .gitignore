@@ -42,7 +42,7 @@ Temporary Items
 .apdisk
 
 dotNetFx45_Full_setup.exe
-SqlLocalDB.MSI
+# SqlLocalDB.MSI
 
 Views/Setup/AwardLetter.cshtml
 Views/Setup/EventNotification.cshtml
