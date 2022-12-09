@@ -661,6 +661,10 @@ namespace CampusLogicEvents.Web.Models
                             var oauthwrapToken = await CredentialsManager.GetOauthWrapTokenAsync(apiIntegration);
                             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("WRAP", "access_token=\"" + oauthwrapToken + "\"");
                             break;
+                        case ConfigConstants.Ethos:
+                            var ethosToken = await CredentialsManager.GetEthosAuthTokenAsync(apiIntegration);
+                            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ethosToken);
+                            break;
                         default:
                             break;
                     }

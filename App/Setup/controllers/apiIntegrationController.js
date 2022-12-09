@@ -102,6 +102,30 @@
              }]
         };
 
+        vm.gridOptions['ethos'] = {
+            columns:
+            [{ 'field': 'apiName', title: 'API Name' },
+            { 'field': 'authentication', title: 'Authentication' },
+            { 'field': 'root', title: 'Root' },
+            {
+                    'field': 'password', title: 'API Key', template: function (dataItem) {
+                        var str = '';
+                        for (var i = 0; i < dataItem.password.length; i++) {
+                            str += '●';
+                        }
+                        return str;
+                    }
+            },
+            {
+                command: [
+                    {
+                        template: kendo.template($("#add-api-settings-template").html())
+                    }
+                ],
+                width: "120px"
+            }]
+        };
+
         vm.gridOptions['endpoints'] = {
             columns:
             [{ 'field': 'name', title: 'Name' },

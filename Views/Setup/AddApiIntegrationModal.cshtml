@@ -21,6 +21,7 @@
                     <option value="basic">Basic</option>
                     <option value="oauth2">OAuth 2.0</option>
                     <option value="oauth_wrap">OAuth WRAP</option>
+                    <option value="ethos">Ethos Authentication</option>
                 </select>
             </div>
         </div>
@@ -42,7 +43,7 @@
                 <span class="field-validation-error" ng-show="tokenIsValid == false">Token must begin with "http://" or "https://"</span>
             </div>
         </div>
-        <div class="row padding-bottom-ten" ng-if="modelCopy.authentication !== 'none'">
+        <div class="row padding-bottom-ten" ng-if="!['none', 'ethos'].includes(modelCopy.authentication)">
             <div class="col-lg-4 text-right">
                 <label class="control-label" ng-if="modelCopy.authentication === 'basic' || modelCopy.authentication === 'oauth_wrap'">Username</label>
                 <label class="control-label" ng-if="modelCopy.authentication === 'oauth2'">Client ID</label>
@@ -56,6 +57,7 @@
             <div class="col-lg-4 text-right">
                 <label class="control-label" ng-if="modelCopy.authentication === 'basic' || modelCopy.authentication === 'oauth_wrap'">Password</label>
                 <label class="control-label" ng-if="modelCopy.authentication === 'oauth2'">Client Secret</label>
+                <label class="control-label" ng-if="modelCopy.authentication === 'ethos'">API Key</label>
             </div>
             <div class="col-lg-8">
                 <input type="password" class="form-control" id="password" name="password" ng-model="modelCopy.password" required />
