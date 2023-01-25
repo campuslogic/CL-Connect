@@ -16,12 +16,12 @@
                 <label class="control-label">Authentication</label>
             </div>
             <div class="col-lg-8">
-                <select id="method" required kendo-drop-down-list class="form-control input-lg " name="method" ng-model="modelCopy.authentication">
+                <select id="method" required kendo-drop-down-list class="form-control input-lg " name="method" ng-model="modelCopy.authentication" ng-change="onMethodChange()" ng-disabled="modalType === 'Edit' && modelCopy.authentication === 'ethos'">
                     <option value="none">None</option>
                     <option value="basic">Basic</option>
                     <option value="oauth2">OAuth 2.0</option>
                     <option value="oauth_wrap">OAuth WRAP</option>
-                    <option value="ethos">Ethos Authentication</option>
+                    <option value="ethos" ng-if="modalType === 'Add' || modelCopy.authentication === 'ethos'">Ethos Authentication</option>
                 </select>
             </div>
         </div>
@@ -30,7 +30,7 @@
                 <label class="control-label">Root</label>
             </div>
             <div class="col-lg-8">
-                <input type="text" class="form-control" id="root" name="root" ng-model="modelCopy.root" required />
+                <input type="text" class="form-control" id="root" name="root" ng-model="modelCopy.root" ng-disabled="modelCopy.authentication === 'ethos'" required />
                 <span class="field-validation-error" ng-show="rootIsValid == false">Root must begin with "http://" or "https://"</span>
             </div>
         </div>

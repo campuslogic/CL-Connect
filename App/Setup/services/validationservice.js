@@ -141,7 +141,6 @@
                 }
             }
 
-            service.pageValidations.apiIntegrationsValid = true;
             return false;
         }
 
@@ -936,8 +935,16 @@
 
                 // Ensure each API Integration has at least one endpoint
                 for (var i = 0; i < apiIntegrationsList.length; i++) {
-                    if (getEndpointsForApi(apiIntegrationsList[i].apiId, apiEndpointsList).length === 0) {
+                    var endpoints = getEndpointsForApi(apiIntegrationsList[i].apiId, apiEndpointsList);
+                    if (endpoints.length === 0) {
                         service.pageValidations.apiIntegrationsValid = false;
+                    }
+
+                    // Ensure parameter mappings are defined for each endpoint
+                    for (var j = 0; j < endpoints.length; j++) {
+                        if (endpoints[j].parameterMappings === null || endpoints[j].parameterMappings === undefined) {
+                            service.pageValidations.apiIntegrationsValid = false;
+                        }
                     }
                 }
             }

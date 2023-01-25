@@ -16,7 +16,7 @@
                 <label class="control-label">Endpoint</label>
             </div>
             <div class="col-lg-9">
-                <input type="text" class="form-control" id="endpoint" name="endpoint" ng-model="modelCopy.endpoint" required />
+                <input type="text" class="form-control" id="endpoint" name="endpoint" ng-model="modelCopy.endpoint" ng-disabled="endpointReadonly" required />
             </div>
         </div>
         <div class="row padding-bottom-ten">
@@ -24,7 +24,7 @@
                 <label class="control-label">Method</label>
             </div>
             <div class="col-lg-9">
-                <select id="method" required kendo-drop-down-list class="form-control input-lg " name="method" ng-model="modelCopy.method">
+                <select id="method" required kendo-drop-down-list class="form-control input-lg " name="method" ng-model="modelCopy.method" ng-disabled="endpointReadonly">
                     <option value="GET">GET</option>
                     <option value="POST">POST</option>
                     <option value="PUT">PUT</option>
@@ -36,7 +36,7 @@
                 <label class="control-label">MIME Type</label>
             </div>
             <div class="col-lg-9">
-                <input type="text" class="form-control" id="mimeType" name="mimeType" ng-model="modelCopy.mimeType" required />
+                <input type="text" class="form-control" id="mimeType" name="mimeType" ng-model="modelCopy.mimeType" ng-disabled="endpointReadonly" required />
                 <span class="field-validation-error" ng-show="mimeTypeIsValid == false">Required</span>
             </div>
         </div>

@@ -102,6 +102,12 @@ clConnectServices.factory("addapiintegrationmodalcontroller", ["$modal",
                         return formIsValid;
                     }
 
+                    $scope.onMethodChange = function () {
+                        if ($scope.modelCopy.authentication === 'ethos') {
+                            $scope.modelCopy.root = 'https://integrate.elluciancloud.com';
+                        }
+                    };
+
                     $scope.closeModal = function () {
                         $modalInstance.close();
                     };

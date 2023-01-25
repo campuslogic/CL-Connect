@@ -555,6 +555,11 @@ namespace CampusLogicEvents.Web.Models
             return JsonConvert.SerializeObject(data.AllKeys.ToDictionary(k => k, k => data[k]));
         }
 
+        private static JObject GetJObjectFromNameValueCollection(NameValueCollection data)
+        {
+            return JObject.FromObject(data.AllKeys.ToDictionary(k => k, k => data[k]));
+        }
+
         /// <summary>
         /// Converts a collection of parameters and their values into HttpContent.
         /// </summary>
@@ -642,7 +647,8 @@ namespace CampusLogicEvents.Web.Models
                     httpClient.Timeout = new TimeSpan(0, 5, 0);
 
                     // Custom header for API service to track requests
-                    httpClient.DefaultRequestHeaders.Add("EventId", eventData.PropertyValues[EventPropertyConstants.Id].Value<string>());
+                    var eventId = eventData.PropertyValues[EventPropertyConstants.Id].Value<string>();
+                    httpClient.DefaultRequestHeaders.Add("EventId", eventId);
 
                     var authType = apiIntegration.Authentication;
                     switch (authType)
@@ -735,7 +741,7 @@ namespace CampusLogicEvents.Web.Models
 
                             break;
                         case WebRequestMethods.Http.Post:
-                            response = await httpClient.PostAsync(endpoint, GetHttpContent(eventParams, apiEndpoint.MimeType));
+                            response = await HandleApiPostAsync(httpClient, eventId, eventParams, apiEndpoint, apiIntegration.Authentication);
                             break;
                         case WebRequestMethods.Http.Put:
                             response = await httpClient.PutAsync(endpoint, GetHttpContent(eventParams, apiEndpoint.MimeType));
@@ -757,6 +763,40 @@ namespace CampusLogicEvents.Web.Models
                 LogManager.ErrorLogFormat("DataService ApiIntegrationsHandler Error: {0}", e);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Creates and handles a post request based on authentication type (basic, ethos)
+        /// </summary>
+        /// <param name="httpClient"></param>
+        /// <param name="eventId"></param>
+        /// <param name="eventParams"></param>
+        /// <param name="apiEndpoint"></param>
+        /// <param name="authenticationMethod"></param>
+        /// <returns></returns>
+        private static async Task<HttpResponseMessage> HandleApiPostAsync(System.Net.Http.HttpClient httpClient, string eventId, NameValueCollection eventParams, ApiIntegrationEndpointElement apiEndpoint, string authenticationMethod)
+        {
+            var endpoint = apiEndpoint.Endpoint;
+            var content = GetHttpContent(eventParams, apiEndpoint.MimeType);
+
+            // PM-631: If this is an Ellucian Ethos Integration, we have to wrap the event data in the appropriate schema
+            if (authenticationMethod == ConfigConstants.Ethos)
+            {
+                var changeNotification = new ChangeNotificationData { 
+                    Resource = new Resource { 
+                        Name = ConfigConstants.EthosApplicationName,
+                        Id = new Guid(eventId), 
+                    },
+                    Operation = "created",
+                    ContentType = "resource-representation",
+                    Content = GetJObjectFromNameValueCollection(eventParams)
+                };
+                // Expects an array for the body
+                var postBody = JsonConvert.SerializeObject(new[] { changeNotification });
+                content = new StringContent(postBody, Encoding.UTF8, apiEndpoint.MimeType);
+            }
+
+            return await httpClient.PostAsync(endpoint, content);
         }
 
         /// <summary>

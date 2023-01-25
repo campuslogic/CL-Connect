@@ -13,6 +13,7 @@ clConnectServices.factory("addapiendpointmodalcontroller", ["$modal",
                     $scope.theItem = modalParams.theItem;
                     $scope.apiId = modalParams.apiId;
                     $scope.endpointsList = modalParams.endpointsList;
+                    $scope.endpointReadonly = modalParams.endpointReadonly;
                     $scope.originalEndpointName = null;
                     $scope.dropdown = { eventPropertyValues: modalParams.eventPropertyValues };
                     $scope.parameterMappings = [
@@ -23,16 +24,18 @@ clConnectServices.factory("addapiendpointmodalcontroller", ["$modal",
                     ];
 
                     $scope.populateParameterMappings = function () {
-                        $scope.parameterMappings = [];
-                        var mappings = JSON.parse($scope.modelCopy.parameterMappings);
+                        if ($scope.modelCopy.parameterMappings != null) {
+                            $scope.parameterMappings = [];
 
-                        for (var i = 0; i < mappings.length; i++) {
-                            var mapping = mappings[i];
-                            $scope.parameterMappings.push({ parameter: mapping.parameter, eventData: mapping.eventData });
+                            var mappings = JSON.parse($scope.modelCopy.parameterMappings);
+                            for (var i = 0; i < mappings.length; i++) {
+                                var mapping = mappings[i];
+                                $scope.parameterMappings.push({ parameter: mapping.parameter, eventData: mapping.eventData });
+                            }
+
+                            $scope.parameterMappings.push({ parameter: "", eventData: null });
+                            $scope.$apply;
                         }
-
-                        $scope.parameterMappings.push({ parameter: "", eventData: null });
-                        $scope.$apply;
                     };
 
                     if (modalParams.theItem === undefined || modalParams.theItem === null) {
@@ -149,7 +152,7 @@ clConnectServices.factory("addapiendpointmodalcontroller", ["$modal",
                     };
                 }],
 
-            open: function (dataItem, apiId, endpointsList, eventPropertyValues) {
+            open: function (dataItem, apiId, endpointsList, eventPropertyValues, endpointReadonly) {
                 // Open modal
                 var $modalInstance = $modal.open({
                     templateUrl: urlRoot + "/setup/template?templateName=AddApiEndpointModal",
@@ -160,7 +163,8 @@ clConnectServices.factory("addapiendpointmodalcontroller", ["$modal",
                                 theItem: dataItem,
                                 apiId: apiId,
                                 endpointsList: endpointsList,
-                                eventPropertyValues: eventPropertyValues
+                                eventPropertyValues: eventPropertyValues,
+                                endpointReadonly: endpointReadonly
                             };
                         }
                     },
