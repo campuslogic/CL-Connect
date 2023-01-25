@@ -57,6 +57,8 @@
 	    # Write to web.config
         Write-Host "Writing updated web.config content back to web.config"
 	    Set-Content -Path $dir\web.config -Value $newWebConfig
+        Write-Host "web.config was updated successfully!"
+
 	} else {
 		Write-Host "New web.config data did not have content. Update did not occur. Exiting..."
 		Exit 1
@@ -65,12 +67,6 @@
 } catch { 
 	Write-Host "An error occurred when attempting to update the web.config:"
 	Write-Host $_
-	WriteHost "Exiting..."
+	Write-Host "Exiting..."
 	Exit 1
 }
-
-Write-Host "web.config was updated successfully!"
-
-
-
-

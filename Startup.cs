@@ -159,32 +159,35 @@ namespace CampusLogicEvents.Web
                 LogManager.ErrorLog("SMTP settings are missing");
                 return;
             }
-            if (!IsValidEmail(smtpSection.From))
+            if (campusLogicSection.SMTPSettings.NotificationsEnabled ?? false)
             {
-                LogManager.ErrorLog("SMTP from email address is not a valid email address");
-                return;
-            }
-            foreach (var email in campusLogicSection.SMTPSettings.SendTo.Split(Convert.ToChar(",")).Where(email => !IsValidEmail(email.Trim())))
-            {
-                LogManager.ErrorLog($"SMTP to email address {email} is not a valid email address");
-                return;
-            }
-            if (smtpSection.DeliveryMethod != SmtpDeliveryMethod.Network && smtpSection.DeliveryMethod != SmtpDeliveryMethod.SpecifiedPickupDirectory && smtpSection.DeliveryMethod != SmtpDeliveryMethod.PickupDirectoryFromIis)
-            {
-                LogManager.ErrorLog($"SMTP delivery method {smtpSection.DeliveryMethod} is not a valid delivery method");
-                return;
-            }
-            if (smtpSection.DeliveryMethod == SmtpDeliveryMethod.Network)
-            {
-                if (!smtpSection.Network.DefaultCredentials && (string.IsNullOrEmpty(smtpSection.Network.UserName.Trim()) || string.IsNullOrEmpty(smtpSection.Network.Password.Trim())))
+                if (!IsValidEmail(smtpSection.From))
                 {
-                    LogManager.ErrorLog("SMTP network credentials (username or password) are missing");
+                    LogManager.ErrorLog("SMTP from email address is not a valid email address");
                     return;
                 }
-            }
-            if (smtpSection.DeliveryMethod == SmtpDeliveryMethod.SpecifiedPickupDirectory && string.IsNullOrEmpty(smtpSection.SpecifiedPickupDirectory.PickupDirectoryLocation))
-            {
-                LogManager.ErrorLog("Specified Pickup Directory was indicated as the delivery method for SMTP but no pickup directory location was specified ");
+                foreach (var email in campusLogicSection.SMTPSettings.SendTo.Split(Convert.ToChar(",")).Where(email => !IsValidEmail(email.Trim())))
+                {
+                    LogManager.ErrorLog($"SMTP to email address {email} is not a valid email address");
+                    return;
+                }
+                if (smtpSection.DeliveryMethod != SmtpDeliveryMethod.Network && smtpSection.DeliveryMethod != SmtpDeliveryMethod.SpecifiedPickupDirectory && smtpSection.DeliveryMethod != SmtpDeliveryMethod.PickupDirectoryFromIis)
+                {
+                    LogManager.ErrorLog($"SMTP delivery method {smtpSection.DeliveryMethod} is not a valid delivery method");
+                    return;
+                }
+                if (smtpSection.DeliveryMethod == SmtpDeliveryMethod.Network)
+                {
+                    if (!smtpSection.Network.DefaultCredentials && (string.IsNullOrEmpty(smtpSection.Network.UserName.Trim()) || string.IsNullOrEmpty(smtpSection.Network.Password.Trim())))
+                    {
+                        LogManager.ErrorLog("SMTP network credentials (username or password) are missing");
+                        return;
+                    }
+                }
+                if (smtpSection.DeliveryMethod == SmtpDeliveryMethod.SpecifiedPickupDirectory && string.IsNullOrEmpty(smtpSection.SpecifiedPickupDirectory.PickupDirectoryLocation))
+                {
+                    LogManager.ErrorLog("Specified Pickup Directory was indicated as the delivery method for SMTP but no pickup directory location was specified ");
+                }
             }
         }
 
