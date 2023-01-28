@@ -20,6 +20,7 @@ using System.IO;
 using System.Xml.Linq;
 using CampusLogicEvents.Implementation.Extensions;
 using CampusLogicEvents.Web.Filters;
+using Newtonsoft.Json.Serialization;
 
 namespace CampusLogicEvents.Web.Models
 {
@@ -322,8 +323,8 @@ namespace CampusLogicEvents.Web.Models
                 var eventSettings = campusLogicConfigSection.PowerFaidsSettings.PowerFaidsSettingCollectionConfig.GetPowerFaidsSettingList();
 
                 var eventSetting = eventSettings
-                    .FirstOrDefault(e => (eventData.PropertyValues[EventPropertyConstants.SvTransactionCategoryId]?.Value<string>() == null 
-                            ? string.Empty 
+                    .FirstOrDefault(e => (eventData.PropertyValues[EventPropertyConstants.SvTransactionCategoryId]?.Value<string>() == null
+                            ? string.Empty
                             : eventData.PropertyValues[EventPropertyConstants.SvTransactionCategoryId]?.Value<string>()) == e.TransactionCategory
                         && e.Event == eventData.PropertyValues[EventPropertyConstants.EventNotificationId].Value<string>());
 
@@ -403,7 +404,7 @@ namespace CampusLogicEvents.Web.Models
                 // Parse parameters based on config.
                 List<OdbcParameter> parameters =
                     storedProcedureSettings.GetParameters().Select(p => ParseParameter(p, eventData)).ToList();
-                
+
                 //Adding logging in case client experiences weird argument error, we can better determine what we are trying to pass
                 //LogManager.InfoLog($"Parameters to be pass into database: { String.Join(", ", parameters.Select(x => x.ParameterName + ": " + x.Value.ToString() + " - DataType: " + Enum.GetName(typeof(OdbcType), x.OdbcType)))}");
 
@@ -555,11 +556,6 @@ namespace CampusLogicEvents.Web.Models
             return JsonConvert.SerializeObject(data.AllKeys.ToDictionary(k => k, k => data[k]));
         }
 
-        private static JObject GetJObjectFromNameValueCollection(NameValueCollection data)
-        {
-            return JObject.FromObject(data.AllKeys.ToDictionary(k => k, k => data[k]));
-        }
-
         /// <summary>
         /// Converts a collection of parameters and their values into HttpContent.
         /// </summary>
@@ -694,6 +690,7 @@ namespace CampusLogicEvents.Web.Models
                     }
 
                     var eventParams = new NameValueCollection();
+                    var changeNotificationContent = new JObject();
 
                     // foreach mapping, get event property, find its corresponding eventdata, get that eventdata's value, attach it to the parameter in mapping
                     foreach (JToken jToken in parameterMappings)
@@ -703,11 +700,19 @@ namespace CampusLogicEvents.Web.Models
                         // This retrieves the "DisplayName" value of the EventProperty
                         var mappingDisplayName = mapping["eventData"].Value<string>();
 
-                        // SV-3872 Convert to the "Name" value of the EventProperty
-                        // In cases of JS formula, this will apply that value instead
-                        var eventValue = eventData.GetValueByDisplayName(mappingDisplayName);
-
-                        eventParams.Add(mapping["parameter"].Value<string>(), eventValue);
+                        // PM-631: For Ethos requests, the POST content object structure changes. Need to maintain property types.
+                        if (authType == ConfigConstants.Ethos)
+                        {
+                            var eventValue = eventData.GetValueByDisplayNameForChangeNotification(mappingDisplayName);
+                            changeNotificationContent.Add(mapping["parameter"].Value<string>(), eventValue);
+                        }
+                        else
+                        {
+                            // SV-3872 Convert to the "Name" value of the EventProperty
+                            // In cases of JS formula, this will apply that value instead
+                            var eventValue = eventData.GetValueByDisplayName(mappingDisplayName);
+                            eventParams.Add(mapping["parameter"].Value<string>(), eventValue);
+                        }
                     }
 
                     HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
@@ -741,7 +746,7 @@ namespace CampusLogicEvents.Web.Models
 
                             break;
                         case WebRequestMethods.Http.Post:
-                            response = await HandleApiPostAsync(httpClient, eventId, eventParams, apiEndpoint, apiIntegration.Authentication);
+                            response = await HandleApiPostAsync(httpClient, eventId, eventParams, changeNotificationContent, apiEndpoint, apiIntegration.Authentication);
                             break;
                         case WebRequestMethods.Http.Put:
                             response = await httpClient.PutAsync(endpoint, GetHttpContent(eventParams, apiEndpoint.MimeType));
@@ -771,32 +776,44 @@ namespace CampusLogicEvents.Web.Models
         /// <param name="httpClient"></param>
         /// <param name="eventId"></param>
         /// <param name="eventParams"></param>
+        /// <param name="changeNotificationContent"></param>
         /// <param name="apiEndpoint"></param>
         /// <param name="authenticationMethod"></param>
         /// <returns></returns>
-        private static async Task<HttpResponseMessage> HandleApiPostAsync(System.Net.Http.HttpClient httpClient, string eventId, NameValueCollection eventParams, ApiIntegrationEndpointElement apiEndpoint, string authenticationMethod)
+        private static async Task<HttpResponseMessage> HandleApiPostAsync(System.Net.Http.HttpClient httpClient, string eventId, NameValueCollection eventParams,
+                                                                            JObject changeNotificationContent, ApiIntegrationEndpointElement apiEndpoint, string authenticationMethod)
         {
-            var endpoint = apiEndpoint.Endpoint;
-            var content = GetHttpContent(eventParams, apiEndpoint.MimeType);
-
-            // PM-631: If this is an Ellucian Ethos Integration, we have to wrap the event data in the appropriate schema
+            StringContent content;
             if (authenticationMethod == ConfigConstants.Ethos)
             {
-                var changeNotification = new ChangeNotificationData { 
-                    Resource = new Resource { 
+                // PM-631: If this is an Ellucian Ethos Integration, we have to wrap the event data in the appropriate schema
+                var changeNotification = new ChangeNotificationData
+                {
+                    Resource = new Resource
+                    {
                         Name = ConfigConstants.EthosApplicationName,
-                        Id = new Guid(eventId), 
+                        Id = new Guid(eventId),
                     },
                     Operation = "created",
                     ContentType = "resource-representation",
-                    Content = GetJObjectFromNameValueCollection(eventParams)
+                    Content = changeNotificationContent
                 };
                 // Expects an array for the body
-                var postBody = JsonConvert.SerializeObject(new[] { changeNotification });
+                DefaultContractResolver contractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy(true, false) };
+                var postBody = JsonConvert.SerializeObject(new[] { changeNotification }, new JsonSerializerSettings
+                {
+                    ContractResolver = contractResolver,
+                    Formatting = Formatting.None
+                });
                 content = new StringContent(postBody, Encoding.UTF8, apiEndpoint.MimeType);
             }
+            else
+            {
+                // Non-Ellucian auth flow
+                content = GetHttpContent(eventParams, apiEndpoint.MimeType);
+            }
 
-            return await httpClient.PostAsync(endpoint, content);
+            return await httpClient.PostAsync(apiEndpoint.Endpoint, content);
         }
 
         /// <summary>

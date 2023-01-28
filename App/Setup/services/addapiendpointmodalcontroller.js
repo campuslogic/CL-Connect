@@ -24,7 +24,7 @@ clConnectServices.factory("addapiendpointmodalcontroller", ["$modal",
                     ];
 
                     $scope.populateParameterMappings = function () {
-                        if ($scope.modelCopy.parameterMappings != null) {
+                        if ($scope.modelCopy.parameterMappings !== null) {
                             $scope.parameterMappings = [];
 
                             var mappings = JSON.parse($scope.modelCopy.parameterMappings);
