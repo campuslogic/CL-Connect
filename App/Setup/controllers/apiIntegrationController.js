@@ -102,6 +102,30 @@
              }]
         };
 
+        vm.gridOptions['ethos'] = {
+            columns:
+            [{ 'field': 'apiName', title: 'API Name' },
+            { 'field': 'authentication', title: 'Authentication' },
+            { 'field': 'root', title: 'Root' },
+            {
+                    'field': 'password', title: 'API Key', template: function (dataItem) {
+                        var str = '';
+                        for (var i = 0; i < dataItem.password.length; i++) {
+                            str += '●';
+                        }
+                        return str;
+                    }
+            },
+            {
+                command: [
+                    {
+                        template: kendo.template($("#add-api-settings-template").html())
+                    }
+                ],
+                width: "120px"
+            }]
+        };
+
         vm.gridOptions['endpoints'] = {
             columns:
             [{ 'field': 'name', title: 'Name' },
@@ -111,14 +135,15 @@
              {
                  'field': 'parameterMappings', title: 'Parameter Mappings', template: function (dataItem) {
                      var parameterMappings = JSON.parse(dataItem.parameterMappings);
-                     var html = [];
+                     if (parameterMappings) {
+                         var html = [];
+                         for (var i = 0; i < parameterMappings.length; i++) {
+                             html.push('<span>' + parameterMappings[i].parameter + '</span> <i class="fa fa-long-arrow-right"></i> ');
+                             html.push('<span>' + parameterMappings[i].eventData + '</span><br/>');
+                         }
 
-                     for (var i = 0; i < parameterMappings.length; i++) {
-                         html.push('<span>' + parameterMappings[i].parameter + '</span> <i class="fa fa-long-arrow-right"></i> ');
-                         html.push('<span>' + parameterMappings[i].eventData + '</span><br/>');
+                         return html.join('');
                      }
-
-                     return html.join('');
                  }
              },
              {
@@ -182,7 +207,9 @@
 
         vm.addOrEditEndpoint = function (dataItem, apiId) {
             var eventPropertyValues = setupservice.configurationModel.campusLogicSection.eventPropertyValueAvailableProperties;
-            vm.addapiendpointmodalcontroller.open(dataItem, apiId, vm.apiEndpointsList, eventPropertyValues).result.then(function () {
+            var index = vm.getIndexOfApiIntegration(apiId);
+            var integration = vm.apiIntegrationsList[index];
+            vm.addapiendpointmodalcontroller.open(dataItem, apiId, vm.apiEndpointsList, eventPropertyValues, integration.authentication === 'ethos').result.then(function () {
                 vm.refreshEndpoints(apiId);
             });
         };
@@ -235,6 +262,21 @@
             }
             vm.apiIntegrationsList.push(apiIntegration);
             vm.addapiintegrationmodalcontroller.open(apiIntegration, vm.apiIntegrationsList).result.then(function () {
+                var index = vm.getIndexOfApiIntegration(apiIntegration.apiId);
+                var integration = vm.apiIntegrationsList[index];
+                if (integration.authentication === 'ethos') {
+                    // For ethos integrations, publish endpoint required
+                    var apiPublishEndpoint = {
+                        apiId: integration.apiId,
+                        name: 'Ethos Publish',
+                        endpoint: '/publish',
+                        method: 'POST',
+                        mimeType: 'application/json',
+                        parameterMappings: null
+                    };
+                    vm.apiEndpointsList.push(apiPublishEndpoint);
+                    vm.refreshEndpoints(apiPublishEndpoint.apiId);
+                }
                 // API Integration setup has been completed, update the grid
                 vm.refreshApiIntegrations(apiIntegration.apiId);
             }, function () {

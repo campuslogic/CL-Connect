@@ -87,19 +87,26 @@ clConnectServices.factory("addapiintegrationmodalcontroller", ["$modal",
                                 }
                             }
 
-                            if ($rootScope.isNullOrWhitespace($scope.modelCopy.username)) {
+                            if ($scope.modelCopy.authentication !== 'ethos' &&
+                                $rootScope.isNullOrWhitespace($scope.modelCopy.username)) {
                                 formIsValid = false;
                                 $scope.usernameIsValid = false;
                             }
-
+                            
                             if ($rootScope.isNullOrWhitespace($scope.modelCopy.password)) {
                                 formIsValid = false;
                                 $scope.passwordIsValid = false;
                             }
                         }
-                        
+
                         return formIsValid;
                     }
+
+                    $scope.onMethodChange = function () {
+                        if ($scope.modelCopy.authentication === 'ethos') {
+                            $scope.modelCopy.root = 'https://integrate.elluciancloud.com';
+                        }
+                    };
 
                     $scope.closeModal = function () {
                         $modalInstance.close();

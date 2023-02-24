@@ -42,6 +42,7 @@ Temporary Items
 .apdisk
 
 dotNetFx45_Full_setup.exe
+ndp48-web.exe
 SqlLocalDB.MSI
 
 Views/Setup/AwardLetter.cshtml
