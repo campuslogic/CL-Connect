@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Web.Optimization;
 
 namespace CampusLogicEvents.Web
@@ -8,10 +9,11 @@ namespace CampusLogicEvents.Web
         // For more information on Bundling, visit http://go.microsoft.com/fwlink/?LinkId=254725
         public static void RegisterBundles(BundleCollection bundles)
         {
-            bundles.Add(new StyleBundle("~/Content/angular").Include(AngularJsFileNames));
-            bundles.Add(new StyleBundle("~/Content/js").Include(JsFileNames));
+            bundles.Add(new Bundle("~/Content/bootstrap").Include(BootstrapJsFileNames));
+            bundles.Add(new ScriptBundle("~/Content/angular").Include(AngularJsFileNames));
+            bundles.Add(new ScriptBundle("~/Content/js").Include(JsFileNames));
 
-           
+
 
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
             // ready for production, use the build tool at http://modernizr.com to pick only the tests you need.
@@ -100,7 +102,6 @@ namespace CampusLogicEvents.Web
                                "~/Scripts/angular.js",
                                "~/Scripts/angular-resource.js",
                                "~/Scripts/angular-route.js",
-                               "~/Scripts/bootstrap.js",
                                "~/Scripts/angular-ui/ui-bootstrap.js",
                                "~/Scripts/angular-ui/ui-bootstrap-tpls.js",
                                "~/Scripts/angular.treeview.js",
@@ -110,6 +111,17 @@ namespace CampusLogicEvents.Web
                                "~/Scripts/jquery.blockUI.js",
                                "~/Scripts/spin.js"
                            };
+            }
+        }
+
+        public static string[] BootstrapJsFileNames
+        {
+            get
+            {
+                return new[]
+                            {
+                                "~/Scripts/bootstrap.js",
+                            };
             }
         }
 
