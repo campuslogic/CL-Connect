@@ -10,6 +10,7 @@
     function validationservice($q, $resource, setupservice, eventpropertyservice, $rootScope) {
         var service = {
             eventNotificationTypes: $resource('api/eventNotifications/EventNotificationTypes'),
+            eventNotifications: $resource('api/eventNotifications/EventNotifications'),
             testApiCredentials: $resource('api/Credentials/TestAPICredentials/', { username: "@username", password: "@password", environment: "@environment" }),
             testConnectionString: $resource('api/EventNotifications/TestConnectionString'),
             testReadWritePermissions: $resource('api/FolderPicker/TestWritePermissions/', { directoryPath: "@directoryPath" }),

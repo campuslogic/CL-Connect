@@ -32,6 +32,13 @@ namespace CampusLogicEvents.Web.WebAPI
         }
 
         [HttpGet]
+        public HttpResponseMessage EventNotifications()
+        {
+            var eventNotifications = EventPropertyService.GetEventNotificationDefinitions();
+            return Request.CreateResponse(HttpStatusCode.OK, eventNotifications);
+        }
+
+        [HttpGet]
         public HttpResponseMessage TestConnectionString(string connectionString)
         {
             string result = string.Empty;

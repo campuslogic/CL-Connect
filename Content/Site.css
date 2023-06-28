@@ -550,7 +550,6 @@ input, textarea {
     font-size: 1.2em;
     margin: 5px 0 6px 0;
     padding: 5px;
-    width: 300px;
 }
 
 textarea {
@@ -558,15 +557,6 @@ textarea {
     width: 500px;
 }
 
-    input:focus, textarea:focus {
-        border: 1px solid #7ac0da;
-    }
-
-input[type="checkbox"] {
-    background: transparent;
-    border: inherit;
-    width: auto;
-}
 
 input[type="submit"],
 input[type="button"],

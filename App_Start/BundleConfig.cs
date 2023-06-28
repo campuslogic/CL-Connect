@@ -64,13 +64,9 @@ namespace CampusLogicEvents.Web
             get
             {
                 return new[]
-                        {                           
-                            // Required
-                            "~/Content/kendo/kendo.common.min.css",
-                            "~/Content/kendo/kendo.default.min.css",
-                            // Which "theme" to use
-                            "~/Content/kendo/kendo.bootstrap.min.css",
-                            "~/Content/kendo/kendo.bootstrap.mobile.min.css",
+                        {
+                            //"~/Content/kendo/default-main.css",
+                            "~/Content/kendo/bootstrap-main.css",
                         };
             }
         }

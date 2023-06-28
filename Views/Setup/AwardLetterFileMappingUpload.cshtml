@@ -8,8 +8,8 @@
     <section>
         This step will allow you to select the configurations for the Award Letter File Mapping Upload process.
         If the file path you wish to use is not available for selection, you may also enter the path below.
-        For assistance in giving appropriate file path permissions, please click <a href="https://campuslogicinc.freshdesk.com/support/solutions/articles/5000701741" target="_blank">File Path Permissions.</a>
-        @*For further detail on the Award Letter Upload section please click <a href="https://campuslogicinc.freshdesk.com/support/solutions/articles/5000706487-award-letter-upload/" target="_blank">AwardLetter Upload Details.</a>*@
+        For assistance in giving appropriate file path permissions, please click <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_set_file_permissions.html" target="_blank">File Path Permissions.</a>
+        @*For further detail on the Award Letter Upload section please click <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_configure_cc_uploads.html/" target="_blank">AwardLetter Upload Details.</a>*@
     </section>
     <hr>
     <div class="row padding-top-ten">
@@ -17,7 +17,7 @@
             <div class="row form-group mb-3">
                 <label class="col-lg-5 control-label"><span class="form-required" aria-hidden="true">* </span>Upload Frequency</label>
                 <div class="col-lg-7 ">
-                    <select required kendo-drop-down-list class="form-control input-lg " name="uploadFrequencyType" ng-model="vm.service.configurationModel.campusLogicSection.fileMappingUploadSettings.fileMappingUploadFrequencyType">
+                    <select required kendo-drop-down-list name="uploadFrequencyType" ng-model="vm.service.configurationModel.campusLogicSection.fileMappingUploadSettings.fileMappingUploadFrequencyType">
                         <option value="daily">Daily</option>
                         <option value="weekly">Weekly</option>
                         <option value="minutes">Minutely</option>

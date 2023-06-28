@@ -5,9 +5,9 @@
         .module('clConnectControllers')
         .controller('eventnotificationscontroller', eventnotificationscontroller);
 
-    eventnotificationscontroller.$inject = ['resolveEventNotificationTypes', 'setupservice', 'validationservice'];
+    eventnotificationscontroller.$inject = ['resolveEventNotificationTypes', 'resolveEventNotifications', 'setupservice', 'validationservice'];
 
-    function eventnotificationscontroller(resolveEventNotificationTypes, setupservice, validationservice) {
+    function eventnotificationscontroller(resolveEventNotificationTypes, resolveEventNotifications, setupservice, validationservice) {
         var vm = this;
 
         vm.addEventNotification = addEventNotification;
@@ -19,6 +19,7 @@
         vm.usingDatabase = (vm.clientDatabaseConnection.connectionString !== '');
         vm.eventNotifications = setupservice.configurationModel.campusLogicSection.eventNotifications;
         vm.eventNotificationTypes = resolveEventNotificationTypes;
+        vm.eventNotificationDefinitions = resolveEventNotifications;
         vm.IsCommandEnabled = IsCommandEnabled;
         vm.IsFileStoreEnabled = IsFileStoreEnabled;
         vm.IsBatchProcessingEnabled = IsBatchProcessingEnabled;
@@ -164,6 +165,23 @@
         }
 
         function onLoad() {
+
+            vm.customOptions = {
+                dataSource: vm.eventNotificationTypes,
+                dataTextField: "label",
+                dataValueField: "eventNotificationTypeId",
+            }
+            vm.eventNotificationOptions = {
+                template: $("#eventDropdownTemplate").html(),
+                valueTemplate: $("#eventDropdownTemplate").html(),
+                dataTextField: "eventNotificationId",
+                dataValueField: "eventNotificationId",
+                dataSource: vm.eventNotificationDefinitions,
+                optionLabel: {
+                    eventNotificationId: "All",
+                    eventNotificationName: 0
+                },
+            };
             checkForDuplicateEvent();
             checkForInvalidBatchName();
             hasInvalidApiEndpointName();
@@ -208,5 +226,6 @@
                 vm.clientDatabaseConnection.connectionString = "DSN=" + vm.dsnName + ";UID=" + vm.dsnUser + ";PWD=" + vm.dsnPassword;
             validationservice.testEventNotifications(form);
         };
+
     };
 })();

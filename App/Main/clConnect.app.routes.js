@@ -63,7 +63,8 @@ angular.module('clConnectApp')
                     controller: "eventnotificationscontroller",
                     controllerAs: "vm",
                     resolve: {
-                        resolveEventNotificationTypes: resolveEventNotificationTypes
+                        resolveEventNotificationTypes: resolveEventNotificationTypes,
+                        resolveEventNotifications: resolveEventNotifications,
                     },
                     templateUrl: urlRoot + "/setup/eventNotifications"
                 })
@@ -177,4 +178,8 @@ angular.module('clConnectApp')
 resolveEventNotificationTypes.$inject = ['validationservice'];
 function resolveEventNotificationTypes(validationservice) {
     return validationservice.eventNotificationTypes.query().$promise;
+};
+resolveEventNotifications.$inject = ['validationservice'];
+function resolveEventNotifications(validationservice) {
+    return validationservice.eventNotifications.query().$promise;
 };

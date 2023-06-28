@@ -21,6 +21,7 @@ using System.Xml.Linq;
 using CampusLogicEvents.Implementation.Extensions;
 using CampusLogicEvents.Web.Filters;
 using Newtonsoft.Json.Serialization;
+using Microsoft.Ajax.Utilities;
 
 namespace CampusLogicEvents.Web.Models
 {
@@ -103,17 +104,15 @@ namespace CampusLogicEvents.Web.Models
                 Value = eventData.PropertyValues[EventPropertyConstants.EventNotificationId].Value<int>()
             });
 
-            if (!eventData.PropertyValues[EventPropertyConstants.SvDocumentId].IsNullOrEmpty() && eventData.PropertyValues[EventPropertyConstants.SvDocumentId].Value<int>() > 0)
+            if (!eventData.PropertyValues[EventPropertyConstants.DocumentName].IsNullOrEmpty())
             {
-                var manager = new DocumentManager();
-                DocumentMetaData metaData = manager.GetDocumentMetaData(eventData.PropertyValues[EventPropertyConstants.SvDocumentId].Value<int>());
 
                 parameters.Add(new OdbcParameter
                 {
                     ParameterName = "DocumentName",
                     OdbcType = OdbcType.VarChar,
                     Size = 128,
-                    Value = metaData != null ? metaData.DocumentName : string.Empty
+                    Value = eventData.PropertyValues[EventPropertyConstants.DocumentName]
                 });
             }
             else
@@ -134,7 +133,7 @@ namespace CampusLogicEvents.Web.Models
         /// </summary>
         /// <param name="notificationEvent"></param>
         [SendEmailFailure()]
-        public static void ProcessPostedEvent(JObject notificationEvent)
+        public static async Task ProcessPostedEvent(JObject notificationEvent)
         {
             try
             {
@@ -150,81 +149,46 @@ namespace CampusLogicEvents.Web.Models
                     if (eventHandler != null)
                     {
                         //Enhance the Event Data for certain situations
-
-                        //Check if the transaction category was one of the three appeal types
-                        if (!eventData.PropertyValues[EventPropertyConstants.SvTransactionCategoryId].IsNullOrEmpty())
+                        //See if event notification type has callbackulr or callback file url
+                        var eventNotificationDefinition = EventPropertyService.GetCallbackUrls(eventNotificationId);
+                        //if so make call for api
+                        if (!string.IsNullOrEmpty(eventNotificationDefinition.CallbackEndpoint) || !string.IsNullOrEmpty(eventNotificationDefinition.CallbackFileEndpoint))
                         {
-                            if (((TransactionCategory)eventData.PropertyValues[EventPropertyConstants.SvTransactionCategoryId].Value<int>() != TransactionCategory.Verification
-                                && (TransactionCategory)eventData.PropertyValues[EventPropertyConstants.SvTransactionCategoryId].Value<int>() != TransactionCategory.Generic) && eventData.PropertyValues[EventPropertyConstants.EventNotificationName].Value<string>() == "Transaction Completed")
+                            if (eventNotificationDefinition.ProductId == null)
                             {
-                                if (eventData.PropertyValues[EventPropertyConstants.SvTransactionId].IsNullOrEmpty())
+                                LogManager.ErrorLog($"There was no product ID for event notificaiton id {eventNotificationId}, but there was a callbackURL {eventNotificationDefinition.CallbackEndpoint} or callbackFileURL {eventNotificationDefinition.CallbackFileEndpoint}");
+                            }
+                            if(!string.IsNullOrEmpty(eventNotificationDefinition.CallbackEndpoint))
+                            {
+                                var callbackURL = eventData.ReplaceStringProperties(eventNotificationDefinition.CallbackEndpoint);
+                                JObject callbackInfo = null;
+
+                                //SV was the first product, so we have this one special caveat for this callback
+                                if (eventNotificationId == 105)
                                 {
-                                    throw new Exception("A transaction Id is needed to get the appeal meta data");
+                                    var tranCategory = (TransactionCategory)eventData.PropertyValues[EventPropertyConstants.SvTransactionCategoryId].Value<int>();
+                                    if (tranCategory != TransactionCategory.Verification && tranCategory != TransactionCategory.Generic)
+                                    {
+                                        callbackInfo = await ExecuteCallback(eventNotificationDefinition, callbackURL);
+                                    }
                                 }
-                                var manager = new AppealManager();
-                                manager.GetAuthorizationForSV();
-                                eventData.PropertyValues[EventPropertyConstants.TransactionOutcomeId] = manager.GetAppealMetaData(eventData.PropertyValues[EventPropertyConstants.SvTransactionId].Value<int>()).Result.ToString();
+                                else
+                                {
+                                    callbackInfo = await ExecuteCallback(eventNotificationDefinition, callbackURL);
+                                }
+                                if (callbackInfo != null)
+                                {
+                                    eventData.PropertyValues.Merge(callbackInfo, new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Concat });
+                                }
+
                             }
-                        }
-
-                        //Was a documentId sent over? If so, populate the Document Metadata.
-                        if (!eventData.PropertyValues[EventPropertyConstants.SvDocumentId].IsNullOrEmpty() && eventData.PropertyValues[EventPropertyConstants.SvDocumentId].Value<int>() > 0)
-                        {
-                            var manager = new DocumentManager();
-                            DocumentMetaData documentMetaData = manager.GetDocumentMetaData(eventData.PropertyValues[EventPropertyConstants.SvDocumentId].Value<int>());
-                            eventData.DocumentMetaData = documentMetaData;
-                        }
-
-                        //Check if this event notification is a communication event. If so, we need to call back to SV to get metadata about the communication
-                        if (eventNotificationId >= 300 && eventNotificationId <= 399)
-                        {
-                            if (eventData.PropertyValues[EventPropertyConstants.AdditionalInfoId].IsNullOrEmpty() || eventData.PropertyValues[EventPropertyConstants.AdditionalInfoId].Value<int>() == 0)
+                            if (!string.IsNullOrEmpty(eventNotificationDefinition.CallbackFileEndpoint))
                             {
-                                throw new Exception("An AdditionalInfoId is needed to get the communication event meta data");
+                                eventNotificationDefinition.CallbackFileEndpoint = eventData.ReplaceStringProperties(eventNotificationDefinition.CallbackFileEndpoint);
                             }
-                            var manager = new CommunicationManager();
-                            manager.GetAuthorizationForSV();
-                            CommunicationActivityMetadata communicationActivityMetadata = manager.GetCommunicationActivityMetaData(eventData.PropertyValues[EventPropertyConstants.AdditionalInfoId].Value<int>()).Result;
-                            eventData.CommunicationActivityMetadata = communicationActivityMetadata;
+
                         }
 
-                        //Check if this event notification is a Scholarship Universe Event (700's). If so, we need to call back to SU to get the metadata
-                        if (eventNotificationId >= 700 && eventNotificationId <= 799)
-                        {
-                            if (!eventData.PropertyValues[EventPropertyConstants.SuScholarshipAwardId].IsNullOrEmpty() && !eventData.PropertyValues[EventPropertyConstants.SuClientTermId].IsNullOrEmpty())
-                            {
-                                var manager = new ScholarshipManager();
-                                AwardPostItemData awardPostItemData = manager.GetAwardPostItemData(
-                                    eventData.PropertyValues[EventPropertyConstants.SuScholarshipAwardId].Value<int>(),
-                                    eventData.PropertyValues[EventPropertyConstants.SuClientTermId].Value<int>());
-                                eventData.AwardPostItemData = awardPostItemData;
-                            }
-                        }
-
-                        // StudentAdvisor Events
-                        if (eventNotificationId >= 800 && eventNotificationId <= 899)
-                        {
-                            // Ignore conversation start events, otherwise call back to SA to get metadata
-                            if (eventNotificationId != 801)
-                            {
-                                var manager = new AdvisorManager();
-                                ConversationData conversationData = manager.GetConversationData(
-                                    eventData.PropertyValues[EventPropertyConstants.ClConversationId].Value<string>());
-                                eventData.ConversationData = conversationData;
-                            }
-                        }
-
-                        // SponsoredScholar Events
-                        if (eventNotificationId >= 900 && eventNotificationId <= 999)
-                        {
-                            if (!eventData.PropertyValues[EventPropertyConstants.SpDonationId].IsNullOrEmpty())
-                            {
-                                var manager = new SponsorshipManager();
-                                var donationPostedInfo = manager.GetDonationPostedInfo(
-                                    eventData.PropertyValues[EventPropertyConstants.SpDonationId].Value<int>());
-                                eventData.DonationPostedInfoData = donationPostedInfo;
-                            }
-                        }
 
                         // populate PropertyValues with all the values that have been gathered
                         eventData.PopulatePropertyValues();
@@ -240,16 +204,16 @@ namespace CampusLogicEvents.Web.Models
                         }
                         else if (eventHandler.HandleMethod == "DocumentRetrieval")
                         {
-                            DocumentRetrievalHandler(eventData);
+                            await DocumentRetrievalHandler(eventData, eventNotificationDefinition);
                         }
                         else if (eventHandler.HandleMethod == "DocumentRetrievalAndStoredProc")
                         {
-                            DocumentRetrievalHandler(eventData);
+                            await DocumentRetrievalHandler(eventData, eventNotificationDefinition);
                             DatabaseStoredProcedure(eventData, eventHandler.DbCommandFieldValue);
                         }
                         else if (eventHandler.HandleMethod == "DocumentRetrievalAndNonQuery")
                         {
-                            DocumentRetrievalHandler(eventData);
+                            await DocumentRetrievalHandler(eventData, eventNotificationDefinition);
                             DatabaseCommandNonQueryHandler(eventData, eventHandler.DbCommandFieldValue);
                         }
                         else if (eventHandler.HandleMethod == "FileStore")
@@ -258,14 +222,14 @@ namespace CampusLogicEvents.Web.Models
                         }
                         else if (eventHandler.HandleMethod == "FileStoreAndDocumentRetrieval")
                         {
-                            DocumentRetrievalHandler(eventData);
+                            await DocumentRetrievalHandler(eventData, eventNotificationDefinition);
                             //SV-2383: Moving the File Store handler *after* the Document Retrieval Handler so that if the Doc handler fails, it won't log the same event on retry.
                             FileStoreHandler(eventData);
                         }
                         else if (eventHandler.HandleMethod == "AwardLetterPrint")
                         {
                             LogManager.InfoLog("detect this is the AwardLetterPrint");
-                            AwardLetterDocumentRetrievalHandler(eventData);
+                            await AwardLetterDocumentRetrievalHandler(eventData, eventNotificationDefinition);
                         }
                         else if (eventHandler.HandleMethod == "BatchProcessingAwardLetterPrint")
                         {
@@ -291,13 +255,19 @@ namespace CampusLogicEvents.Web.Models
                         dbContext.SaveChanges();
                     }
                 }
-            }
+            } 
             catch (Exception ex)
             {
                 //Log here any exceptions
                 LogManager.ErrorLogFormat("DataService ProcessPostedEvent Error: {0}", ex);
                 throw;
             }
+        }
+
+        private static async Task<JObject> ExecuteCallback( EventNotificationDefinition eventNotificationDefinition, string callbackURL)
+        {
+            var manager = new CallbackManager();
+            return await manager.GetCallbackInfo(callbackURL, (Guid)eventNotificationDefinition.ProductId);
         }
 
         /// <summary>
@@ -470,24 +440,25 @@ namespace CampusLogicEvents.Web.Models
         /// This will get the metadata and pull the documents and optionally create an index file for the documents
         /// </summary>
         /// <param name="eventData"></param>
-        private static void DocumentRetrievalHandler(EventNotificationData eventData)
+        private static async Task DocumentRetrievalHandler(EventNotificationData eventData, EventNotificationDefinition eventNotificationDefinition)
         {
             var manager = new DocumentManager();
+            var callbackManager = new CallbackManager();
 
-            if (eventData.PropertyValues[EventPropertyConstants.SvDocumentId].IsNullOrEmpty())
+            if (eventNotificationDefinition.ProductId == null)
             {
-                LogManager.ErrorLogFormat("DataService ProcessPostedEvent Missing Document Id for Event Id: {0}", eventData.PropertyValues[EventPropertyConstants.Id].Value<string>());
+                LogManager.ErrorLogFormat("DataService ProcessPostedEvent Missing Product ID for File Callback URL for EventId : {0}", eventData.PropertyValues[EventPropertyConstants.Id].Value<string>());
+                return;
+            }
+            if (eventNotificationDefinition.CallbackFileEndpoint.IsNullOrWhiteSpace())
+            {
+                LogManager.ErrorLogFormat("DataService ProcessPostedEvent Missing File Callback URL for EventId : {0}", eventData.PropertyValues[EventPropertyConstants.Id].Value<string>());
                 return;
             }
 
-            //First make sure we have the document metadata otherwise get it
-            if (eventData.DocumentMetaData.Id == 0)
-            {
-                eventData.DocumentMetaData = manager.GetDocumentMetaData(eventData.PropertyValues[EventPropertyConstants.SvDocumentId].Value<int>());
-            }
-
             //Get and Store the Documents
-            var dataFiles = manager.GetDocumentFiles(eventData.PropertyValues[EventPropertyConstants.SvDocumentId].Value<int>(), eventData);
+            var fileStream = await callbackManager.GetCallbackFile(eventNotificationDefinition.CallbackFileEndpoint, (Guid)eventNotificationDefinition.ProductId);
+            var dataFiles = manager.ProcessDocumentFiles(eventData, fileStream);
 
             //If required create an index file
             if (dataFiles.Any() && (campusLogicConfigSection.DocumentSettings.IndexFileEnabled ?? false))
@@ -517,9 +488,10 @@ namespace CampusLogicEvents.Web.Models
         /// for printers
         /// </summary>
         /// <param name="eventData"></param>
-        private static void AwardLetterDocumentRetrievalHandler(EventNotificationData eventData)
+        private static async Task AwardLetterDocumentRetrievalHandler(EventNotificationData eventData, EventNotificationDefinition eventNotificationDefinition)
         {
             var manager = new DocumentManager();
+            var callbackManager = new CallbackManager();
 
             if (eventData.PropertyValues[EventPropertyConstants.AlRecordId].IsNullOrEmpty())
             {
@@ -527,8 +499,9 @@ namespace CampusLogicEvents.Web.Models
                 return;
             }
 
+            var fileStream = await callbackManager.GetCallbackFile(eventNotificationDefinition.CallbackFileEndpoint, (Guid)eventNotificationDefinition.ProductId);
             //Get and Store the Documents
-            manager.GetAwardLetterPdfFile(Guid.Parse(eventData.PropertyValues[EventPropertyConstants.AlRecordId].Value<string>()), eventData);
+            manager.ProcessAwardLetterDocumentFiles(eventData, fileStream);
         }
 
         /// <summary>

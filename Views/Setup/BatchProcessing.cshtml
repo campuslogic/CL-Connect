@@ -10,7 +10,7 @@
         You may define one or many Batch Processes for a specific Batch Processing Type. The Batch Name must be unique. 
         A Batch Process will run on the interval defined by the Batch Execution Minutes setting.
         Each batch execution will process the records in the given max batch size increments until all records have been processed.
-        For additional help on this page please see <a href="https://campuslogicinc.freshdesk.com/" target="_blank">Batch Processing Help.</a>
+        For additional help on this page please see <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_set_up_cc_event_notifications.html" target="_blank">Batch Processing Help.</a>
     </section>
     <hr />
 
@@ -18,7 +18,7 @@
         <div class="col-lg-12">
             <div class="col-lg-4">
                 <label class="control-label">Batch Processing Type</label>
-                <select id="batchProcessingType" required kendo-drop-down-list class="form-control input-lg " name="batchProcessingType" ng-model="model.batchProcessingType">                    
+                <select id="batchProcessingType" required kendo-drop-down-list name="batchProcessingType" ng-model="model.batchProcessingType">                    
                     <option value="awardLetterPrint">AwardLetter Print</option>
                 </select>
                 <span ng-show="bpvalidation" class="important-color"><b>This batch processing type already exists.</b></span>

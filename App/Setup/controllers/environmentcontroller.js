@@ -36,6 +36,25 @@
             $scope.disableAutoUpdate = $scope.service.configurationModel.appSettingsSection.disableAutoUpdate;
         }
 
+        // create DropDownList from select HTML element
+        $("#smtp").kendoCheckBox();
+        $("#isirUpload").kendoCheckBox();
+        $("#bulkActions").kendoCheckBox();
+        $("#awardLetterUpload").kendoCheckBox();
+        $("#fileMappingUpload").kendoCheckBox();
+        $("#dataFileUpload").kendoCheckBox();
+        $("#documentImports").kendoCheckBox();
+        $("#isirBatchCorrections").kendoCheckBox();
+        $("#eventNotifications").kendoCheckBox();
+        $("#documentImaging").kendoCheckBox();
+        $("#storedProcedure").kendoCheckBox();
+        $("#fileStore").kendoCheckBox();
+        $("#awardLetterPrint").kendoCheckBox();
+        $("#batchProcessing").kendoCheckBox();
+        $("#apiIntegration").kendoCheckBox();
+        $("#fileDefinitions").kendoCheckBox();
+        $("#powerFaids").kendoCheckBox();
+
         // update event properties each time the setup wizard loads 
         // (starts on environment page)
         eventpropertyservice.updateEventProperties.save({},

@@ -16,7 +16,7 @@
                 <label class="control-label">Authentication</label>
             </div>
             <div class="col-lg-8">
-                <select id="method" required kendo-drop-down-list class="form-control input-lg " name="method" ng-model="modelCopy.authentication" ng-change="onMethodChange()" ng-disabled="modalType === 'Edit' && modelCopy.authentication === 'ethos'">
+                <select id="method" required kendo-drop-down-list name="method" ng-model="modelCopy.authentication" ng-change="onMethodChange()" ng-disabled="modalType === 'Edit' && modelCopy.authentication === 'ethos'">
                     <option value="none">None</option>
                     <option value="basic">Basic</option>
                     <option value="oauth2">OAuth 2.0</option>
