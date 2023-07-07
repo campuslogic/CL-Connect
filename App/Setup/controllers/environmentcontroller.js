@@ -13,6 +13,10 @@
         $scope.environmentDropDownChangeEvent = environmentDropDownChangeEvent;
         $scope.addRemovePageFromValidation = addRemovePageFromValidation;
         $scope.disableAutoUpdate = false;
+        $scope.environments = [
+            { text: "Sandbox", value: "sandbox" },
+            { text: "Production", value: "production" }
+        ];
 
         if (!$scope.service.configurationModel) {
             $scope.service.configurationModel = configurations;
@@ -34,6 +38,10 @@
 
         if ($scope.service.configurationModel.appSettingsSection.disableAutoUpdate) {
             $scope.disableAutoUpdate = $scope.service.configurationModel.appSettingsSection.disableAutoUpdate;
+            if ($scope.disableAutoUpdate) {
+                let environment = $scope.service.configurationModel.appSettingsSection.environment;
+                $scope.environments.push({ text: environment, value: environment })
+            }
         }
 
         // create DropDownList from select HTML element

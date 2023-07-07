@@ -16,15 +16,7 @@
                     <b> What environment would you like to set up?</b>
                 </h4>
                 <div class="col-md-10">
-                    <select kendo-drop-down-list id="environmentdropdown" name="environmentdropdown" required k-on-change="environmentDropDownChangeEvent(kendoEvent)" ng-model="service.configurationModel.appSettingsSection.environment" style="width: 100%;">
-                        <option value="">Select one..</option>
-
-                        <option value="{{service.configurationModel.appSettingsSection.environment}}" ng-if="disableAutoUpdate">
-                            {{service.configurationModel.appSettingsSection.environment}}
-                        </option>
-
-                        <option value="sandbox">Sandbox</option>
-                        <option value="production">Production</option>
+                    <select kendo-drop-down-list id="environmentdropdown" name="environmentdropdown" required k-data-source="environments" k-data-text-field="'text'" k-data-value-field="'value'" k-on-change="environmentDropDownChangeEvent(kendoEvent)" ng-model="service.configurationModel.appSettingsSection.environment" style="width: 100%;">
                     </select>
                 </div>
                 <div class="col-md-10">
