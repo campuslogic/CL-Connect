@@ -178,6 +178,13 @@ namespace CampusLogicEvents.Web.Models
                                 }
                                 if (callbackInfo != null)
                                 {
+                                    //bit of a hack but we are passing back our student id in these callbacks,
+                                    //and it is overriding the student id property from the original call(the school ID)
+                                    //removing from the callback so it doesn't override an existing property
+                                    if (callbackInfo["StudentId"] != null)
+                                    {
+                                        callbackInfo.Property("StudentId").Remove();
+                                    }
                                     eventData.PropertyValues.Merge(callbackInfo, new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Concat });
                                 }
 
