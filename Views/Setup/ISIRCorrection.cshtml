@@ -10,24 +10,24 @@
         <p>
         This step will allow you to select the configurations for the ISIR Batch Corrections process.
         If the file path you wish to use is not available for selection, you may also enter the path below.
-        For assistance in giving appropriate file path permissions, please click <a href="https://campuslogicinc.freshdesk.com/support/solutions/articles/5000701741" target="_blank">File Path Permissions.</a>
-        For further detail on the ISIR Batch Corrections section please click <a href="https://campuslogicinc.freshdesk.com/support/solutions/articles/5000706492-isir-corrections" target="_blank">ISIR Batch Corrections Detail.</a>
+        For assistance in giving appropriate file path permissions, please click <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_set_file_permissions.html" target="_blank">File Path Permissions.</a>
+        For further detail on the ISIR Batch Corrections section please click <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_set_up_isir_corrections.html" target="_blank">ISIR Batch Corrections Detail.</a>
     </section>
     <hr>
     <div class="row padding-bottom-ten">
         <div class="row padding-top-ten">
-            <div class="col-lg-5">
+            <div class="col-lg-6">
                 <div class="row form-group mb-3">
                     <label class="col-lg-5 control-label"><span class="form-required" aria-hidden="true">* </span>Days to Run</label>
                     <div class="col-lg-7">
-                        <select name="daysToRun" kendo-multi-select k-options="vm.daysToRunOptions" k-ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.daysToRun"></select>
+                        <select required id="daysToRun" name="daysToRun" k-ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.daysToRun"></select>
                         <span class="field-validation-error" ng-show="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.daysToRun.length <= 0">Required</span>
                     </div>
                 </div>
                 <div class="row form-group mb-3 padding-top-twenty">
                     <label class="col-lg-5 control-label"><span class="form-required" aria-hidden="true">* </span>Time to Run</label>
-                    <div class="col-lg-3">
-                        <input class="padding-bottom-seven" required ng-pattern="/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]+(AM|PM|am|pm)$/" name="timeToRun" kendo-time-picker k-format="'hh:mmtt'" style="height: 29px" ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.timeToRun">
+                    <div class="col-lg-4">
+                        <input class="padding-bottom-seven" required ng-pattern="/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]+(AM|PM|am|pm)$/" name="timeToRun" kendo-time-picker k-format="'hh:mmtt'" ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.timeToRun">
                         <span class="field-validation-error" ng-show="isircorrectionForm.timeToRun.$dirty && isircorrectionForm.timeToRun.$error.required">Required</span>
                         <span class="field-validation-error" ng-show="isircorrectionForm.timeToRun.$dirty && isircorrectionForm.timeToRun.$error.pattern">Format is incorrect, format must be: hh:mmtt</span>
                     </div>
@@ -42,7 +42,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-7">
+            <div class="col-lg-6">
                 <div class="row form-group mb-3">
                     <label class="col-lg-3 control-label"><span class="form-required" aria-hidden="true">*</span>Corrections File Path</label>
                     <cl-folder-picker class="col-lg-7" isrequired="true" formvalid="vm.validationService.pageValidations.isirCorrectionsValid" uploadpath="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.correctionsFilePath"></cl-folder-picker>

@@ -23,6 +23,7 @@
                     <option value="boolean">Boolean</option>
                     <option value="numeric">Numeric</option>
                     <option value="float">Float</option>
+                    <option value="datetime">DateTime</option>
                     <option value="date">Date</option>
                     <option value="time">Time</option>
                 </select>
@@ -43,8 +44,7 @@
                 <label class="control-label">Source Field</label>
             </div>
             <div class="col-lg-8">
-                <select style="width: 100%;" id="inputPropertyFieldValue" required kendo-drop-down-list name="inputPropertyFieldValue" ng-model="modelCopy.source">
-                    <option ng-repeat="value in dropdown.eventPropertyValues" value="{{value}}">{{value}}</option>
+                <select style="width: 100%;" id="inputPropertyFieldValue" required kendo-drop-down-list name="inputPropertyFieldValue" ng-model="modelCopy.source" k-data-source="dropdown.eventPropertyValues">
                 </select>
                 <span class="field-validation-error" ng-show="sourceValidation == true">Required</span>
             </div>

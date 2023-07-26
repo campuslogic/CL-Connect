@@ -13,9 +13,8 @@ clConnectServices.factory("addfieldmappingmodalcontroller", ["$modal",
             modalController: ["$rootScope", "$scope", "$modalInstance", "modalParams",
                 function ($rootScope, $scope, $modalInstance, modalParams) {
                     $scope.dropdown = { eventPropertyValueAvailableProperties: modalParams.eventPropertyValueAvailableProperties };
-                    $scope.valueType = { valueTypes: ["Basic Property Value", "Constant Value", "Database Command", "Dynamic Field Value"] }
                     $scope.selectedValueType = selectedValueType();
-                    $scope.onSelectedValueType = onSelectedValueType;
+                    $scope.onSelectedValueChange = onSelectedValueChange;
                     $scope.theItem = modalParams.theItem;
                     $scope.theList = modalParams.theList;
 
@@ -60,8 +59,8 @@ clConnectServices.factory("addfieldmappingmodalcontroller", ["$modal",
                         return "";
                     }
 
-                    function onSelectedValueType(valueType) {
-                        switch (valueType) {
+                    function onSelectedValueChange() {
+                        switch ($scope.selectedValueType) {
                             case "Basic Property Value":
                                 $scope.modelCopy.constantFieldValue = null;
                                 $scope.modelCopy.dbCommandFieldValue = null;

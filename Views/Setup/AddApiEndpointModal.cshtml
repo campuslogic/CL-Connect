@@ -24,7 +24,7 @@
                 <label class="control-label">Method</label>
             </div>
             <div class="col-lg-9">
-                <select id="method" required kendo-drop-down-list class="form-control input-lg " name="method" ng-model="modelCopy.method" ng-disabled="endpointReadonly">
+                <select id="method" required kendo-drop-down-list name="method" ng-model="modelCopy.method" ng-disabled="endpointReadonly">
                     <option value="GET">GET</option>
                     <option value="POST">POST</option>
                     <option value="PUT">PUT</option>
@@ -64,7 +64,7 @@
                             <label class="control-label">Maps To</label>
                         </div>
                         <div class="col-lg-7">
-                            <select required kendo-drop-down-list class="form-control input-lg " name="eventData" ng-model="parameterMapping.eventData">
+                            <select required kendo-drop-down-list name="eventData" ng-model="parameterMapping.eventData">
                                 <option ng-repeat="value in dropdown.eventPropertyValues" value="{{value}}">{{value}}</option>
                             </select>
                         </div>

@@ -8,8 +8,8 @@
 <p>
     This step will allow you to select the configurations for the Document Import process.
     If the file path you wish to use is not available for selection, you may also enter the path below.
-    For assistance in giving appropriate file path permissions, please click <a href="https://campuslogicinc.freshdesk.com/support/solutions/articles/5000701741" target="_blank">File Path Permissions.</a>
-    For further detail on the Document Import section please click <a href="https://campuslogicinc.freshdesk.com/support/solutions/articles/5000710793-testing-doc-imports/" target="_blank">Document Import Details.</a>
+    For assistance in giving appropriate file path permissions, please click <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_set_file_permissions.html" target="_blank">File Path Permissions.</a>
+    For further detail on the Document Import section please click <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_import_document.html/" target="_blank">Document Import Details.</a>
 </p>
 <hr />
 <form class="padding-top-ten" novalidate="" name="vm.form">
@@ -19,7 +19,6 @@
             <div class="col-lg-7 ">
                 <select required 
                         kendo-drop-down-list
-                        class="form-control input-lg "
                         ng-model="vm.settings.frequency"
                         style="width: calc(100% - 14px)">
                     <option value="daily">Daily</option>
@@ -48,7 +47,6 @@
             <div class="col-lg-7 ">
                 <select required
                         kendo-drop-down-list
-                        class="form-control input-lg "
                         ng-model="vm.settings.fileExtension"
                         style="width: calc(100% - 14px)">
                     <option value=".txt">.txt</option>

@@ -7,8 +7,8 @@
     </h2>
     <section>
         This step will allow you to configure File Store options.
-        If the path you wish to use is not available for selection, you may also enter the path below. For additional information, please click <a href="https://campuslogicinc.freshdesk.com/support/solutions/articles/5000701741" target="_blank">File Path Permissions.</a>
-        For additional help on this page please see <a href="https://campuslogicinc.freshdesk.com/support/solutions/articles/5000712338-file-store/" target="_blank">File Store Help.</a>
+        If the path you wish to use is not available for selection, you may also enter the path below. For additional information, please click <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_set_file_permissions.html" target="_blank">File Path Permissions.</a>
+        For additional help on this page please see <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_int_event_notes_file_store.html" target="_blank">File Store Help.</a>
     </section>
     <hr>
     <div class="row padding-bottom-ten">
@@ -22,8 +22,10 @@
     <div class="row padding-bottom-ten">
         <div class="col-lg-8">
             <label class="control-label" for="fileStoreMinutes"><span class="form-required" aria-hidden="true">*</span>File Store Minutes</label><br />
-            <input type="text" id="fileStoreMinutes" name="fileStoreMinutes" kendo-numeric-text-box k-format="'n0'" k-min="1" ng-model="vm.service.configurationModel.campusLogicSection.fileStoreSettings.fileStoreMinutes" required /><br />
-            <span class="field-validation-error" ng-show="(vm.fileStoreForm.fileStoreMinutes.$dirty || vm.service.pageValidations.fileStoreSettingsValid == false) && vm.fileStoreForm.fileStoreMinutes.$error.required">Required</span>
+            <div class="col-lg-2">
+                <input type="text" id="fileStoreMinutes" name="fileStoreMinutes" kendo-numeric-text-box k-format="'n0'" k-min="1" ng-model="vm.service.configurationModel.campusLogicSection.fileStoreSettings.fileStoreMinutes" required /><br />
+                <span class="field-validation-error" ng-show="(vm.fileStoreForm.fileStoreMinutes.$dirty || vm.service.pageValidations.fileStoreSettingsValid == false) && vm.fileStoreForm.fileStoreMinutes.$error.required">Required</span>
+            </div>
         </div>
     </div>
     <div class="row padding-bottom-ten"></div>

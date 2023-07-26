@@ -13,6 +13,10 @@
         $scope.environmentDropDownChangeEvent = environmentDropDownChangeEvent;
         $scope.addRemovePageFromValidation = addRemovePageFromValidation;
         $scope.disableAutoUpdate = false;
+        $scope.environments = [
+            { text: "Sandbox", value: "sandbox" },
+            { text: "Production", value: "production" }
+        ];
 
         if (!$scope.service.configurationModel) {
             $scope.service.configurationModel = configurations;
@@ -34,7 +38,30 @@
 
         if ($scope.service.configurationModel.appSettingsSection.disableAutoUpdate) {
             $scope.disableAutoUpdate = $scope.service.configurationModel.appSettingsSection.disableAutoUpdate;
+            if ($scope.disableAutoUpdate) {
+                let environment = $scope.service.configurationModel.appSettingsSection.environment;
+                $scope.environments.push({ text: environment, value: environment })
+            }
         }
+
+        // create DropDownList from select HTML element
+        $("#smtp").kendoCheckBox();
+        $("#isirUpload").kendoCheckBox();
+        $("#bulkActions").kendoCheckBox();
+        $("#awardLetterUpload").kendoCheckBox();
+        $("#fileMappingUpload").kendoCheckBox();
+        $("#dataFileUpload").kendoCheckBox();
+        $("#documentImports").kendoCheckBox();
+        $("#isirBatchCorrections").kendoCheckBox();
+        $("#eventNotifications").kendoCheckBox();
+        $("#documentImaging").kendoCheckBox();
+        $("#storedProcedure").kendoCheckBox();
+        $("#fileStore").kendoCheckBox();
+        $("#awardLetterPrint").kendoCheckBox();
+        $("#batchProcessing").kendoCheckBox();
+        $("#apiIntegration").kendoCheckBox();
+        $("#fileDefinitions").kendoCheckBox();
+        $("#powerFaids").kendoCheckBox();
 
         // update event properties each time the setup wizard loads 
         // (starts on environment page)

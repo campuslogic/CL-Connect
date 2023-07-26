@@ -3,8 +3,8 @@
     </div>
     <div class="modal-body">
         <div class="jumbotron">
-            <div id="folderpicker-treeview" kendo-tree-view k-data-text-field="'name'" k-template="treeTemplate" k-data-value-field="'path'" k-data-source="treeData" k-on-change="onSelectChange()">
-                <span id="treeTemplate">
+            <div id="folderpicker-treeview" kendo-tree-view="tree" k-data-text-field="'name'" k-data-value-field="'path'" k-data-source="treeData" k-on-change="onSelectChange()">
+                <span k-template id="treeTemplate">
                     {{dataItem.name}}
                 </span>
             </div>

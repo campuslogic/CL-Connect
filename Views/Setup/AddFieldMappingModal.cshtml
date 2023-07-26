@@ -33,9 +33,12 @@
                 <label class="control-label">Value Type</label>
             </div>
             <div class="col-lg-8">
-                <select style="width: 100%;" id="inputValueType" required kendo-drop-down-list name="inputValueType" ng-model="selectedValueType" ng-change="onSelectedValueType(value)">
+                <select style="width: 100%;" id="inputValueType" required kendo-drop-down-list name="inputValueType" ng-model="selectedValueType" ng-change="onSelectedValueChange()">
                     <option value="">No Value</option>
-                    <option ng-repeat="value in valueType.valueTypes" value="{{value}}">{{value}}</option>
+                    <option value="Basic Property Value">Basic Property Value</option>
+                    <option value="Constant Value">Constant Value</option>
+                    <option value="Database Command">Database Command</option>
+                    <option value="Dynamic Field Value">Dynamic Field Value</option>
                 </select>
             </div>
         </div>
@@ -44,11 +47,7 @@
                 <label class="control-label">Basic Property Value</label>
             </div>
             <div class="col-lg-8">
-                <!--Changing to a type ahead so that we can adjust the value simply if need be, by pre-pending or appending values-->
                 <input placeholder="'Enter Event Property Value...'" style="width: 100%;" id="inputPropertyFieldValue" required kendo-auto-complete ng-model="modelCopy.propertyFieldValue" k-data-source="dropdown.eventPropertyValueAvailableProperties"/>
-                @*<select style="width: 100%;" id="inputPropertyFieldValue" required kendo-auto-complete name="inputPropertyFieldValue" ng-model="modelCopy.propertyFieldValue">
-                    <option ng-repeat="value in dropdown.eventPropertyValueAvailableProperties" value="{{value}}">{{value}}</option>
-                </select>*@
             </div>
         </div>
         <div class="row padding-bottom-ten" ng-if="selectedValueType === 'Constant Value'">
@@ -64,7 +63,7 @@
                 <label class="control-label">Database Command</label>
             </div>
             <div class="col-lg-8">
-                <textarea class="form-control" id="inputDbCommandFieldValue" name="inputDbCommandFieldValue" ng-model="modelCopy.dbCommandFieldValue"/>
+                <textarea class="form-control" id="inputDbCommandFieldValue" name="inputDbCommandFieldValue" ng-model="modelCopy.dbCommandFieldValue"> </textarea>
             </div>
         </div>
         <div class="row padding-bottom-ten" ng-if="selectedValueType === 'Dynamic Field Value'">
@@ -72,7 +71,7 @@
                 <label class="control-label">Dynamic Value</label>
             </div>
             <div class="col-lg-8">
-                <textarea class="form-control" id="inputDynamicFieldValue" name="inputDynamicFieldValue" ng-model="modelCopy.dynamicFieldValue"/>
+                <textarea class="form-control" id="inputDynamicFieldValue" name="inputDynamicFieldValue" ng-model="modelCopy.dynamicFieldValue"> </textarea>
             </div>
         </div>
     </form>

@@ -55,6 +55,8 @@ namespace CampusLogicEvents.Web
             // Setup/Update scheduled job
             RecurringJob.AddOrUpdate(() => DataService.DataCleanup(), Cron.Daily);
 
+            SchemaUpdates();
+
             ValidateSMTPSettings();
             AutomatedISIRUpload();
             AutomatedBulkActionJob();
@@ -66,6 +68,14 @@ namespace CampusLogicEvents.Web
             AutomatedFileStoreJob();
             AutomatedBatchProcessingJob();
             AutomatedPowerFaidsJob();
+        }
+
+        private void SchemaUpdates()
+        {
+            VerifyEventNotificationTableExists();
+            VerifyEventPropertyTableExists();
+            VerifyEventPropertyOldColumnsExist();
+            VerifyEventNotificationDefinitionTableExists();
         }
 
         /// <summary>
@@ -120,11 +130,6 @@ namespace CampusLogicEvents.Web
         /// </summary>
         private void AutomatedFileStoreJob()
         {
-            //Does the EventNotification table exist? If not, create it.
-            VerifyEventNotificationTableExists();
-            //Does the EventProperty table exist? If not, create it.
-            VerifyEventPropertyTableExists();
-            VerifyEventPropertyNewColumnsExist();
 
             bool? filestoreEnabled = campusLogicSection.FileStoreSettings.FileStoreEnabled;
 
@@ -918,6 +923,61 @@ namespace CampusLogicEvents.Web
                 }
             }
         }
+        private static void VerifyEventPropertyOldColumnsExist()
+        {
+            using (var dbContext = new CampusLogicContext())
+            {
+                try
+                {
+                    dbContext.Database.ExecuteSqlCommand(
+                        "IF EXISTS (SELECT 1 FROM sys.columns WHERE name = N'CallbackEndpoint' and object_id = OBJECT_ID(N'[dbo].[EventProperty]'))" +
+                        "BEGIN ALTER TABLE [dbo].[EventProperty]" +
+                        "DROP COLUMN [CallbackEndpoint], [CallbackFileEndpoint]; END");
+                }
+                catch (Exception ex)
+                {
+                    LogManager.ErrorLog($"There was an issue with validating and/or creating the new columns for the BatchProcessRecord table in LocalDB: {ex}");
+                }
+            }
+        }
+        private static void VerifyEventNotificationDefinitionTableExists()
+        {
+            using (var dbContext = new CampusLogicContext())
+            {
+                try
+                {
+                    dbContext.Database.ExecuteSqlCommand(
+                        "IF NOT EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[EventNotificationDefinition]'))" +
+                        "BEGIN CREATE TABLE[dbo].[EventNotificationDefinition]" +
+                        "([Id] int NOT NULL" +
+                        ",[ProductId] uniqueidentifier NULL" +
+                        ",[EventName] NVARCHAR(100) NOT NULL" +
+                        ",[CallbackEndpoint] NVARCHAR(500) NULL" +
+                        ",[CallbackFileEndpoint] NVARCHAR(500) NULL" +
+                        ",[IsActive] BIT NOT NULL" +
+                        ",CONSTRAINT [PK_EventNotificationDefinition] PRIMARY KEY CLUSTERED ([Id] ASC));" +
+                        " END");
+
+                    dbContext.Database.ExecuteSqlCommand(
+                         "IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[EventNotificationEventProperty]'))" +
+                        "BEGIN CREATE TABLE[dbo].[EventNotificationEventProperty]" +
+                        "([EventNotificationId] int  NOT NULL," +
+                        " [EventPropertyId] int  NOT NULL," +
+                        "CONSTRAINT [PK_EventNotificationEventProperty] PRIMARY KEY CLUSTERED ([EventNotificationId], [EventPropertyId] ASC)," +
+                        "CONSTRAINT [FK_EventNotificationDefinitionEventNotificationEventProperty] FOREIGN KEY([EventNotificationId])" +
+                        "REFERENCES [dbo].[EventNotificationDefinition] ([Id])," +
+                        "CONSTRAINT [FK_EventPropertyEventNotificationEventProperty] FOREIGN KEY([EventPropertyId])" +
+                        "REFERENCES [dbo].[EventProperty] ([Id])); " +
+                        "END"
+                        );
+                }
+                catch (Exception ex)
+                {
+                    LogManager.ErrorLog($"There was an issue with validating and/or creating the EventNotificationDefinition table in LocalDB: {ex}");
+                }
+            }
+        }
+
 
         /// <summary>
         /// In case the domain is for whatever reason 
