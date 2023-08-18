@@ -395,6 +395,7 @@
     <Content Include="Content\toastr.css" />
     <Content Include="Content\toastr.min.css" />
     <Content Include="Content\ui-bootstrap-csp.css" />
+    <Content Include="dotNetFx45_Full_setup.exe" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\toastr.less" />
