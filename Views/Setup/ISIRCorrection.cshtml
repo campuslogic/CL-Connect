@@ -20,7 +20,7 @@
                 <div class="row form-group mb-3">
                     <label class="col-lg-5 control-label"><span class="form-required" aria-hidden="true">* </span>Days to Run</label>
                     <div class="col-lg-7">
-                        <select required id="daysToRun" name="daysToRun" k-ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.daysToRun"></select>
+                        <select kendo-multi-select required k-options="vm.daysToRunOptions" k-ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.daysToRun"></select>
                         <span class="field-validation-error" ng-show="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.daysToRun.length <= 0">Required</span>
                     </div>
                 </div>
