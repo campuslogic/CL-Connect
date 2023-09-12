@@ -16,14 +16,13 @@
         vm.isirCorrectionsValid = validationservice.pageValidations.isirCorrectionsValid;
 
 
-        $("#daysToRun").kendoMultiSelect({
+        vm.daysToRunOptions = {
             dataTextField: "text",
             dataValueField: "value",
             valuePrimitive: true,
             autoBind: false,
-            autoWidth: true,
             dataSource: daysToRunDataSource()
-        });
+        };
 
         function daysToRunDataSource() {
             return new kendo.data.DataSource({
