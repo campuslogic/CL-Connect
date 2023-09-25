@@ -12,12 +12,12 @@ clConnectServices.factory("addapiintegrationmodalcontroller", ["$modal",
                 function ($rootScope, $scope, $modalInstance, modalParams) {
                     $scope.theItem = modalParams.theItem;
                     $scope.theList = modalParams.theList;
-
+                    
                     if (!modalParams.theItem.authentication) {
                         $scope.modelCopy = {
                             apiId: modalParams.theItem.apiId,
                             apiName: null,
-                            authentication: null,
+                            authentication: 'none',
                             tokenService: null,
                             root: null,
                             username: null,
