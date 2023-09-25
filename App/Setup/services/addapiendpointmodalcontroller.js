@@ -15,12 +15,22 @@ clConnectServices.factory("addapiendpointmodalcontroller", ["$modal",
                     $scope.endpointsList = modalParams.endpointsList;
                     $scope.endpointReadonly = modalParams.endpointReadonly;
                     $scope.originalEndpointName = null;
-                    $scope.dropdown = { eventPropertyValues: modalParams.eventPropertyValues };
+                    $scope.dropdown =
+                    {
+                        dataSource: modalParams.eventPropertyValues,
+                        optionLabel: "Select property..."
+                    };
                     $scope.parameterMappings = [
                         {
                             parameter: "",
                             eventData: null
                         }
+                    ];
+
+                    $scope.methods = [
+                        { text: "GET", value: "GET" },
+                        { text: "POST", value: "POST" },
+                        { text: "PUT", value: "PUT" }
                     ];
 
                     $scope.populateParameterMappings = function () {
@@ -43,7 +53,7 @@ clConnectServices.factory("addapiendpointmodalcontroller", ["$modal",
                             apiId: modalParams.apiId,
                             name: null,
                             endpoint: null,
-                            method: null,
+                            method: 'GET',
                             mimeType: null,
                             parameterMappings: null
                         };
