@@ -51,26 +51,29 @@ namespace CampusLogicEvents.Web.Models
 
                             dbContext.EventNotificationDefinition.AddRange(gatewayInfo.EventNotifications);
 
-                            dbContext.EventProperty.AddRange(gatewayInfo.EventProperties.Select(p =>
-                                new EventProperty
-                                {
-                                    Id = p.Id,
-                                    Name = p.Name,
-                                    DisplayName = p.DisplayName,
-                                    DisplayFormula = p.DisplayFormula,
-                                }));
-
-                            dbContext.SaveChanges();
-
-                            foreach (var p in gatewayInfo.EventProperties)
+                            if (gatewayInfo.EventNotifications.First().EventProperty.Count == 0)
                             {
-                                var existingProperty = dbContext.EventProperty.Single(e => e.Id == p.Id);
-                                var existingEventNotifications = dbContext.EventNotificationDefinition.Where(x => p.EventNotificationIds.Contains(x.Id)).ToList();
-                                foreach (var eventNotification in existingEventNotifications)
+                                dbContext.EventProperty.AddRange(gatewayInfo.EventProperties.Select(p =>
+                                    new EventProperty
+                                    {
+                                        Id = p.Id,
+                                        Name = p.Name,
+                                        DisplayName = p.DisplayName,
+                                        DisplayFormula = p.DisplayFormula,
+                                    }));
+
+                                dbContext.SaveChanges();
+
+                                foreach (var p in gatewayInfo.EventProperties)
                                 {
-                                    existingProperty.EventNotificationDefinition.Add(eventNotification);
+                                    var existingProperty = dbContext.EventProperty.Single(e => e.Id == p.Id);
+                                    var existingEventNotifications = dbContext.EventNotificationDefinition.Where(x => p.EventNotificationIds.Contains(x.Id)).ToList();
+                                    foreach (var eventNotification in existingEventNotifications)
+                                    {
+                                        existingProperty.EventNotificationDefinition.Add(eventNotification);
+                                    }
                                 }
-                            }
+                            }        
 
                             dbContext.SaveChanges();
                             tran.Commit();
@@ -114,7 +117,7 @@ namespace CampusLogicEvents.Web.Models
         {
             using (var dbContext = new CampusLogicContext())
             {
-                return dbContext.EventNotificationDefinition.Select( x => new EventNotificationDefinitionDto { EventNotificationId = x.Id, EventNotificationName = x.EventName }).ToList();
+                return dbContext.EventNotificationDefinition.Select(x => new EventNotificationDefinitionDto { EventNotificationId = x.Id, EventNotificationName = x.EventName }).ToList();
             }
         }
     }
