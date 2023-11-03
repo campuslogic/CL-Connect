@@ -97,15 +97,42 @@ namespace CampusLogicEvents.Web
                     return;
                 }
 
-                // Check the environment and the STS
+                // Check the environment and the STS and update the GwWebApiUrl if a value is not present
                 var environment = ConfigurationManager.AppSettings["Environment"] ?? "initial";
-                if (string.IsNullOrEmpty(environment) || string.Equals("initial", environment, StringComparison.InvariantCultureIgnoreCase))
+                var hasChanges = string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["GwWebApiUrl"]);
+                Configuration config = null;
+                if (hasChanges)
+                {
+                    config = WebConfigurationManager.OpenWebConfiguration(HostingEnvironment.ApplicationVirtualPath);
+                    if (ConfigurationManager.AppSettings["GwWebApiUrl"] == null) //If the property doesnt exist add it
+                    {
+                        if (environment == EnvironmentConstants.PRODUCTION)
+                        {
+                            config.AppSettings.Settings.Add("GwWebApiUrl", ApiUrlConstants.GW_URL_PROD);
+                        }
+                        else
+                        {
+                            config.AppSettings.Settings.Add("GwWebApiUrl", ApiUrlConstants.GW_URL_SANDBOX);
+                        }
+                    }
+                    else if(ConfigurationManager.AppSettings["GwWebApiUrl"].Trim() == "") //If it does exist but is empty update the value
+                    {
+                        if (environment == EnvironmentConstants.PRODUCTION)
+                        {
+                            config.AppSettings.Settings["GwWebApiUrl"].Value = ApiUrlConstants.GW_URL_PROD;
+                        }
+                        else
+                        {
+                            config.AppSettings.Settings["GwWebApiUrl"].Value = ApiUrlConstants.GW_URL_SANDBOX;
+                        }
+                    }                
+                }
+
+                if (!hasChanges && (string.IsNullOrEmpty(environment) || string.Equals("initial", environment, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     // Not setup anyway
                     return;
                 }
-                var hasChanges = false;
-                var config = WebConfigurationManager.OpenWebConfiguration(HostingEnvironment.ApplicationVirtualPath);
 
                 // Save if needed
                 if(hasChanges)
