@@ -172,7 +172,7 @@ namespace CampusLogicEvents.Web.Models
                                         callbackInfo = await ExecuteCallback(eventNotificationDefinition, callbackURL);
                                         //Another special SV caveat, previously we were translating this (no idea why) and to ensure this backward compatible
                                         //we have to do the same
-                                        if (callbackInfo[EventPropertyConstants.OutcomeId] != null)
+                                        if (callbackInfo[EventPropertyConstants.OutcomeId].Value<int?>() != null)
                                         {
                                             eventData.PropertyValues[EventPropertyConstants.TransactionOutcomeId] = ((TransactionOutcome)Enum.ToObject(typeof(TransactionOutcome), callbackInfo[EventPropertyConstants.OutcomeId].Value<int>())).ToString();
                                         }
