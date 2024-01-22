@@ -94,8 +94,20 @@
                 </div>
                 <div class="row padding-bottom-ten">
                     <div class="col-lg-12">
-                        <label class="control-label">SAIG mailbox User ID: (ex: TGxxxxx)<a popover-template="'tdClientFtpUserId.html'"><i class="fa fa-question-circle"></i></a></label>
+                        <label class="control-label">Sender Mailbox User ID: (ex: TGxxxxx or FTxxxxx)<a popover-template="'tdClientFtpUserId.html'"><i class="fa fa-question-circle"></i></a></label>
                         <input name="ftpUserId" type="text" ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.tdClientFtpUserId" class="form-control">
+                    </div>
+                </div>
+                <div class="row padding-bottom-ten">
+                    <div class="col-lg-12">
+                        <label class="control-label">Recipient Mailbox User ID: (ex: TGxxxxx or FTxxxxx)<a popover-template="'tdClientFtpRecipientUserId.html'"><i class="fa fa-question-circle"></i></a></label>
+                        <input name="ftpRecipientUserId" type="text" ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.tdClientFtpRecipientUserId" class="form-control">
+                    </div>
+                </div>
+                <div class="row padding-bottom-ten">
+                    <div class="col-lg-12">
+                        <label class="control-label">Network<a popover-template="'tdClientNetwork.html'"><i class="fa fa-question-circle"></i></a></label>
+                        <input name="ftpNetwork" type="text" ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.tdClientNetwork" class="form-control">
                     </div>
                 </div>
             </div>
@@ -134,5 +146,17 @@
 <script type="text/ng-template" id="tdClientFtpUserId.html">
     <div>
         SENDUSERID is a required parm in the Transfer command line. You must use a valid TG ID as a place holder in this field. Using your own TG ID is highly recommended. 
+    </div>
+</script>
+
+<script type="text/ng-template" id="tdClientNetwork.html">
+    <div>
+        NETWORK is a required parm in the TD Client for specifying SAIG TDClient or FTI-SAIG TDClient.
+    </div>
+</script>
+
+<script type="text/ng-template" id="tdClientFtpRecipientUserId.html">
+    <div>
+        The Mailbox ID of who is to receive the data when you are sending. See application-specific guides and references for the correct destination mailbox for each message class.
     </div>
 </script>
