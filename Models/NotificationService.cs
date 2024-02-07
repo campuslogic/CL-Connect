@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Configuration;
 using CampusLogicEvents.Implementation.Configurations;
 using CampusLogicEvents.Implementation.Models;
+using System.Threading.Tasks;
 
 namespace CampusLogicEvents.Web.Models
 {
@@ -31,9 +32,9 @@ namespace CampusLogicEvents.Web.Models
             }
         }
 
-        public static void ErrorNotification(SmtpSection smtpSection, string sendTo)
+        public static async Task ErrorNotification(SmtpSection smtpSection, string sendTo)
         {
-            DataService.LogNotification(notificationManager.TestSMTP(smtpSection, sendTo));
+            DataService.LogNotification(await notificationManager.TestSMTP(smtpSection, sendTo));
         }
 
         /// <summary>
