@@ -43,7 +43,7 @@ namespace CampusLogicEvents.Web.Models
                 }
                 if (configurationModel.CampusLogicSection.SMTPSettings.NotificationsEnabled ?? false)
                 {
-                    response.SMTPValid = ValidateSMTPSettings(configurationModel.CampusLogicSection.SMTPSettings, configurationModel.SmtpSection).IsSuccessStatusCode;
+                    response.SMTPValid = (await ValidateSMTPSettings(configurationModel.CampusLogicSection.SMTPSettings, configurationModel.SmtpSection)).IsSuccessStatusCode;
                 }
                 if (configurationModel.CampusLogicSection.ISIRUploadSettings.ISIRUploadEnabled ?? false)
                 {
@@ -440,13 +440,13 @@ namespace CampusLogicEvents.Web.Models
         /// <param name="settings"></param>
         /// <param name="smtpSection"></param>
         /// <returns></returns>
-        public static HttpResponseMessage ValidateSMTPSettings(SMTPSettings settings, SmtpSection smtpSection)
+        public static async Task<HttpResponseMessage> ValidateSMTPSettings(SMTPSettings settings, SmtpSection smtpSection)
         {
             try
             {
                 if (settings.NotificationsEnabled ?? false)
                 {
-                    NotificationService.ErrorNotification(smtpSection, settings.SendTo);
+                    await NotificationService.ErrorNotification(smtpSection, settings.SendTo);
                 }
             }
             catch (Exception exception)
