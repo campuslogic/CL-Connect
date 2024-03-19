@@ -1,6 +1,6 @@
-﻿using CampusLogicEvents.Web.Filters;
+﻿using CampusLogicEvents.Implementation;
+using CampusLogicEvents.Web.Filters;
 using CampusLogicEvents.Web.Models;
-using log4net;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,6 @@ namespace CampusLogicEvents.Web.WebAPI
     [Authorize] // Require authenticated requests.
     public class NotificationEventController : ApiController
     {
-        private static readonly ILog logger = LogManager.GetLogger("AdoNetAppender");
 
         // POST api/NotificationEvent
         public HttpResponseMessage Post([FromBody] IEnumerable<JObject> postData)
@@ -37,7 +36,7 @@ namespace CampusLogicEvents.Web.WebAPI
             }
             catch (Exception ex)
             {
-                logger.ErrorFormat("NotificationEvent Post Error: {0}", ex);
+                LogManager.ErrorLogFormat("NotificationEvent Post Error: {0}", ex);
                 return Request.CreateResponse(HttpStatusCode.ExpectationFailed);
             }
         }

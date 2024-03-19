@@ -1,16 +1,16 @@
 ﻿using CampusLogicEvents.Implementation;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Net.Configuration;
 using CampusLogicEvents.Implementation.Configurations;
 using CampusLogicEvents.Implementation.Models;
+using System.Threading.Tasks;
 
 namespace CampusLogicEvents.Web.Models
 {
-    public static class NotificationService
+	public static class NotificationService
     {
         private static readonly CampusLogicSection campusLogicSection = (CampusLogicSection)ConfigurationManager.GetSection(ConfigConstants.CampusLogicConfigurationSectionName);
         private static readonly NotificationManager notificationManager = new NotificationManager();
@@ -32,9 +32,9 @@ namespace CampusLogicEvents.Web.Models
             }
         }
 
-        public static void ErrorNotification(SmtpSection smtpSection, string sendTo)
+        public static async Task ErrorNotification(SmtpSection smtpSection, string sendTo)
         {
-            DataService.LogNotification(notificationManager.TestSMTP(smtpSection, sendTo));
+            DataService.LogNotification(await notificationManager.TestSMTP(smtpSection, sendTo));
         }
 
         /// <summary>

@@ -2,18 +2,18 @@
 using System.IO;
 using System.Linq;
 using System.Net;
-using log4net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
 using CampusLogicEvents.Implementation;
+using CampusLogicEvents.Web.Filters;
 
 namespace CampusLogicEvents.Web.WebAPI
 {
+    [LocalRequestOnly]
     public class FolderPickerController : ApiController
     {
-        private static readonly ILog logger = LogManager.GetLogger("AdoNetAppender");
-
+        
         /// <summary>
         /// Constructor for the FolderPickerController
         /// </summary>
@@ -65,7 +65,7 @@ namespace CampusLogicEvents.Web.WebAPI
             }
             catch (Exception ex)
             {
-                logger.ErrorFormat("OpenFolderExplorer Get Error: {0}", ex);
+                LogManager.ErrorLogFormat("OpenFolderExplorer Get Error: {0}", ex);
                 return Request.CreateResponse(HttpStatusCode.ExpectationFailed);
             }
         }
@@ -80,7 +80,7 @@ namespace CampusLogicEvents.Web.WebAPI
             }
             catch (Exception ex)
             {
-                logger.ErrorFormat("TestWritePermissions Get Error: {0}", ex);
+                LogManager.ErrorLogFormat("TestWritePermissions Get Error: {0}", ex);
                 return Request.CreateResponse(HttpStatusCode.ExpectationFailed);
             }
         }

@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Runtime.InteropServices;
 using CampusLogicEvents.Implementation;
 using CampusLogicEvents.Implementation.Configurations;
 using CampusLogicEvents.Implementation.Models;
 using Hangfire;
-using log4net;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace CampusLogicEvents.Web.Models
 {
     public static class FileStoreService
     {
-        private static readonly ILog logger = LogManager.GetLogger("AdoNetAppender");
         public const string Name = "File Storage";
         private static readonly CampusLogicSection campusLogicConfigSection = (CampusLogicSection)ConfigurationManager.GetSection(ConfigConstants.CampusLogicConfigurationSectionName);
 
@@ -34,6 +34,10 @@ namespace CampusLogicEvents.Web.Models
                 //4. Rinse & Repeat every x minutes.
                 try
                 {
+                    Dictionary<int, EventNotificationData> eventNotificationDataList = new Dictionary<int, EventNotificationData>();
+                    List<int> successEventIds = new List<int>();
+                    List<int> failEventIds = new List<int>();
+
                     //update all the current eventNotification records with no processguid to be processed.
                     dbContext.Database.ExecuteSqlCommand($"UPDATE [dbo].[EventNotification] SET [ProcessGuid] = '{processGuid}' WHERE [ProcessGuid] IS NULL");
 
@@ -52,50 +56,52 @@ namespace CampusLogicEvents.Web.Models
 
                         if (sharedEvents.Any())
                         {
-                            List<EventNotificationData> eventNotificationDataList = new List<EventNotificationData>();
                             //Make sure the event's processguid matches what we just generated so we're not re-processing events.
                             var sharedEventsToProcess =
                                 dbContext.EventNotifications
                                 .Where(e => sharedEvents.Contains(e.EventNotificationId) && e.ProcessGuid == processGuid)
-                                .Select(m => m.Message);
+                                .Select(m => new { id = m.Id, message = m.Message });
 
-                            foreach (string message in sharedEventsToProcess)
+                            foreach (var eventRec in sharedEventsToProcess)
                             {
-                                //Convert the json back into EventNotificationData
-                                EventNotificationData eventData = JsonConvert.DeserializeObject<EventNotificationData>(message);
+                                var eventData = new EventNotificationData(JObject.Parse(eventRec.message));
 
-                                eventNotificationDataList.Add(eventData);
+                                eventNotificationDataList.Add(eventRec.id, eventData);
                             }
 
-                            if (eventNotificationDataList.Any())
+                            if (eventNotificationDataList.Count > 0)
                             {
                                 //send the list of events over to be processed into a file
                                 FileStoreManager filestoreManager = new FileStoreManager();
-                                filestoreManager.CreateFileStoreFile(eventNotificationDataList);
+                                filestoreManager.CreateFileStoreFile(eventNotificationDataList, ref successEventIds, ref failEventIds);
+                                eventNotificationDataList.Clear();
+
+                                CleanEventNotificationRecords(processGuid, ref successEventIds, ref failEventIds);
                             }
                         }
 
-                        //Process any individual events
                         if (individualEvents.Any())
                         {
-                            var individualEventsToProcess =
-                                dbContext.EventNotifications
-                                .Where(e => individualEvents.Contains(e.EventNotificationId) && e.ProcessGuid == processGuid)
-                                .Select(m => m.Message);
+                            var individualEventsToProcess = dbContext.EventNotifications.Where(e => individualEvents.Contains(e.EventNotificationId) && e.ProcessGuid == processGuid);
 
-                            foreach (string message in individualEventsToProcess)
+                            //Process any events configured for individual store into separate files (e.g., all 104 events in one file, all 105 in another)
+                            foreach (int eventNotificationId in individualEvents)
                             {
-                                List<EventNotificationData> eventNotificationDataList =
-                                    new List<EventNotificationData>();
-                                //Convert the json back into EventNotificationData
-                                EventNotificationData eventData =
-                                    JsonConvert.DeserializeObject<EventNotificationData>(message);
-                                eventNotificationDataList.Add(eventData);
+                                foreach (var eventRec in individualEventsToProcess.Where(s => s.EventNotificationId == eventNotificationId).Select(m => new { id = m.Id, message = m.Message }))
+                                {
+                                    var eventData = new EventNotificationData(JObject.Parse(eventRec.message));
+                                    eventNotificationDataList.Add(eventRec.id, eventData);
+                                }
 
-                                //process these event into individual file
-                                FileStoreManager filestoreManager = new FileStoreManager();
-                                filestoreManager.CreateFileStoreFile(eventNotificationDataList);
-                                eventNotificationDataList.Remove(eventData);
+                                if (eventNotificationDataList.Count > 0)
+                                {
+                                    FileStoreManager filestoreManager = new FileStoreManager();
+                                    filestoreManager.CreateFileStoreFile(eventNotificationDataList, ref successEventIds, ref failEventIds);
+                                    //clear out the list now that we've completed processing
+                                    eventNotificationDataList.Clear();
+
+                                    CleanEventNotificationRecords(processGuid, ref successEventIds, ref failEventIds);
+                                }
                             }
                         }
                     }
@@ -103,8 +109,26 @@ namespace CampusLogicEvents.Web.Models
                 catch (Exception ex)
                 {
                     //Something happened during processing. Update any records that may have been marked for processing back to null so that they can be re-processed.
-                    logger.Error($"An error occured while attempting to process the event(s) for file store: {ex}");
+                    LogManager.ErrorLog($"An error occured while attempting to process the event(s) for file store: {ex}");
                     dbContext.Database.ExecuteSqlCommand($"UPDATE [dbo].[EventNotification] SET [ProcessGuid] = NULL WHERE [ProcessGuid] = '{processGuid}'");
+                }
+            }
+        }
+
+        private static void CleanEventNotificationRecords(Guid processingGuid, ref List<int> succeededRecords, ref List<int> failedRecords)
+        {
+            using (var dbContext = new CampusLogicContext())
+            {
+                //Remove events that succeeded and reset failed events, so they can be processed again
+                if (succeededRecords.Count > 0)
+                {
+                    dbContext.Database.ExecuteSqlCommand($"DELETE FROM [dbo].[EventNotification] WHERE [ProcessGuid] = '{processingGuid}' and [Id] IN ({string.Join(",", succeededRecords)})");
+                    succeededRecords.Clear();
+                }
+                if (failedRecords.Count > 0)
+                {
+                    dbContext.Database.ExecuteSqlCommand($"UPDATE [dbo].[EventNotification] SET [ProcessGuid] = NULL WHERE [ProcessGuid] = '{processingGuid}' and [Id] IN ({string.Join(",", failedRecords)})");
+                    failedRecords.Clear();
                 }
             }
         }

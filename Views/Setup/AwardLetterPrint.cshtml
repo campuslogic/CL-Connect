@@ -1,0 +1,31 @@
+﻿@{
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+}
+<form class="form-horizontal" name="awardLetterPrintForm">
+    <h2>
+        <b>AwardLetter - Print</b>
+    </h2>
+    <section>
+        This section will allow you to configure the folder path where your Award Letter PDFs will be delivered. For more information, please click <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_set_up_cc_print.html" target="_blank">Award Letter Print</a>.
+    </section>
+    <hr>
+
+    <div class="row">
+        <div class="col-lg-3">
+            <label><span class="form-required" aria-hidden="true">* </span>Upload Path</label>
+        </div>
+        <div class="col-lg-7">
+            <cl-folder-picker class="col-lg-7" isrequired="true" formvalid="validationService.pageValidations.awardLetterPrintValid" uploadpath="vm.service.configurationModel.campusLogicSection.awardLetterPrintSettings.awardLetterPrintFilePath"></cl-folder-picker>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3">
+            <label for="printNameFormat"><span aria-hidden="true"></span>File Name Format</label>
+        </div>
+        <div class="col-lg-4">
+            <input type="text" class="form-control" id="printNameFormat" name="printNameFormat" ng-model="vm.service.configurationModel.campusLogicSection.awardLetterPrintSettings.awardLetterPrintFileName" />
+        </div>
+    </div>
+</form>
+
