@@ -1,5 +1,13 @@
-﻿<div id="body">
-    <div ng-app="clConnectApp" ng-strict-di>
-        <ng-view></ng-view>
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <base href="@Request.Url.Scheme://@Request.Url.Authority@Request.ApplicationPath.TrimEnd('/')/" />
+</head>
+<body>
+    <div id="body">
+        <div ng-app="clConnectApp" ng-strict-di>
+            <ng-view></ng-view>
+        </div>
     </div>
-</div>
+</body>
+</html>

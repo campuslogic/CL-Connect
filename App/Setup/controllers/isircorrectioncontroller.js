@@ -14,6 +14,8 @@
         vm.validationService = validationservice;
         vm.isirCorrectionsSettings = vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings;
         vm.isirCorrectionsValid = validationservice.pageValidations.isirCorrectionsValid;
+
+
         vm.daysToRunOptions = {
             dataTextField: "text",
             dataValueField: "value",

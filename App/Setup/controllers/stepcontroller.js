@@ -20,10 +20,19 @@
         $scope.errorCopying = false;
         $scope.success = false;
         $scope.invalidPages = $scope.validationService.invalidPages;
+        $scope.checkForInvalidBatchName = $scope.validationService.checkForInvalidBatchName;
+        $scope.checkForMissingBatchName = $scope.validationService.checkForMissingBatchName;
+        $scope.hasInvalidApiEndpointName = $scope.validationService.hasInvalidApiEndpointName;
+        $scope.hasMissingApiEndpointName = $scope.validationService.hasMissingApiEndpointName;
+        $scope.hasImproperFileDefinitions = $scope.validationService.hasImproperFileDefinitions;
         $scope.disableSave = false;
         $scope.fail = false;
         $scope.duplicatePath = false;
         $scope.duplicateEvent = false;
+        $scope.invalidBatchName = false;
+        $scope.missingBatchName = false;
+        $scope.missingApiEndpointName = false;
+        $scope.improperFileDefinitions = false;
 
         function getActiveStep(path) {
             $scope.activeStep = $location.path();
@@ -33,7 +42,7 @@
         function goToNextEnabledStep() {
             var activeStepListLinks = [];
             var nextStepLink = '';
-            $('#stepList li a').each(function () {
+            $('#stepList a').each(function () {
                 activeStepListLinks.push($(this).attr('cl-link-to'));
             });
 
@@ -57,8 +66,10 @@
                 $scope.errorCopying = false;
                 $scope.success = false;
                 $scope.fail = false;
+
+                // Convert from array to concatenated string
                 $scope.concatenateDaysToRun();
-                //Resetting isir upload days to run and award letter days to run from array to concatenated string
+                
                 $scope.validationService.validateAllConfigurations.save($scope.service.configurationModel, function () {
                     $scope.service.archiveWebConfig.save(function () {
                         $scope.service.configurations.save($scope.service.configurationModel, function() {
@@ -78,14 +89,20 @@
                     $scope.validationService.pageValidations = response.data;
                     $scope.duplicatePath = response.data.duplicatePath;
                     $scope.duplicateEvent = response.data.duplicateEvent;
+                    $scope.invalidBatchName = response.data.invalidBatchName;
+                    $scope.missingBatchName = response.data.missingBatchName;
+                    $scope.missingApiEndpointName = response.data.missingApiEndpointName;
+                    $scope.improperFileDefinitions = response.data.improperFileDefinitions;
                     $scope.disableSave = false;
                 });
             }
         }
 
         function concatenateDaysToRun() {
-            $scope.service.configurationModel.campusLogicSection.isirUploadSettings.isirUploadDaysToRun =  $scope.service.configurationModel.campusLogicSection.isirUploadSettings.isirUploadDaysToRun.join(",");
+            $scope.service.configurationModel.campusLogicSection.isirUploadSettings.isirUploadDaysToRun = $scope.service.configurationModel.campusLogicSection.isirUploadSettings.isirUploadDaysToRun.join(",");
             $scope.service.configurationModel.campusLogicSection.awardLetterUploadSettings.awardLetterUploadDaysToRun = $scope.service.configurationModel.campusLogicSection.awardLetterUploadSettings.awardLetterUploadDaysToRun.join(",");
+            $scope.service.configurationModel.campusLogicSection.fileMappingUploadSettings.fileMappingUploadDaysToRun = $scope.service.configurationModel.campusLogicSection.fileMappingUploadSettings.fileMappingUploadDaysToRun.join(",");
+            $scope.service.configurationModel.campusLogicSection.dataFileUploadSettings.dataFileUploadDaysToRun = $scope.service.configurationModel.campusLogicSection.dataFileUploadSettings.dataFileUploadDaysToRun.join(",");
             $scope.service.configurationModel.campusLogicSection.isirCorrectionsSettings.daysToRun = $scope.service.configurationModel.campusLogicSection.isirCorrectionsSettings.daysToRun.join(",");
         }
 
@@ -111,6 +128,8 @@
                     break;
                 case '/awardLetterUpload':
                     break;
+                case 'dataFileUpload':
+                    break;
                 case '/isircorrections':
                     break;
                 case '/storedprocedure':
@@ -123,6 +142,26 @@
                     break;
                 case '/filestore':
                     form = $scope.fileStoreForm;
+                    break;
+                case '/awardLetterPrint':
+                    form = $scope.fileStoreForm;
+                    break;
+                case '/awardLetterFileMappingUpload':
+                    form = $scope.awardLetterFileMappingUploadForm;
+                    break;
+                case '/batchprocessing':
+                    form = $scope.batchProcessingForm;
+                    break;
+                case '/apiintegration':
+                    form = $scope.apiIntegrationForm;
+                    break;
+                case '/bulkAction':
+                    break;
+                case '/filedefinitions':
+                    form = $scope.fileDefinitionsForm;
+                    break;
+                case '/powerfaids':
+                    form = $scope.powerFaidsForm;
                     break;
                 default:
                     return;

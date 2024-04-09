@@ -7,98 +7,33 @@
     </h2>
     <section>
         This step will allow you to configure File Store options.
-        If the path you wish to use is not available for selection, you may also enter the path below. For additional information, please click <a href="https://campuslogicinc.freshdesk.com/support/solutions/articles/5000701741" target="_blank">File Path Permissions.</a>
-        For addional help on this page please see <a href="https://campuslogicinc.freshdesk.com/support/solutions/articles/5000712338-file-store/" target="_blank">File Store Help.</a>
+        If the path you wish to use is not available for selection, you may also enter the path below. For additional information, please click <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_set_file_permissions.html" target="_blank">File Path Permissions.</a>
+        For additional help on this page please see <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_int_event_notes_file_store.html" target="_blank">File Store Help.</a>
     </section>
     <hr>
     <div class="row padding-bottom-ten">
-        <div class="col-md-8">
+        <div class="col-lg-8">
             <div class="form-group">
                 <label><span class="form-required" aria-hidden="true">*</span>File Store Path</label>
-                <cl-folder-picker isrequired="true" formvalid="validationService.pageValidations.fileStoreSettingsValid" uploadpath="vm.service.configurationModel.campusLogicSection.fileStoreSettings.fileStorePath"></cl-folder-picker>
+                <cl-folder-picker class="col-lg-7" isrequired="true" formvalid="validationService.pageValidations.fileStoreSettingsValid" uploadpath="vm.service.configurationModel.campusLogicSection.fileStoreSettings.fileStorePath"></cl-folder-picker>
             </div>
         </div>
     </div>
-    <div class="row"><div class="col-md-12 padding-left-10 padding-right-10"><hr /></div></div>
-    <div>
-        <div class="row padding-bottom-ten">
-            <div class="form-group">
-                <label class="control-label col-md-5" for="fileStoreNameFormat" align="right"><span class="form-required" aria-hidden="true">*</span>File Name Format</label>
-                <div class="col-md-2">
-                    <input type="text" class="form-control" id="fileStoreNameFormat" name="fileStoreNameFormat" ng-model="vm.service.configurationModel.campusLogicSection.fileStoreSettings.fileStoreNameFormat" required/>
-                    <span class="field-validation-error" ng-show="(vm.fileStoreForm.fileStoreNameFormat.$dirty || vm.service.pageValidations.fileStoreSettingsValid == false) && vm.fileStoreForm.fileStoreNameFormat.$error.required">Required</span>
-                </div>
+    <div class="row padding-bottom-ten">
+        <div class="col-lg-8">
+            <label class="control-label" for="fileStoreMinutes"><span class="form-required" aria-hidden="true">*</span>File Store Minutes</label><br />
+            <div class="col-lg-2">
+                <input type="text" id="fileStoreMinutes" name="fileStoreMinutes" kendo-numeric-text-box k-format="'n0'" k-min="1" ng-model="vm.service.configurationModel.campusLogicSection.fileStoreSettings.fileStoreMinutes" required /><br />
+                <span class="field-validation-error" ng-show="(vm.fileStoreForm.fileStoreMinutes.$dirty || vm.service.pageValidations.fileStoreSettingsValid == false) && vm.fileStoreForm.fileStoreMinutes.$error.required">Required</span>
             </div>
         </div>
-            <div class="row padding-bottom-ten">
-            <div class="form-group">
-                <label class="control-label col-md-5" for="fileStoreMinutes" align="right"><span class="form-required" aria-hidden="true">*</span>File Store Minutes</label>
-                <div class="col-md-4">
-                    <input type="text" id="fileStoreMinutes" name="fileStoreMinutes" kendo-numeric-text-box k-format="'n0'" k-min="5" k-max="60" ng-model="vm.service.configurationModel.campusLogicSection.fileStoreSettings.fileStoreMinutes" required />
-                    <span class="field-validation-error" ng-show="(vm.fileStoreForm.fileStoreMinutes.$dirty || vm.service.pageValidations.fileStoreSettingsValid == false) && vm.fileStoreForm.fileStoreMinutes.$error.required">Required</span>
-                </div>
-            </div>
-        </div>
-        <div class="row padding-bottom-ten">
-            <div class="col-md-5" align="right">
-                <label class="control-label"><span class="form-required" aria-hidden="true">*</span>Include Header Record</label>
-            </div>
-            <div class="col-md-3">
-                <input type="radio" ng-value="true" ng-model="vm.service.configurationModel.campusLogicSection.fileStoreSettings.includeHeaderRecord" style="width: 20px">True
-                <input type="radio" ng-value="false" ng-model="vm.service.configurationModel.campusLogicSection.fileStoreSettings.includeHeaderRecord" style="width: 20px">False
-            </div>
-        </div>
-        <div class="row padding-bottom-ten">
-            <div class="form-group">
-                <label class="control-label col-md-5" for="fileExtension" align="right">File Extension (txt, csv)</label>
-                <div class="col-md-4">
-                    <select id="fileExtension" required kendo-drop-down-list name="fileExtension" ng-model="vm.service.configurationModel.campusLogicSection.fileStoreSettings.fileExtension">
-                        <option value="txt">txt</option>
-                        <option value="csv">CSV</option>
-                    </select>
-                    <span class="field-validation-error" ng-show="(vm.fileStoreForm.fileExtension.$dirty || vm.service.pageValidations.fileStoreSettingsValid == false) && vm.fileStoreForm.fileExtension.$error.required">Required</span>
-                </div>
-            </div>
-        </div>
-        <div class="row padding-bottom-ten">
-            <div class="form-group">
-                <label class="control-label col-md-5" for="fileStoreFileFormat" align="right">File Store File Format</label>
-            </div>
-            <div class="col-md-4">
-                <select id="fileStoreFileFormat" required kendo-drop-down-list name="fileStoreFileFormat" ng-model="vm.service.configurationModel.campusLogicSection.fileStoreSettings.fileStoreFileFormat">
-                    <option value="csv">CSV</option>
-                    <option value="csvnoquotes">CSV No Quotes</option>
-                    <option value="tabdelimited">Tab Delimited</option>
-                    <option value="fixedwidth">Fixed Width</option>
-                </select>
-            </div>
-        </div>
-        <div class="row padding-bottom-ten">
-        </div>
-        <div class="row">
-            <div class="col-md-12 padding-left-10 padding-right-10">
-                <hr />
-            </div>
-        </div>
-        <div class="row padding-bottom-ten">
-            <label class="control-label col-md-5">File Store Mapping Collection</label>
-        </div>
-        <div class="row padding-bottom-ten">
-            <div class="col-md-12">
-                <div id="field-mapping-collection-grid" kendo-grid k-options="vm.fieldMappingCollectionGridOptions"></div>
-            </div>
-        </div>
-        <div class="row padding-bottom-ten">
-            <div class="col-md-12">
-                <button class="btn btn-default" ng-click="vm.addFieldMapping()">Add</button>
-            </div>
+    </div>
+    <div class="row padding-bottom-ten"></div>
+    <div class="row padding-bottom-ten">
+        <div class="col-lg-8">
+            <label class="control-label" for="fileDefinitionName"><span class="form-required" aria-hidden="true">*</span>File Definition Name</label><br />
+            <input type="text" id="fileDefinitionName" name="fileDefinitionName" ng-model="vm.service.configurationModel.campusLogicSection.fileStoreSettings.fileDefinitionName" required /><br />
+            <span class="field-validation-error" ng-show="(vm.fileStoreForm.fileDefinitionName.$dirty || vm.fileStoreSettingsValid == false) && vm.fileStoreForm.fileDefinitionName.$error.required">Required</span>
         </div>
     </div>
 </form>
-
-<script id="add-field-mapping-collection-template" type="text/x-kendo-template">
-    <button class="btn btn-default" ng-click="vm.moveUpFieldMappingItem(dataItem)"><i class="fa fa-arrow-up"></i></button>
-    <button class="btn btn-default" ng-click="vm.moveDownFieldMappingItem(dataItem)"><i class="fa fa-arrow-down"></i></button>
-    <button class="btn btn-default" ng-click="vm.editFieldMappingItem(dataItem)"><i class="fa fa-pencil"></i></button>
-    <button class="btn btn-default" ng-click="vm.deleteFieldMappingItem(dataItem)"><i class="fa fa-trash"></i></button>
-</script>

@@ -1,26 +1,27 @@
-﻿using System.Collections.Generic;
-using System.Web;
+﻿using System;
+using System.Collections.Generic;
 using System.Web.Optimization;
 
 namespace CampusLogicEvents.Web
 {
-    public class BundleConfig
+	public class BundleConfig
     {
         // For more information on Bundling, visit http://go.microsoft.com/fwlink/?LinkId=254725
         public static void RegisterBundles(BundleCollection bundles)
         {
-            bundles.Add(new StyleBundle("~/Content/angular").Include(AngularJsFileNames));
-            bundles.Add(new StyleBundle("~/Content/js").Include(JsFileNames));
+            bundles.Add(new Bundle("~/Content/bootstrap").Include(BootstrapJsFileNames));
+            bundles.Add(new ScriptBundle("~/Content/angular").Include(AngularJsFileNames));
+            bundles.Add(new ScriptBundle("~/Content/js").Include(JsFileNames));
 
-           
+
 
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
             // ready for production, use the build tool at http://modernizr.com to pick only the tests you need.
             bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
                         "~/Scripts/modernizr-*"));
 
-            bundles.Add(new ScriptBundle("~/bundles/clConnect.main.js").Include(MainJsFiles));
-            bundles.Add(new ScriptBundle("~/bundles/clConnect.setup.js").Include(SetupJsFiles));
+            bundles.Add(new ScriptBundle("~/bundles/clConnectmain").Include(MainJsFiles));
+            bundles.Add(new ScriptBundle("~/bundles/clConnectsetup").Include(SetupJsFiles));
 
             bundles.Add(new StyleBundle("~/Content/css").Include("~/Content/site.css"));
 
@@ -28,9 +29,9 @@ namespace CampusLogicEvents.Web
             bundles.Add(new StyleBundle("~/Content/toastr").Include("~/Content/toastr.css", new CssRewriteUrlTransform()));
 
             // Kendo styles
-            bundles.Add(new StyleBundle("~/Content/kendo/2014.3.1316/css").Include(CssKendoFileNames)
-                .Include("~/Content/bootstrap.min.css", new CssRewriteUrlTransform())
-                .Include("~/Content/fontawesome/font-awesome.css", new CssRewriteUrlTransform()));
+            bundles.Add(new StyleBundle("~/Content/kendo/css").Include(CssKendoFileNames)
+            .Include("~/Content/bootstrap.min.css", new CssRewriteUrlTransform())
+            .Include("~/Content/fontawesome/font-awesome.css", new CssRewriteUrlTransform()));
 
             bundles.Add(new StyleBundle("~/Content/themes/base/css").Include(
                         "~/Content/themes/base/jquery.ui.core.css",
@@ -63,13 +64,9 @@ namespace CampusLogicEvents.Web
             get
             {
                 return new[]
-                        {                           
-                            // Required
-                            "~/Content/kendo/kendo.common.min.css",
-                            "~/Content/kendo/kendo.default.min.css",
-                            // Which "theme" to use
-                            "~/Content/kendo/kendo.bootstrap.min.css",
-                            "~/Content/kendo/kendo.bootstrap.mobile.min.css",
+                        {
+                            //"~/Content/kendo/default-main.css",
+                            "~/Content/kendo/bootstrap-main.css",
                         };
             }
         }
@@ -101,7 +98,6 @@ namespace CampusLogicEvents.Web
                                "~/Scripts/angular.js",
                                "~/Scripts/angular-resource.js",
                                "~/Scripts/angular-route.js",
-                               "~/Scripts/bootstrap.js",
                                "~/Scripts/angular-ui/ui-bootstrap.js",
                                "~/Scripts/angular-ui/ui-bootstrap-tpls.js",
                                "~/Scripts/angular.treeview.js",
@@ -111,6 +107,17 @@ namespace CampusLogicEvents.Web
                                "~/Scripts/jquery.blockUI.js",
                                "~/Scripts/spin.js"
                            };
+            }
+        }
+
+        public static string[] BootstrapJsFileNames
+        {
+            get
+            {
+                return new[]
+                            {
+                                "~/Scripts/bootstrap.js",
+                            };
             }
         }
 

@@ -10,31 +10,31 @@
         <p>
         This step will allow you to select the configurations for the ISIR Batch Corrections process.
         If the file path you wish to use is not available for selection, you may also enter the path below.
-        For assistance in giving appropriate file path permissions, please click <a href="https://campuslogicinc.freshdesk.com/support/solutions/articles/5000701741" target="_blank">File Path Permissions.</a>
-        For further detail on the ISIR Batch Corrections section please click <a href="https://campuslogicinc.freshdesk.com/support/solutions/articles/5000706492-isir-corrections" target="_blank">ISIR Batch Corrections Detail.</a>
+        For assistance in giving appropriate file path permissions, please click <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_set_file_permissions.html" target="_blank">File Path Permissions.</a>
+        For further detail on the ISIR Batch Corrections section please click <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_set_up_isir_corrections.html" target="_blank">ISIR Batch Corrections Detail.</a>
     </section>
     <hr>
     <div class="row padding-bottom-ten">
-        <div class="col-md-12 padding-top-ten">
-            <div class="col-md-5">
-                <div class="form-group">
-                    <label class="col-md-5 control-label"><span class="form-required" aria-hidden="true">* </span>Days to Run</label>
-                    <div class="col-md-7">
-                        <select name="daysToRun" kendo-multi-select k-options="vm.daysToRunOptions" k-ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.daysToRun"></select>
+        <div class="row padding-top-ten">
+            <div class="col-lg-6">
+                <div class="row form-group mb-3">
+                    <label class="col-lg-5 control-label"><span class="form-required" aria-hidden="true">* </span>Days to Run</label>
+                    <div class="col-lg-7">
+                        <select kendo-multi-select required k-options="vm.daysToRunOptions" k-ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.daysToRun"></select>
                         <span class="field-validation-error" ng-show="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.daysToRun.length <= 0">Required</span>
                     </div>
                 </div>
-                <div class="form-group padding-top-twenty">
-                    <label class="col-md-5 control-label"><span class="form-required" aria-hidden="true">* </span>Time to Run</label>
-                    <div class="col-md-3">
-                        <input class="padding-bottom-seven" required ng-pattern="/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]+(AM|PM|am|pm)$/" name="timeToRun" kendo-time-picker k-format="'hh:mmtt'" style="height: 29px" ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.timeToRun">
+                <div class="row form-group mb-3 padding-top-twenty">
+                    <label class="col-lg-5 control-label"><span class="form-required" aria-hidden="true">* </span>Time to Run</label>
+                    <div class="col-lg-4">
+                        <input class="padding-bottom-seven" required ng-pattern="/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]+(AM|PM|am|pm)$/" name="timeToRun" kendo-time-picker k-format="'hh:mmtt'" ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.timeToRun">
                         <span class="field-validation-error" ng-show="isircorrectionForm.timeToRun.$dirty && isircorrectionForm.timeToRun.$error.required">Required</span>
                         <span class="field-validation-error" ng-show="isircorrectionForm.timeToRun.$dirty && isircorrectionForm.timeToRun.$error.pattern">Format is incorrect, format must be: hh:mmtt</span>
                     </div>
                 </div>
-                <div class="form-group padding-top-twenty">
-                    <label class="col-md-5 control-label"><span class="form-required" aria-hidden="true">* </span>File Extension</label>
-                    <div class="col-md-3">
+                <div class="row form-group mb-3 padding-top-twenty">
+                    <label class="col-lg-5 control-label"><span class="form-required" aria-hidden="true">* </span>File Extension</label>
+                    <div class="col-lg-3">
                         <select kendo-drop-down-list name="fileExtension" style="height: 34px" ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.fileExtension">
                             <option style="height: 34px" value="txt">txt</option>
                             <option style="height: 34px" value="dat">dat</option>
@@ -42,14 +42,14 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-7">
-                <div class="form-group">
-                    <label class="col-md-3 control-label"><span class="form-required" aria-hidden="true">*</span>Corrections File Path</label>
-                    <cl-folder-picker isrequired="true" formvalid="vm.validationService.pageValidations.isirCorrectionsValid" uploadpath="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.correctionsFilePath"></cl-folder-picker>
+            <div class="col-lg-6">
+                <div class="row form-group mb-3">
+                    <label class="col-lg-3 control-label"><span class="form-required" aria-hidden="true">*</span>Corrections File Path</label>
+                    <cl-folder-picker class="col-lg-7" isrequired="true" formvalid="vm.validationService.pageValidations.isirCorrectionsValid" uploadpath="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.correctionsFilePath"></cl-folder-picker>
                 </div>
-                <div class="form-group">
-                    <label class="col-md-3 control-label">File Name</label>
-                    <div class="col-md-5">
+                <div class="row form-group mb-3">
+                    <label class="col-lg-3 control-label">File Name</label>
+                    <div class="col-lg-5">
                         <input name="fileName" type="text" ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.fileName" class="form-control">
                     </div>
                 </div>
@@ -57,45 +57,57 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12 padding-left-10 padding-right-10"><hr/>
+        <div class="col-lg-12 padding-left-10 padding-right-10"><hr/>
         </div>
     </div>
     <div class="row padding-bottom-ten">
-        <div class="col-md-3">
+        <div class="col-lg-3">
             <label>TDClient Integration Enabled:</label>
         </div>
-        <div class="col-md-3">
+        <div class="col-lg-3">
             <input type="radio" ng-value="true" ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.tdClientEnabled" style="width: 20px"><strong>True</strong>
             <input type="radio" ng-value="false" ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.tdClientEnabled" style="width: 20px"><strong>False</strong>
         </div>
     </div>
     <div ng-if="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.tdClientEnabled">
         <div class="row padding-bottom-ten">
-            <div class="col-md-6">
+            <div class="col-lg-6">
                 <label>TDClient Executable Path:<a popover-template="'tdClientExecutablePath.html'"><i class="fa fa-question-circle"></i></a></label>
-                <cl-folder-picker isrequired="true" formvalid="validationService.pageValidations.isirCorrectionsValid" uploadpath="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.tdClientExecutablePath"></cl-folder-picker>
+                <cl-folder-picker class="col-lg-7" isrequired="true" formvalid="validationService.pageValidations.isirCorrectionsValid" uploadpath="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.tdClientExecutablePath"></cl-folder-picker>
             </div>
-            <div class="col-md-6">
-                <label>TDClient secfile Folder Path:<a popover-template="'tdClientSecfileFolderPath.html'"><i class="fa fa-question-circle"></i></a></label>
-                <cl-folder-picker isrequired="true" formvalid="validationService.pageValidations.isirCorrectionsValid" uploadpath="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.tdClientSecfileFolderPath"></cl-folder-picker>
+            <div class="col-lg-6">
+                <label>TDClient secfile Folder/Relative Path:<a popover-template="'tdClientSecfileFolderPath.html'"><i class="fa fa-question-circle"></i></a></label>
+                <input ng-required="true" name="secFilePath" type="text" ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.tdClientSecfileFolderPath" class="form-control">
             </div>
         </div>
         <div class="row padding-bottom-ten">
-            <div class="col-md-6">
+            <div class="col-lg-6">
                 <label>Archive File Path<a popover-template="'tdClientArchiveFilePath.html'"><i class="fa fa-question-circle"></i></a></label>
-                <cl-folder-picker isrequired="true" formvalid="validationService.pageValidations.isirCorrectionsValid" uploadpath="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.tdClientArchiveFilePath"></cl-folder-picker>
+                <cl-folder-picker class="col-lg-7" isrequired="true" formvalid="validationService.pageValidations.isirCorrectionsValid" uploadpath="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.tdClientArchiveFilePath"></cl-folder-picker>
             </div>
-            <div class="col-md-6">
+            <div class="col-lg-6">
                 <div class="row padding-bottom-ten">
-                    <div class="col-md-12">
+                    <div class="col-lg-12">
                         <label class="control-label">Name of Transfer: (ex: john.doe.fsa)<a popover-template="'tdClientFtpUsername.html'"><i class="fa fa-question-circle"></i></a></label>
                         <input name="ftpName" type="text" ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.tdClientFtpUsername" class="form-control">
                     </div>
                 </div>
                 <div class="row padding-bottom-ten">
-                    <div class="col-md-12">
-                        <label class="control-label">SAIG mailbox User ID: (ex: TGxxxxx)<a popover-template="'tdClientFtpUserId.html'"><i class="fa fa-question-circle"></i></a></label>
+                    <div class="col-lg-12">
+                        <label class="control-label">Sender Mailbox User ID: (ex: TGxxxxx or FTxxxxx)<a popover-template="'tdClientFtpUserId.html'"><i class="fa fa-question-circle"></i></a></label>
                         <input name="ftpUserId" type="text" ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.tdClientFtpUserId" class="form-control">
+                    </div>
+                </div>
+                <div class="row padding-bottom-ten">
+                    <div class="col-lg-12">
+                        <label class="control-label">Recipient Mailbox User ID: (ex: TGxxxxx or FTxxxxx)<a popover-template="'tdClientFtpRecipientUserId.html'"><i class="fa fa-question-circle"></i></a></label>
+                        <input name="ftpRecipientUserId" type="text" ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.tdClientFtpRecipientUserId" class="form-control">
+                    </div>
+                </div>
+                <div class="row padding-bottom-ten">
+                    <div class="col-lg-12">
+                        <label class="control-label">Network<a popover-template="'tdClientNetwork.html'"><i class="fa fa-question-circle"></i></a></label>
+                        <input name="ftpNetwork" type="text" ng-model="vm.service.configurationModel.campusLogicSection.isirCorrectionsSettings.tdClientNetwork" class="form-control">
                     </div>
                 </div>
             </div>
@@ -113,7 +125,9 @@
 
 <script type="text/ng-template" id="tdClientSecfileFolderPath.html">
     <div>
-        The location of the TdClient secfile file.
+        The location of the TdClient secfile file. This can be a relative or absolute path.
+        PLEASE NOTE: No spacing is allowed in this path. There is also no validation on this path for 
+        permissions because it can also be relative.
     </div>
 </script>
 
@@ -132,5 +146,17 @@
 <script type="text/ng-template" id="tdClientFtpUserId.html">
     <div>
         SENDUSERID is a required parm in the Transfer command line. You must use a valid TG ID as a place holder in this field. Using your own TG ID is highly recommended. 
+    </div>
+</script>
+
+<script type="text/ng-template" id="tdClientNetwork.html">
+    <div>
+        NETWORK is a required parm in the TD Client for specifying SAIG TDClient or FTI-SAIG TDClient.
+    </div>
+</script>
+
+<script type="text/ng-template" id="tdClientFtpRecipientUserId.html">
+    <div>
+        The Mailbox ID of who is to receive the data when you are sending. See application-specific guides and references for the correct destination mailbox for each message class.
     </div>
 </script>
