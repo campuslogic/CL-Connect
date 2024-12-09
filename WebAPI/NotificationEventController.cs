@@ -39,6 +39,6 @@ namespace CampusLogicEvents.Web.WebAPI
                 LogManager.ErrorLogFormat("NotificationEvent Post Error: {0}", ex);
                 return Request.CreateResponse(HttpStatusCode.ExpectationFailed);
             }
-        }
+        } 
     }
 }
