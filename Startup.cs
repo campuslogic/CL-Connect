@@ -391,7 +391,7 @@ namespace CampusLogicEvents.Web
             {
                 UploadEnabled = campusLogicSection.DataFileUploadSettings.DataFileUploadEnabled ?? false,
                 UploadFilePath = $"{campusLogicSection.DataFileUploadSettings.DataFileUploadFilePath}\\{UploadSettings.SecureFileTransfer}",
-                ArchiveFilePath = campusLogicSection.DataFileUploadSettings.DataFileArchiveFilePath,
+                ArchiveFilePath = $"{campusLogicSection.DataFileUploadSettings.DataFileArchiveFilePath}\\{UploadSettings.SecureFileTransfer}",
                 UploadFrequencyType = campusLogicSection.DataFileUploadSettings.DataFileUploadFrequencyType,
                 DaysToRun = campusLogicSection.DataFileUploadSettings.DataFileUploadDaysToRun,
                 UploadType = UploadSettings.SecureFileTransfer
