@@ -31,7 +31,7 @@
             $scope.setupservice.configurationModel = configurations;
         }
 
-        $scope.dataFileUploadFilePath = $scope.setupservice.configurationModel.campusLogicSection.dataFileUploadSettings.dataFileUploadFilePath;
+        $scope.dataFileUploadEnabled = $scope.setupservice.configurationModel.campusLogicSection.dataFileUploadSettings.dataFileUploadEnabled;
 
         // add table if not exists in $scope.tables remove it if it does
         function addRemove(table) {

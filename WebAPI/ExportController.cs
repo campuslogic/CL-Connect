@@ -21,22 +21,24 @@ namespace CampusLogicEvents.Web.WebAPI
         [Route("api/Export/ExportLogs")]
         public HttpResponseMessage ExportLogs([FromBody] ExportRequest request)
         {
-            var test = ClientDatabaseManager.GetDatabaseSize();
             var exportManager = new ExportManager();
+            HttpResponseMessage response;
             try
             {
                 exportManager.ExportLogs(request.Days, request.Tables);
+                response = new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent("Logs exported successfully")
+                };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-
-                throw;
+                response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent("Error exporting logs")
+                };
             }
 
-            var response = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent("Logs exported successfully")
-            };
             return response;
         }
     }

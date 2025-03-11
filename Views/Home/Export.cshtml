@@ -31,12 +31,12 @@
         <p>This will create logs and drop them in a Secure File Transfer folder to be picked up and sent to the Platform Management Secure File Transfer screen.
         This automated process will occur at the same interval set for the Data File Upload process.</p>
         <hr />
-        <div ng-if="dataFileUploadFilePath == null" class="padding-bottom-ten">
+        <div ng-if="!dataFileUploadEnabled" class="padding-bottom-ten">
             <label>
-                This feature requires DataFile Uploads in the Setup Wizard to be configured.
+                This feature requires DataFile Uploads in the Setup Wizard to be enabled.
             </label>
         </div>
-        <form ng-submit="exportLogs()" ng-if="dataFileUploadFilePath != null">
+        <form ng-submit="exportLogs()" ng-if="dataFileUploadEnabled">
             <div class="row">
                 <div class="col-lg-6">
                     <div class="row">
