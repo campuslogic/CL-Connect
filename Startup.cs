@@ -63,6 +63,7 @@ namespace CampusLogicEvents.Web
             AutomatedAwardLetterUpload();
             AutomatedFileMappingUpload();
             AutomatedDataFileUpload();
+            AutomatedSecureFileUpload();
             AutomatedISIRCorrectionBatching();
             AutomatedDocumentImportWorker();
             AutomatedFileStoreJob();
@@ -373,6 +374,31 @@ namespace CampusLogicEvents.Web
         }
 
         /// <summary>
+        /// Checking the configurations and setting them
+        /// for the automated Secure File Transfer process
+        /// </summary>
+        private void AutomatedSecureFileUpload()
+        {
+            //validation
+            if (campusLogicSection.DataFileUploadSettings == null)
+            {
+                NotificationService.ErrorNotification("Automated Data File Mapping Upload", "The data file settings are missing");
+                LogManager.ErrorLog("Data File Upload settings are missing");
+                return;
+            }
+
+            UploadConfigurationValidation(new UploadSettings
+            {
+                UploadEnabled = campusLogicSection.DataFileUploadSettings.DataFileUploadEnabled ?? false,
+                UploadFilePath = $"{campusLogicSection.DataFileUploadSettings.DataFileUploadFilePath}\\{UploadSettings.SecureFileTransfer}",
+                ArchiveFilePath = $"{campusLogicSection.DataFileUploadSettings.DataFileArchiveFilePath}\\{UploadSettings.SecureFileTransfer}",
+                UploadFrequencyType = campusLogicSection.DataFileUploadSettings.DataFileUploadFrequencyType,
+                DaysToRun = campusLogicSection.DataFileUploadSettings.DataFileUploadDaysToRun,
+                UploadType = UploadSettings.SecureFileTransfer
+            });
+        }
+
+        /// <summary>
         /// Checks for configurations and settings 
         /// for the automated Bulk Action process
         /// </summary>
@@ -517,7 +543,8 @@ namespace CampusLogicEvents.Web
             if (uploadSettings.UploadEnabled)
             {
                 if (uploadSettings.UploadType != UploadSettings.AwardLetter && uploadSettings.UploadType != UploadSettings.ISIR 
-                    && uploadSettings.UploadType != UploadSettings.FileMapping && uploadSettings.UploadType != UploadSettings.DataFile)
+                    && uploadSettings.UploadType != UploadSettings.FileMapping && uploadSettings.UploadType != UploadSettings.DataFile
+                    && uploadSettings.UploadType != UploadSettings.SecureFileTransfer)
                 {
                     NotificationService.ErrorNotification($"Automated {uploadSettings.UploadType} Upload", $"The upload type of {uploadSettings.UploadType} is not a valid upload type");
                     LogManager.ErrorLog($"{uploadSettings.UploadType} is not a valid upload type");

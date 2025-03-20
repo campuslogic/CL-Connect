@@ -41,16 +41,26 @@ namespace CampusLogicEvents.Web.Models
 
                 //Get list of files to upload, ignore base folder for data files, we only accept sub folder items
                 var filesToUpload = new List<string>();
-                if(uploadSettings.UploadType != UploadSettings.DataFile)
+                if (uploadSettings.UploadType != UploadSettings.DataFile)
                 {
                     filesToUpload.AddRange(Directory.GetFiles(uploadSettings.UploadFilePath));
                 }
-                
 
-                if((uploadSettings.UploadType == UploadSettings.AwardLetter || uploadSettings.UploadType == UploadSettings.DataFile) && uploadSettings.CheckSubDirectories == true) {
+                if ((uploadSettings.UploadType == UploadSettings.AwardLetter || uploadSettings.UploadType == UploadSettings.DataFile)
+                   && uploadSettings.CheckSubDirectories == true)
+                {
                     //Get files from first level sub-folders as well except the archive folder - these will be files that are not the default FileType
-                    foreach(var dir in Directory.GetDirectories(uploadSettings.UploadFilePath)) {
-                        if(dir.Equals(uploadSettings.ArchiveFilePath, StringComparison.CurrentCultureIgnoreCase) == true) {
+                    // also skipping secure files transfer folder
+                    foreach (var dir in Directory.GetDirectories(uploadSettings.UploadFilePath))
+                    {
+                        if (dir.Equals(uploadSettings.ArchiveFilePath, StringComparison.CurrentCultureIgnoreCase) == true)
+                        {
+                            continue;
+                        }
+
+                        if (dir.Equals($"{uploadSettings.UploadFilePath}\\{UploadSettings.SecureFileTransfer}")
+                            && uploadSettings.UploadType != UploadSettings.SecureFileTransfer)
+                        {
                             continue;
                         }
 

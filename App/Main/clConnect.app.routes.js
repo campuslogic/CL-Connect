@@ -149,6 +149,17 @@ angular.module('clConnectApp')
                     controller: "powerFaidsController",
                     controllerAs: "vm"
                 })
+                .when("/export", {
+                    templateUrl: "/home/export",
+                    controller: "exportController",
+                    resolve: {
+                        configurations: ["setupservice", function (setupservice) {
+                            if (!setupservice.configurationModel) {
+                                return setupservice.configurations.get().$promise;
+                            }
+                        }]
+                    }
+                })
                 .otherwise({ redirectTo: "" });
 
             $provide.decorator("$location", ["$delegate", function ($delegate) {

@@ -39,5 +39,15 @@ namespace CampusLogicEvents.Web.Controllers
 
             return View(eventData);
         }
+
+        public ActionResult Export()
+        {
+            if (!Request.IsLocal)
+            {
+                throw new SecurityException("This is only available locally.");
+            }
+
+            return PartialView();
+        }
     }
 }
