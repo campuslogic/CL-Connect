@@ -28,7 +28,8 @@ namespace CampusLogicEvents.Web.Models
     public static class DataService
     {
         private static readonly CampusLogicSection campusLogicConfigSection = (CampusLogicSection)ConfigurationManager.GetSection(ConfigConstants.CampusLogicConfigurationSectionName);
-
+        private static System.Net.Http.HttpClient _httpClient = new System.Net.Http.HttpClient();
+        private static System.Net.Http.HttpClient _httpClientTimeout = new System.Net.Http.HttpClient() { Timeout = new TimeSpan(0, 5, 0) };
         /// <summary>
         /// Process the Notification Events by storing each event received and then queue them each for processing
         /// </summary>
@@ -562,28 +563,26 @@ namespace CampusLogicEvents.Web.Models
         {
             try
             {
-                using (var httpClient = new System.Net.Http.HttpClient())
+                var request = new HttpRequestMessage(HttpMethod.Post, new Uri(apiIntegration.TokenService));
+                request.Headers.Authorization = new AuthenticationHeaderValue("Basic",
+                    Convert.ToBase64String(
+                        Encoding.ASCII.GetBytes(
+                            $"{apiIntegration.Username}:{apiIntegration.Password}")));
+
+                var body = "grant_type=client_credentials";
+
+                StringContent theContent = new StringContent(body, Encoding.UTF8, "application/x-www-form-urlencoded");
+                request.Content = theContent;
+
+                HttpResponseMessage response = await _httpClient.SendAsync(request).ConfigureAwait(false);
+                if (response.IsSuccessStatusCode)
                 {
-                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-                        Convert.ToBase64String(
-                            Encoding.ASCII.GetBytes(
-                                $"{apiIntegration.Username}:{apiIntegration.Password}")));
-
-                    var body = "grant_type=client_credentials";
-
-                    StringContent theContent = new StringContent(body, Encoding.UTF8, "application/x-www-form-urlencoded");
-
-                    HttpResponseMessage response = await httpClient.PostAsync(new Uri(apiIntegration.TokenService), theContent).ConfigureAwait(false);
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseJson = await response.Content.ReadAsStringAsync();
-                        return (string)JObject.Parse(responseJson)["access_token"];
-                    }
-                    else
-                    {
-                        throw new Exception("Invalid response");
-                    }
+                    var responseJson = await response.Content.ReadAsStringAsync();
+                    return (string)JObject.Parse(responseJson)["access_token"];
+                }
+                else
+                {
+                    throw new Exception("Invalid response");
                 }
             }
             catch (Exception ex)
@@ -609,145 +608,145 @@ namespace CampusLogicEvents.Web.Models
         {
             try
             {
-                using (var httpClient = new System.Net.Http.HttpClient())
+                var apiEndpoint = campusLogicConfigSection.ApiEndpoints.GetEndpoints().FirstOrDefault(e => e.Name == endpointName);
+                if (apiEndpoint == null)
                 {
-                    var apiEndpoint = campusLogicConfigSection.ApiEndpoints.GetEndpoints().FirstOrDefault(e => e.Name == endpointName);
-                    if (apiEndpoint == null)
+                    throw new Exception("Invalid API Endpoint");
+                }
+
+                var apiIntegration = campusLogicConfigSection.ApiIntegrations.GetApiIntegrations().FirstOrDefault(a => a.ApiId == apiEndpoint.ApiId);
+                if (apiIntegration == null)
+                {
+                    throw new Exception("Invalid API Integration");
+                }
+
+                // Custom header for API service to track requests
+                var eventId = eventData.PropertyValues[EventPropertyConstants.Id].Value<string>();
+
+                var authType = apiIntegration.Authentication;
+                AuthenticationHeaderValue authentication = null;
+                switch (authType)
+                {
+                    case ConfigConstants.Basic:
+                        authentication = new AuthenticationHeaderValue("Basic",
+                            Convert.ToBase64String(
+                                Encoding.ASCII.GetBytes(
+                                    $"{apiIntegration.Username}:{apiIntegration.Password}")));
+                        break;
+                    case ConfigConstants.OAuth2:
+                        var oauth2Token = await GetOauth2TokenAsync(apiIntegration);
+                        authentication = new AuthenticationHeaderValue("Bearer", oauth2Token);
+                        break;
+                    case ConfigConstants.OAuth_WRAP:
+                        var oauthwrapToken = await CredentialsManager.GetOauthWrapTokenAsync(apiIntegration);
+                        authentication = new AuthenticationHeaderValue("WRAP", "access_token=\"" + oauthwrapToken + "\"");
+                        break;
+                    case ConfigConstants.Ethos:
+                        var ethosToken = await CredentialsManager.GetEthosAuthTokenAsync(apiIntegration);
+                        authentication = new AuthenticationHeaderValue("Bearer", ethosToken);
+                        break;
+                    default:
+                        break;
+                }
+
+                // use the eventdata and its values to link up to the endpoint's parameters
+                JArray parameterMappings;
+                try
+                {
+                    parameterMappings = JArray.Parse(apiEndpoint.ParameterMappings);
+                }
+                catch (Exception)
+                {
+                    LogManager.ErrorLog("apiEndpoint.ParameterMappings could not be parsed");
+
+                    throw;
+                }
+
+                if (!parameterMappings.Any())
+                {
+                    throw new Exception("No parameter mappings were found");
+                }
+
+                var eventParams = new NameValueCollection();
+                var changeNotificationContent = new JObject();
+
+                // foreach mapping, get event property, find its corresponding eventdata, get that eventdata's value, attach it to the parameter in mapping
+                foreach (JToken jToken in parameterMappings)
+                {
+                    var mapping = (JObject)jToken;
+
+                    // This retrieves the "DisplayName" value of the EventProperty
+                    var mappingDisplayName = mapping["eventData"].Value<string>();
+
+                    // PM-631: For Ethos requests, the POST content object structure changes. Need to maintain property types.
+                    if (authType == ConfigConstants.Ethos)
                     {
-                        throw new Exception("Invalid API Endpoint");
+                        var eventValue = eventData.GetValueByDisplayNameForChangeNotification(mappingDisplayName);
+                        changeNotificationContent.Add(mapping["parameter"].Value<string>(), eventValue);
                     }
-
-                    var apiIntegration = campusLogicConfigSection.ApiIntegrations.GetApiIntegrations().FirstOrDefault(a => a.ApiId == apiEndpoint.ApiId);
-                    if (apiIntegration == null)
+                    else
                     {
-                        throw new Exception("Invalid API Integration");
-                    }
-
-                    httpClient.BaseAddress = new Uri(apiIntegration.Root);
-
-                    // Allow 5 minutes for response
-                    httpClient.Timeout = new TimeSpan(0, 5, 0);
-
-                    // Custom header for API service to track requests
-                    var eventId = eventData.PropertyValues[EventPropertyConstants.Id].Value<string>();
-                    httpClient.DefaultRequestHeaders.Add("EventId", eventId);
-
-                    var authType = apiIntegration.Authentication;
-                    switch (authType)
-                    {
-                        case ConfigConstants.Basic:
-                            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-                                Convert.ToBase64String(
-                                    Encoding.ASCII.GetBytes(
-                                        $"{apiIntegration.Username}:{apiIntegration.Password}")));
-                            break;
-                        case ConfigConstants.OAuth2:
-                            var oauth2Token = await GetOauth2TokenAsync(apiIntegration);
-                            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", oauth2Token);
-                            break;
-                        case ConfigConstants.OAuth_WRAP:
-                            var oauthwrapToken = await CredentialsManager.GetOauthWrapTokenAsync(apiIntegration);
-                            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("WRAP", "access_token=\"" + oauthwrapToken + "\"");
-                            break;
-                        case ConfigConstants.Ethos:
-                            var ethosToken = await CredentialsManager.GetEthosAuthTokenAsync(apiIntegration);
-                            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ethosToken);
-                            break;
-                        default:
-                            break;
-                    }
-
-                    // use the eventdata and its values to link up to the endpoint's parameters
-                    JArray parameterMappings;
-                    try
-                    {
-                        parameterMappings = JArray.Parse(apiEndpoint.ParameterMappings);
-                    }
-                    catch (Exception)
-                    {
-                        LogManager.ErrorLog("apiEndpoint.ParameterMappings could not be parsed");
-
-                        throw;
-                    }
-
-                    if (!parameterMappings.Any())
-                    {
-                        throw new Exception("No parameter mappings were found");
-                    }
-
-                    var eventParams = new NameValueCollection();
-                    var changeNotificationContent = new JObject();
-
-                    // foreach mapping, get event property, find its corresponding eventdata, get that eventdata's value, attach it to the parameter in mapping
-                    foreach (JToken jToken in parameterMappings)
-                    {
-                        var mapping = (JObject)jToken;
-
-                        // This retrieves the "DisplayName" value of the EventProperty
-                        var mappingDisplayName = mapping["eventData"].Value<string>();
-
-                        // PM-631: For Ethos requests, the POST content object structure changes. Need to maintain property types.
-                        if (authType == ConfigConstants.Ethos)
-                        {
-                            var eventValue = eventData.GetValueByDisplayNameForChangeNotification(mappingDisplayName);
-                            changeNotificationContent.Add(mapping["parameter"].Value<string>(), eventValue);
-                        }
-                        else
-                        {
-                            // SV-3872 Convert to the "Name" value of the EventProperty
-                            // In cases of JS formula, this will apply that value instead
-                            var eventValue = eventData.GetValueByDisplayName(mappingDisplayName);
-                            eventParams.Add(mapping["parameter"].Value<string>(), eventValue);
-                        }
-                    }
-
-                    HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
-
-                    var endpoint = apiEndpoint.Endpoint;
-                    var url = apiIntegration.Root + endpoint;
-
-                    switch (apiEndpoint.Method)
-                    {
-                        case WebRequestMethods.Http.Get:
-                            var list = new List<string>();
-
-                            foreach (string key in eventParams.AllKeys)
-                            {
-                                string[] eventParamsKeyValues = eventParams.GetValues(key);
-
-                                if (eventParamsKeyValues == null)
-                                {
-                                    throw new NullReferenceException($"EventParams for key:{key} returned null");
-                                }
-
-                                foreach (string value in eventParamsKeyValues)
-                                {
-                                    list.Add($"{HttpUtility.UrlEncode(key)}={HttpUtility.UrlEncode(value)}");
-                                }
-                            }
-
-                            string[] array = list.ToArray();
-                            endpoint += "?" + string.Join("&", array);
-                            response = await httpClient.GetAsync(endpoint);
-
-                            break;
-                        case WebRequestMethods.Http.Post:
-                            response = await HandleApiPostAsync(httpClient, eventId, eventParams, changeNotificationContent, apiEndpoint, apiIntegration.Authentication);
-                            break;
-                        case WebRequestMethods.Http.Put:
-                            response = await httpClient.PutAsync(endpoint, GetHttpContent(eventParams, apiEndpoint.MimeType));
-                            break;
-                        default:
-                            break;
-                    }
-
-                    LogRequest(response, eventParams);
-
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        throw new Exception("Invalid response - " + (int)response.StatusCode + " " + response.ReasonPhrase + " - Attempted to call " + apiEndpoint.Method + " " + url);
+                        // SV-3872 Convert to the "Name" value of the EventProperty
+                        // In cases of JS formula, this will apply that value instead
+                        var eventValue = eventData.GetValueByDisplayName(mappingDisplayName);
+                        eventParams.Add(mapping["parameter"].Value<string>(), eventValue);
                     }
                 }
+
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
+                HttpRequestMessage request = null;
+                var endpoint = apiEndpoint.Endpoint;
+                var url = apiIntegration.Root + endpoint;
+
+                switch (apiEndpoint.Method)
+                {
+                    case WebRequestMethods.Http.Get:
+                        var list = new List<string>();
+
+                        foreach (string key in eventParams.AllKeys)
+                        {
+                            string[] eventParamsKeyValues = eventParams.GetValues(key);
+
+                            if (eventParamsKeyValues == null)
+                            {
+                                throw new NullReferenceException($"EventParams for key:{key} returned null");
+                            }
+
+                            foreach (string value in eventParamsKeyValues)
+                            {
+                                list.Add($"{HttpUtility.UrlEncode(key)}={HttpUtility.UrlEncode(value)}");
+                            }
+                        }
+
+                        string[] array = list.ToArray();
+                        endpoint += "?" + string.Join("&", array);
+                        request = new HttpRequestMessage(HttpMethod.Get, $"{url}{endpoint}");
+                        request.Headers.Authorization = authentication;
+                        request.Headers.Add("EventId", eventId);
+                        response = await _httpClientTimeout.SendAsync(request);
+
+                        break;
+                    case WebRequestMethods.Http.Post:
+                        response = await HandleApiPostAsync(_httpClientTimeout, eventId, eventParams, changeNotificationContent, apiEndpoint, apiIntegration.Authentication, authentication);
+                        break;
+                    case WebRequestMethods.Http.Put:
+                        request = new HttpRequestMessage(HttpMethod.Put, $"{url}{endpoint}");
+                        request.Headers.Authorization = authentication;
+                        request.Headers.Add("EventId", eventId);
+                        request.Content = GetHttpContent(eventParams, apiEndpoint.MimeType);
+                        response = await _httpClientTimeout.SendAsync(request);
+                        break;
+                    default:
+                        break;
+                }
+
+                LogRequest(response, eventParams);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception("Invalid response - " + (int)response.StatusCode + " " + response.ReasonPhrase + " - Attempted to call " + apiEndpoint.Method + " " + url);
+                }
+                
             }
             catch (Exception e)
             {
@@ -767,7 +766,8 @@ namespace CampusLogicEvents.Web.Models
         /// <param name="authenticationMethod"></param>
         /// <returns></returns>
         private static async Task<HttpResponseMessage> HandleApiPostAsync(System.Net.Http.HttpClient httpClient, string eventId, NameValueCollection eventParams,
-                                                                            JObject changeNotificationContent, ApiIntegrationEndpointElement apiEndpoint, string authenticationMethod)
+                                                                            JObject changeNotificationContent, ApiIntegrationEndpointElement apiEndpoint, 
+                                                                            string authenticationMethod, AuthenticationHeaderValue authentication)
         {
             StringContent content;
             if (authenticationMethod == ConfigConstants.Ethos)
@@ -799,7 +799,12 @@ namespace CampusLogicEvents.Web.Models
                 content = GetHttpContent(eventParams, apiEndpoint.MimeType);
             }
 
-            return await httpClient.PostAsync(apiEndpoint.Endpoint, content);
+            var request = new HttpRequestMessage(HttpMethod.Post, apiEndpoint.Endpoint);
+            request.Headers.Authorization = authentication;
+            request.Headers.Add("EventId", eventId);
+            request.Content = content;
+
+            return await httpClient.SendAsync(request);
         }
 
         /// <summary>
