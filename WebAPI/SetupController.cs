@@ -300,6 +300,11 @@ namespace CampusLogicEvents.Web.WebAPI
 
                 response.CampusLogicSection.DocumentSettings.ImportSettings = null;
 
+                if(response.CampusLogicSection.ISIRCorrectionsSettings.TdClientEnabled == false && response.CampusLogicSection.ISIRCorrectionsSettings.TdClientFtpRecipientUserId == "TG50002")
+                {
+                    response.CampusLogicSection.ISIRCorrectionsSettings.TdClientFtpRecipientUserId = "TGDE552";
+                }
+
                 return Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception ex)
