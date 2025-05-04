@@ -9,29 +9,30 @@
     </h2>
     This step is for configuring custom Stored Procedures to associate to Event Notifications. You can have one or many, but if you have enabled this feature at least one Stored Procedure is required.
     If you previously used the default Stored Procedure, you will not need to configure it through this step. Two stored procedures' name should not be same. If the parameter's data type is integer, the length is unnecessary.
-    For further detail on the Stored Procedure configurations section please click <a href="https://campuslogicinc.freshdesk.com/support/solutions/articles/5000706491-stored-procedures" target="_blank">Stored Procedure Help.</a>
+    For further detail on the Stored Procedure configurations section please click <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_configure_event_notifications_and_stored_procedures.html" target="_blank">Stored Procedure Help.</a>
     <hr>
-    <div class="form-group">
-        <div class="col-md-8">
-            <label class="control-label col-md-4"><span class="form-required" aria-hidden="true">* </span> Stored Procedure Name</label>
-            <div class="col-md-6">
+    <div class="row form-group mb-3">
+        <div class="col-lg-8">
+            <label class="control-label col-lg-4"><span class="form-required" aria-hidden="true">* </span> Stored Procedure Name</label>
+            <div class="col-lg-6">
                 <input type="text" class="form-control" ng-model="model.storedProcedureName" ng-blur="storedProcedureNameChange(model)"/>
                 <span ng-show="spvalidation">You cannot add two stored procedures with same name.</span>
                 <div class="padding-top-twenty">
-                    <button class="btn btn-default pull-right" ng-click="add()" ng-disabled="model.storedProcedureName===null">Add Stored Procedure</button>
+                    <button class="btn btn-light pull-right" ng-click="add()" ng-disabled="model.storedProcedureName===null">Add Stored Procedure</button>
                 </div>
             </div>
         </div>
     </div>
     <div ng-if="storedProcedureList.length > 0" ng-repeat="storedProcedure in storedProcedureList">
-        <div class="col-md-12">
+        <div class="col-lg-12">
             <h3><b>Stored Procedure Name: {{storedProcedure.name}}</b> <i class="fa fa-trash-o pointer padding-left-fifteen" aria-hidden="true" ng-click="deleteStoredProcedure(storedProcedure)"></i>
             </h3>
+            <p>Please note that the order of the parameters added here must match the exact order of your stored procedure(type and order identify the parameter, not name).</p>
         </div>
-        <div class="col-md-12">
+        <div class="col-lg-12">
             <label class="control-label" id="parameterValue">Parameter values</label>
         </div>
-        <div class="col-md-12 padding-bottom-ten">
+        <div class="col-lg-12 padding-bottom-ten">
             <div id="{{storedProcedure.storedProcedureGridName}}" kendo-grid
                  data-role="grid"
                  data-editable="false"
@@ -39,8 +40,8 @@
                  k-options="gridOptions">
             </div>
             <div class="row padding-top-ten">
-                <div class="col-md-12">
-                    <button class="btn btn-default" ng-click="addParameter(storedProcedure)">Add</button>
+                <div class="col-lg-12">
+                    <button class="btn btn-light" ng-click="addParameter(storedProcedure)">Add</button>
                 </div>
             </div>
         </div>
@@ -49,6 +50,6 @@
 </div>
 
 <script id="add-parameter-collection-template" type="text/x-kendo-template">
-    <button class="btn btn-default" ng-click="editParameter(storedProcedure, dataItem)"><i class="fa fa-pencil"></i></button>
-    <button class="btn btn-default" ng-click="deleteParameter(storedProcedure, dataItem)"><i class="fa fa-trash"></i></button>
+    <button class="btn btn-light" ng-click="editParameter(storedProcedure, dataItem)"><i class="fa fa-pencil"></i></button>
+    <button class="btn btn-light" ng-click="deleteParameter(storedProcedure, dataItem)"><i class="fa fa-trash"></i></button>
 </script>

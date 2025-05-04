@@ -5,6 +5,9 @@ var clConnectServices = angular.module("clConnectServices");
 clConnectServices.factory("addparametermodalcontroller", ["$modal",
     function ($modal) {
 
+        var urlRoot = '';
+        urlRoot = $("base").first().attr("href");
+
         var service = {
 
             modalController: ["$rootScope", "$scope", "$modalInstance", "modalParams",
@@ -95,7 +98,7 @@ clConnectServices.factory("addparametermodalcontroller", ["$modal",
 
                 //Open modal
                 var $modalInstance = $modal.open({
-                    templateUrl: "/setup/template?templateName=AddParameterModal",
+                    templateUrl: urlRoot + "/setup/template?templateName=AddParameterModal",
                     controller: service.modalController,
                     resolve: {
                         modalParams: function () {
@@ -106,8 +109,8 @@ clConnectServices.factory("addparametermodalcontroller", ["$modal",
                             };
                         }
                     },
-                    backdrop: 'static'//,
-                    //windowClass: "full-screen-modal"
+                    backdrop: 'static',
+                    windowClass: 'show'
                 });
 
                 //Done

@@ -1,0 +1,72 @@
+﻿<div class="modal-header"><h4>{{modalType}} API Integration</h4></div>
+<div class="modal-body">
+    <form>
+        <div class="row padding-bottom-ten">
+            <div class="col-lg-4 text-right">
+                <label class="control-label">API Name</label>
+            </div>
+            <div class="col-lg-8">
+                <input type="text" class="form-control" id="apiName" name="apiName" ng-model="modelCopy.apiName" required />
+                <span class="field-validation-error" ng-show="apiNameIsValid == false">Required</span>
+                <span class="field-validation-error" ng-show="apiNameIsDuplicate == true">Name must be unique</span>
+            </div>
+        </div>
+        <div class="row padding-bottom-ten">
+            <div class="col-lg-4 text-right">
+                <label class="control-label">Authentication</label>
+            </div>
+            <div class="col-lg-8">
+                <select id="method" required kendo-drop-down-list name="method" ng-model="modelCopy.authentication" default-item="none" ng-change="onMethodChange()" ng-disabled="modalType === 'Edit' && modelCopy.authentication === 'ethos'">
+                    <option value="none">None</option>
+                    <option value="basic">Basic</option>
+                    <option value="oauth2">OAuth 2.0</option>
+                    <option value="oauth_wrap">OAuth WRAP</option>
+                    <option value="ethos" ng-if="modalType === 'Add' || modelCopy.authentication === 'ethos'">Ethos Authentication</option>
+                </select>
+            </div>
+        </div>
+        <div class="row padding-bottom-ten">
+            <div class="col-lg-4 text-right">
+                <label class="control-label">Root</label>
+            </div>
+            <div class="col-lg-8">
+                <input type="text" class="form-control" id="root" name="root" ng-model="modelCopy.root" ng-disabled="modelCopy.authentication === 'ethos'" required />
+                <span class="field-validation-error" ng-show="rootIsValid == false">Root must begin with "http://" or "https://"</span>
+            </div>
+        </div>
+        <div class="row padding-bottom-ten" ng-if="modelCopy.authentication === 'oauth2' || modelCopy.authentication === 'oauth_wrap'">
+            <div class="col-lg-4 text-right">
+                <label class="control-label">Token Service</label>
+            </div>
+            <div class="col-lg-8">
+                <input type="text" class="form-control" id="tokenService" name="tokenService" ng-model="modelCopy.tokenService" required />
+                <span class="field-validation-error" ng-show="tokenIsValid == false">Token must begin with "http://" or "https://"</span>
+            </div>
+        </div>
+        <div class="row padding-bottom-ten" ng-if="!['none', 'ethos'].includes(modelCopy.authentication)">
+            <div class="col-lg-4 text-right">
+                <label class="control-label" ng-if="modelCopy.authentication === 'basic' || modelCopy.authentication === 'oauth_wrap'">Username</label>
+                <label class="control-label" ng-if="modelCopy.authentication === 'oauth2'">Client ID</label>
+            </div>
+            <div class="col-lg-8">
+                <input type="text" class="form-control" id="username" name="username" ng-model="modelCopy.username" required />
+                <span class="field-validation-error" ng-show="usernameIsValid == false">Required</span>
+            </div>
+        </div>
+        <div class="row padding-bottom-ten" ng-if="modelCopy.authentication !== 'none'">
+            <div class="col-lg-4 text-right">
+                <label class="control-label" ng-if="modelCopy.authentication === 'basic' || modelCopy.authentication === 'oauth_wrap'">Password</label>
+                <label class="control-label" ng-if="modelCopy.authentication === 'oauth2'">Client Secret</label>
+                <label class="control-label" ng-if="modelCopy.authentication === 'ethos'">API Key</label>
+            </div>
+            <div class="col-lg-8">
+                <input type="password" class="form-control" id="password" name="password" ng-model="modelCopy.password" required />
+                <span class="field-validation-error" ng-show="passwordIsValid == false">Required</span>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <input type="button" id="button-field-search-cancel" class="btn btn-light" value="Cancel" ng-click="$dismiss()" />
+    <input type="button" id="button-field-search-save" class="btn btn-primary" value="Save" ng-click="save()" />
+</div>
