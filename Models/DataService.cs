@@ -720,17 +720,17 @@ namespace CampusLogicEvents.Web.Models
 
                         string[] array = list.ToArray();
                         endpoint += "?" + string.Join("&", array);
-                        request = new HttpRequestMessage(HttpMethod.Get, $"{url}{endpoint}");
+                        request = new HttpRequestMessage(HttpMethod.Get, $"{apiIntegration.Root}{endpoint}");
                         request.Headers.Authorization = authentication;
                         request.Headers.Add("EventId", eventId);
                         response = await _httpClientTimeout.SendAsync(request);
 
                         break;
                     case WebRequestMethods.Http.Post:
-                        response = await HandleApiPostAsync(_httpClientTimeout, eventId, eventParams, changeNotificationContent, apiEndpoint, apiIntegration.Authentication, authentication);
+                        response = await HandleApiPostAsync(_httpClientTimeout, eventId, eventParams, changeNotificationContent, apiEndpoint, apiIntegration.Authentication, authentication, $"{apiIntegration.Root}{endpoint}");
                         break;
                     case WebRequestMethods.Http.Put:
-                        request = new HttpRequestMessage(HttpMethod.Put, $"{url}{endpoint}");
+                        request = new HttpRequestMessage(HttpMethod.Put, $"{apiIntegration.Root}{endpoint}");
                         request.Headers.Authorization = authentication;
                         request.Headers.Add("EventId", eventId);
                         request.Content = GetHttpContent(eventParams, apiEndpoint.MimeType);
@@ -767,7 +767,7 @@ namespace CampusLogicEvents.Web.Models
         /// <returns></returns>
         private static async Task<HttpResponseMessage> HandleApiPostAsync(System.Net.Http.HttpClient httpClient, string eventId, NameValueCollection eventParams,
                                                                             JObject changeNotificationContent, ApiIntegrationEndpointElement apiEndpoint, 
-                                                                            string authenticationMethod, AuthenticationHeaderValue authentication)
+                                                                            string authenticationMethod, AuthenticationHeaderValue authentication, string requestUri)
         {
             StringContent content;
             if (authenticationMethod == ConfigConstants.Ethos)
@@ -799,7 +799,7 @@ namespace CampusLogicEvents.Web.Models
                 content = GetHttpContent(eventParams, apiEndpoint.MimeType);
             }
 
-            var request = new HttpRequestMessage(HttpMethod.Post, apiEndpoint.Endpoint);
+            var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
             request.Headers.Authorization = authentication;
             request.Headers.Add("EventId", eventId);
             request.Content = content;
