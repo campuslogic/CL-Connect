@@ -1,0 +1,73 @@
+﻿@{
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+}
+<div>
+    <div class="row">
+        <div class="col-lg-12">
+            <h2>
+                <b>API Integration Settings</b>
+            </h2>
+        </div>
+    </div>
+    <section>
+        This step will allow you to configure API Integration options.
+        You may define one or many API Endpoints for an API Integration. The API Endpoint Name must be unique.
+        An API Endpoint should be associated with an Event Notification, so when that event ID is handled, that integration's specified API will be called.
+        For additional help on this page please see <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_configure_event_notifications_and_apis.html" target="_blank">API Integration Help.</a>
+    </section>
+    <button class="btn btn-light btn-lg pull-right" ng-click="vm.addApiIntegration()">Add</button>
+    <div class="row"><div class="col-lg-12"><hr /></div></div>
+
+    <div class="row">
+        <div class="col-lg-12 padding-bottom-ten">
+            <h3><b>API Integrations</b></h3>
+        </div>
+    </div>
+
+    <div ng-if="vm.apiIntegrationsList.length > 0">
+        <div class="row" ng-repeat="apiIntegration in vm.apiIntegrationsList" style="padding-right:15px;padding-left:15px;margin-bottom:8px;">
+            <div class="col-lg-12 padding-bottom-ten" ng-show="apiIntegration.authentication" style="border:1px solid #eee;border-radius: 4px;padding:20px;">
+                <div class="padding-bottom-ten">
+                    <div id="api_grid_{{apiIntegration.apiId}}" kendo-grid
+                         data-role="grid"
+                         data-editable="false"
+                         k-data-source="{{[apiIntegration]}}"
+                         k-options="vm.gridOptions['{{apiIntegration.authentication}}']">
+                    </div>
+                </div>
+                <div ng-show="vm.endpoints[apiIntegration.apiId].length > 0" class="padding-bottom-ten pull-right" style="width:98%;">
+                    <div id="api_endpoints_grid_{{apiIntegration.apiId}}" kendo-grid
+                         data-role="grid"
+                         data-editable="false"
+                         k-data-source="vm.endpoints[apiIntegration.apiId]"
+                         k-options="vm.gridOptions['endpoints']"
+                         class="pull-right">
+                    </div>
+                </div>
+                <span class="field-validation-error" ng-show="vm.endpoints[apiIntegration.apiId].length === 0 && !vm.pageValid">At least one endpoint is required.</span>
+                <div>
+                    <span class="field-validation-error" ng-show="apiIntegration.authentication === 'ethos' && (vm.endpoints[apiIntegration.apiId][0].parameterMappings === null || vm.endpoints[apiIntegration.apiId][0].parameterMappings === undefined) && !vm.pageValid">
+                        {{vm.endpoints[apiIntegration.apiId][0].name}}: At least one parameter is required.
+                    </span>
+                </div>
+                <button class="btn btn-light pull-right" ng-click="vm.addOrEditEndpoint(null, apiIntegration.apiId)" ng-if="apiIntegration.authentication !== 'ethos'">Add Endpoint</button>
+            </div>
+        </div>
+
+    </div>
+    <div ng-if="vm.apiIntegrationsList.length === 0" class="text-center">
+        <h3>Click 'Add' to create an API Integration</h3>
+        <span class="field-validation-error" ng-show="!vm.pageValid">At least one API Integration is required.</span>
+    </div>
+
+</div>
+
+<script id="add-api-settings-template" type="text/x-kendo-template">
+    <button class="btn btn-light" ng-click="vm.editApiIntegration(apiIntegration)" title="Edit"><i class="fa fa-pencil"></i></button>
+    <button class="btn btn-light" ng-click="vm.deleteApiIntegration(apiIntegration)" title="Delete"><i class="fa fa-trash"></i></button>
+</script>
+
+<script id="add-endpoint-template" type="text/x-kendo-template">
+    <button class="btn btn-light" ng-click="vm.addOrEditEndpoint(dataItem, apiIntegration.apiId)" title="Edit"><i class="fa fa-pencil"></i></button>
+    <button class="btn btn-light" ng-click="vm.deleteEndpoint(dataItem, apiIntegration.apiId)" title="Delete" ng-if="apiIntegration.authentication !== 'ethos'"><i class="fa fa-trash"></i></button>
+</script>

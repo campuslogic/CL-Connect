@@ -1,0 +1,151 @@
+﻿<div class="modal-header"><h4>{{modalType}} PowerFAIDS Record</h4></div>
+<form name="powerFaidsModalForm" ng-submit="powerFaidsModalForm.$valid && save()" novalidate>
+    <div class="modal-body">
+        <div class="row">
+            <!-- Event -->
+            <div class="col-lg-4">
+                <label class="control-label">Event</label>
+                <input name="event"
+                       id="event"
+                       class="form-control"
+                       ng-model="modelCopy.event"
+                       required />
+                <span class="field-validation-error" ng-show="(submitted || powerFaidsModalForm.event.$dirty) && powerFaidsModalForm.event.$error.required">Required</span>
+            </div>
+            <!-- Transaction Category -->
+            <div class="col-lg-6">
+                <label class="control-label">Transaction Category</label>
+                <input name="transactionCategory"
+                       id="transactionCategory"
+                       class="form-control"
+                       ng-model="modelCopy.transactionCategory" />
+            </div>
+        </div>
+        <!-- Outcome -->
+        <div class="row" style="margin-top:16px;">
+            <div class="col-lg-12">
+                <label class="control-label">Outcome</label>
+                <select id="outcome"
+                        kendo-drop-down-list
+                        class="form-control input-lg "
+                        name="outcome"
+                        ng-model="modelCopy.outcome"
+                        required>
+                    <option value="">Select an outcome...</option>
+                    <option value="documents">Documents</option>
+                    <option value="verification">Verification Information</option>
+                    <option value="both">Both Documents and Verification Information</option>
+                </select>
+                <span class="field-validation-error" ng-show="(submitted || powerFaidsModalForm.outcome.$dirty) && powerFaidsModalForm.outcome.$error.required">Required</span>
+            </div>
+        </div>
+        <!-- Document Or Both -->
+        <div ng-if="modelCopy.outcome === 'documents' || modelCopy.outcome === 'both'">
+            <div class="row" style="margin-top:16px">
+                <div class="col-lg-12">
+                    <label class="control-label">Short Name</label>
+                    <input name="shortName"
+                           id="shortName"
+                           class="form-control"
+                           ng-model="modelCopy.shortName"
+                           required />
+                    <span class="field-validation-error" ng-show="(submitted || powerFaidsModalForm.shortName.$dirty) && powerFaidsModalForm.shortName.$error.required">Required</span>
+                </div>
+            </div>
+            <div class="row" style="margin-top:16px">
+                <div class="col-lg-12">
+                    <label class="control-label">Required For</label>
+                    <select id="requiredFor"
+                            ng-required="true"
+                            kendo-drop-down-list
+                            class="form-control input-lg "
+                            name="requiredFor"
+                            ng-model="modelCopy.requiredFor">
+                        <option value="">Select an option...</option>
+                        <option value="D">Disbursement</option>
+                        <option value="P">Packaging</option>
+                    </select>
+                    <span class="field-validation-error" ng-show="(submitted || powerFaidsModalForm.requiredFor.$dirty) && powerFaidsModalForm.requiredFor.$error.required">Required</span>
+                </div>
+            </div>
+            <div class="row" style="margin-top:16px;">
+                <div class="col-lg-12">
+                    <label class="control-label">Status</label>
+                    <select id="status"
+                            required
+                            kendo-drop-down-list
+                            class="form-control input-lg "
+                            name="status"
+                            ng-model="modelCopy.status">
+                        <option value="">Select a status...</option>
+                        <option value="1">Received</option>
+                        <option value="2">Not Reviewed</option>
+                        <option value="3">Approved</option>
+                        <option value="4">Incomplete</option>
+                        <option value="5">Not Received</option>
+                        <option value="6">Not Signed</option>
+                        <option value="7">Waived</option>
+                    </select>
+                    <span class="field-validation-error" ng-show="(submitted || powerFaidsModalForm.status.$dirty) && powerFaidsModalForm.status.$error.required">Required</span>
+                </div>
+            </div>
+            <div class="row" style="margin-top:16px;">
+                <div class="col-lg-12">
+                    <label class="control-label">Document Lock</label>
+                    <select id="documentLock"
+                            required
+                            kendo-drop-down-list
+                            class="form-control input-lg "
+                            name="documentLock"
+                            ng-model="modelCopy.documentLock">
+                        <option value="">Select an option...</option>
+                        <option value="Y">Locked</option>
+                        <option value="N">Unlocked</option>
+                    </select>
+                    <span class="field-validation-error" ng-show="(submitted || powerFaidsModalForm.documentLock.$dirty) && powerFaidsModalForm.documentLock.$error.required">Required</span>
+                </div>
+            </div>
+        </div>
+        <!-- Verification or Both -->
+        <div ng-if="modelCopy.outcome === 'verification' || modelCopy.outcome === 'both'">
+            <div class="row" style="margin-top:16px">
+                <div class="col-lg-12">
+                    <label class="control-label">Verification Outcome</label>
+                    <select id="verificationOutcome"
+                            required
+                            kendo-drop-down-list
+                            class="form-control input-lg "
+                            name="verificationOutcome"
+                            ng-model="modelCopy.verificationOutcome">
+                        <option value="">Select an option...</option>
+                        <option value="N">Not Performed</option>
+                        <option value="S">Selected; Not Verified</option>
+                        <option value="V">Verified</option>
+                        <option value="W">Without Documentation</option>
+                    </select>
+                    <span class="field-validation-error" ng-show="(submitted || powerFaidsModalForm.verificationOutcome.$dirty) && powerFaidsModalForm.verificationOutcome.$error.required">Required</span>
+                </div>
+            </div>
+            <div class="row" style="margin-top:16px;">
+                <div class="col-lg-12">
+                    <label class="control-label">Verification Outcome Lock</label>
+                    <select id="verificationOutcomeLock"
+                            required
+                            kendo-drop-down-list
+                            class="form-control input-lg "
+                            name="verificationOutcomeLock"
+                            ng-model="modelCopy.verificationOutcomeLock">
+                        <option value="">Select an option...</option>
+                        <option value="Y">Locked</option>
+                        <option value="N">Unlocked</option>
+                    </select>
+                    <span class="field-validation-error" ng-show="(submitted || powerFaidsModalForm.verificationOutcomeLock.$dirty) && powerFaidsModalForm.verificationOutcomeLock.$error.required">Required</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <input type="button" class="btn btn-light" value="Cancel" ng-click="closeModal()" />
+        <input type="submit" class="btn btn-primary" value="Save" ng-click="submitted = true" />
+    </div>
+</form>

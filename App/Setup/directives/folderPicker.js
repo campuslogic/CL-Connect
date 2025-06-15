@@ -5,12 +5,15 @@
     angular.module("clConnectDirectives").directive("clFolderPicker", ['validationservice', '$modal',
         function (validationservice, $modal) {
 
+            var urlRoot = '';
+            urlRoot = $("base").first().attr("href");
+
             /// <summary>
             /// This directive allows the user to manually enter a folder path, or select a folder from a modal
             /// </summary>
             return {
                 restrict: "E",
-                templateUrl: '/setup/template/template?templateName=FolderPicker',
+                templateUrl: urlRoot + '/setup/template/template?templateName=FolderPicker',
                 scope: {
                     uploadpath: '=',
                     formvalid: '=',
@@ -104,7 +107,7 @@
                     scope.open = function () {
                         //Open modal
                         var $modalInstance = $modal.open({
-                            templateUrl: "/setup/template/template?templateName=FolderPickerModal",
+                            templateUrl: urlRoot + "/setup/template/template?templateName=FolderPickerModal",
                             controller: scope.modalController,
                             resolve: {
                                 modalParams: function () {
@@ -113,7 +116,7 @@
                                 }
                             },
                             backdrop: 'static',
-                            windowClass: "full-screen-modal"
+                            windowClass: "full-screen-modal show"
                         });
                         //Done
                         return $modalInstance;

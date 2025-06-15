@@ -1,0 +1,48 @@
+﻿@{
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+}
+<form class="form-horizontal" name="awardLetterFileMappingUploadForm" novalidate>
+    <h2>
+        <b>AwardLetter File Mapping Upload</b>
+    </h2>
+    <section>
+        This step will allow you to select the configurations for the Award Letter File Mapping Upload process.
+        If the file path you wish to use is not available for selection, you may also enter the path below.
+        For assistance in giving appropriate file path permissions, please click <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_set_file_permissions.html" target="_blank">File Path Permissions.</a>
+        @*For further detail on the Award Letter Upload section please click <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_configure_cc_uploads.html/" target="_blank">AwardLetter Upload Details.</a>*@
+    </section>
+    <hr>
+    <div class="row padding-top-ten">
+        <div class="col-lg-5">
+            <div class="row form-group mb-3">
+                <label class="col-lg-5 control-label"><span class="form-required" aria-hidden="true">* </span>Upload Frequency</label>
+                <div class="col-lg-7 ">
+                    <select required kendo-drop-down-list name="uploadFrequencyType" ng-model="vm.service.configurationModel.campusLogicSection.fileMappingUploadSettings.fileMappingUploadFrequencyType">
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="minutes">Minutely</option>
+                        <option value="hourly">Hourly</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row form-group mb-3 padding-top-one-hundred">
+                <label class="col-lg-5 control-label"><span class="form-required" aria-hidden="true">* </span>Days to Run</label>
+                <div class="col-lg-7 ">
+                    <select kendo-multi-select k-options="vm.daysToRunOptions" k-ng-model="vm.service.configurationModel.campusLogicSection.fileMappingUploadSettings.fileMappingUploadDaysToRun"></select>
+                    <span class="field-validation-error" ng-show="vm.service.configurationModel.campusLogicSection.fileMappingUploadSettings.fileMappingUploadDaysToRun.length <= 0">Required</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="row form-group mb-3">
+                <label class="col-lg-3 control-label "><span class="form-required" aria-hidden="true">* </span>Upload Path</label>
+                <cl-folder-picker class="col-lg-7" isrequired="true" formvalid="validationService.pageValidations.fileMappingUploadValid" uploadpath="vm.service.configurationModel.campusLogicSection.fileMappingUploadSettings.fileMappingUploadFilePath"></cl-folder-picker>
+            </div>
+            <div class="row form-group mb-3">
+                <label class="col-lg-3 control-label "><span class="form-required" aria-hidden="true">* </span>Archive Path</label>
+                <cl-folder-picker class="col-lg-7" isrequired="true" formvalid="validationService.pageValidations.fileMappingUploadValid" uploadpath="vm.service.configurationModel.campusLogicSection.fileMappingUploadSettings.fileMappingArchiveFilePath"></cl-folder-picker>
+            </div>
+        </div>
+    </div>
+</form>
+

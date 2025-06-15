@@ -105,6 +105,26 @@ namespace CampusLogicEvents.Web.Controllers
             return PartialView();
         }
 
+        public ActionResult AwardLetterFileMappingUpload()
+        {
+            if (!Request.IsLocal)
+            {
+                throw new SecurityException("This is only available locally.");
+            }
+
+            return PartialView();
+        }
+
+        public ActionResult DataFileUpload()
+        {
+            if (!Request.IsLocal)
+            {
+                throw new SecurityException("This is only available locally.");
+            }
+
+            return PartialView();
+        }
+
         public ActionResult DocumentImports()
         {
             if (!Request.IsLocal)
@@ -126,6 +146,67 @@ namespace CampusLogicEvents.Web.Controllers
         }
 
         public ActionResult FileStore()
+        {
+            if (!Request.IsLocal)
+            {
+                throw new SecurityException("This is only available locally.");
+            }
+
+            return PartialView();
+        }
+
+
+        public ActionResult AwardLetterPrint()
+        {
+            if (!Request.IsLocal)
+            {
+                throw new SecurityException("This is only available locally.");
+            }
+
+            return PartialView();
+        }
+
+        public ActionResult BatchProcessing()
+        {
+            if (!Request.IsLocal)
+            {
+                throw new SecurityException("This is only available locally.");
+            }
+
+            return PartialView();
+        }
+
+        public ActionResult ApiIntegration()
+        {
+            if (!Request.IsLocal)
+            {
+                throw new SecurityException("This is only available locally.");
+            }
+
+            return PartialView();
+        }
+
+		public ActionResult BulkAction()
+		{
+			if (!Request.IsLocal)
+			{
+				throw new SecurityException("This is only available locally.");
+			}
+
+			return PartialView();
+		}
+
+        public ActionResult FileDefinitions()
+        {
+            if (!Request.IsLocal)
+            {
+                throw new SecurityException("This is only available locally.");
+            }
+
+            return PartialView();
+        }
+
+        public ActionResult PowerFAIDS()
         {
             if (!Request.IsLocal)
             {

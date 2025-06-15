@@ -7,16 +7,16 @@
         <p>
             This step will allow you to select the configurations for the ISIR Upload process.
             If the file path you wish to use is not available for selection, you may also enter the path below.
-            For assistance in giving appropriate file path permissions, please click <a href="https://campuslogicinc.freshdesk.com/support/solutions/articles/5000701741" target="_blank">File Path Permissions.</a>
-            For further detail on the ISIR Upload section please click <a href="https://campuslogicinc.freshdesk.com/support/solutions/articles/5000706488-isir-upload" target="_blank">ISIR Upload Details.</a>
+            For assistance in giving appropriate file path permissions, please click <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_set_file_permissions.html" target="_blank">File Path Permissions.</a>
+            For further detail on the ISIR Upload section please click <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_configure_isir_upload_processing.html" target="_blank">ISIR Upload Details.</a>
     </section>
     <hr>
-    <div class="col-md-12 padding-top-ten">
-        <div class="col-md-5">
-            <div class="form-group">
-                <label class="col-md-5 control-label"><span class="form-required" aria-hidden="true">* </span>Upload Frequency</label>
-                <div class="col-md-7 no-gutter">
-                    <select required kendo-drop-down-list class="form-control input-lg height-100" name="uploadFrequencyType" ng-model="vm.service.configurationModel.campusLogicSection.isirUploadSettings.isirUploadFrequencyType">
+    <div class="row padding-top-ten">
+        <div class="col-lg-6">
+            <div class="row form-group mb-3">
+                <label class="col-lg-5 control-label"><span class="form-required" aria-hidden="true">* </span>Upload Frequency</label>
+                <div class="col-lg-7 no-gutter">
+                    <select required kendo-drop-down-list name="uploadFrequencyType" ng-model="vm.service.configurationModel.campusLogicSection.isirUploadSettings.isirUploadFrequencyType">
                         <option value="daily">Daily</option>
                         <option value="weekly">Weekly</option>
                         <option value="minutes">Minutely</option>
@@ -25,21 +25,21 @@
                 </div>
             </div>
             <div class="form-group padding-top-one-hundred">
-                <label class="col-md-5 control-label"><span class="form-required" aria-hidden="true">* </span>Days to Run</label>
-                <div class="col-md-7 no-gutter">
-                    <select kendo-multi-select k-options="vm.daysToRunOptions" k-ng-model="vm.service.configurationModel.campusLogicSection.isirUploadSettings.isirUploadDaysToRun"></select>
+                <label class="col-lg-5 control-label"><span class="form-required" aria-hidden="true">* </span>Days to Run</label>
+                <div class="col-lg-7 no-gutter">
+                    <select kendo-multi-select required k-options="vm.daysToRunOptions" k-ng-model="vm.service.configurationModel.campusLogicSection.isirUploadSettings.isirUploadDaysToRun"></select>
                     <span class="field-validation-error" ng-show="vm.service.configurationModel.campusLogicSection.isirUploadSettings.isirUploadDaysToRun.length <= 0">Required</span>
                 </div>
             </div>
         </div>
-        <div class="col-md-7">
-            <div class="form-group">
-                <label class="col-md-3 control-label no-gutter"><span class="form-required" aria-hidden="true">* </span>Upload Path</label>
-                <cl-folder-picker isrequired="true" formvalid="validationService.pageValidations.isirUploadValid" uploadpath="vm.service.configurationModel.campusLogicSection.isirUploadSettings.isirUploadFilePath"></cl-folder-picker>
+        <div class="col-lg-6">
+            <div class="row form-group mb-3">
+                <label class="col-lg-3 control-label no-gutter"><span class="form-required" aria-hidden="true">* </span>Upload Path</label>
+                <cl-folder-picker class="col-lg-9" isrequired="true" formvalid="validationService.pageValidations.isirUploadValid" uploadpath="vm.service.configurationModel.campusLogicSection.isirUploadSettings.isirUploadFilePath"></cl-folder-picker>
             </div>
-            <div class="form-group">
-                <label class="col-md-3 control-label no-gutter"><span class="form-required" aria-hidden="true">* </span>Archive Path</label>
-                <cl-folder-picker isrequired="true" formvalid="validationService.pageValidations.isirUploadValid" uploadpath="vm.service.configurationModel.campusLogicSection.isirUploadSettings.isirArchiveFilePath"></cl-folder-picker>
+            <div class="row form-group mb-3">
+                <label class="col-lg-3 control-label no-gutter"><span class="form-required" aria-hidden="true">* </span>Archive Path</label>
+                <cl-folder-picker class="col-lg-9" isrequired="true" formvalid="validationService.pageValidations.isirUploadValid" uploadpath="vm.service.configurationModel.campusLogicSection.isirUploadSettings.isirArchiveFilePath"></cl-folder-picker>
             </div>
         </div>
     </div>

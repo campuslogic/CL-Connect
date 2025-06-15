@@ -1,0 +1,75 @@
+﻿<div class="modal-header"><h4>{{modalType}} {{displayName}} Batch Process</h4></div>
+<div class="modal-body">
+    <form ng-if="typeName == 'awardLetterPrint'">
+        <div class="row padding-bottom-ten">
+            <div class="col-lg-4 text-right">
+                <label class="control-label">Batch Name</label>
+            </div>
+            <div class="col-lg-8">
+                <input type="text" class="form-control" id="batchName" name="batchName" ng-model="modelCopy.batchName" required />
+                <span class="field-validation-error" ng-show="batchNameValidation == true">Required</span>
+                <span class="field-validation-error" ng-show="batchNameDuplicateValidation == true">No two batch processes of the same type may have the same name</span>
+                <span class="field-validation-error" ng-show="batchNameLengthValidation == true">Name cannot be longer than 25 characters</span>
+            </div>
+        </div>
+        <div class="row padding-bottom-ten">
+            <div class="col-lg-4 text-right">
+                <label class="control-label">Max Batch Size</label>
+            </div>
+            <div class="col-lg-8">
+                <input type="text" id="maxBatchSize" name="maxBatchSize" kendo-numeric-text-box k-format="'n0'" k-min="1" k-max="200" ng-model="modelCopy.maxBatchSize" required /><br />
+                <span class="field-validation-error" ng-show="maxBatchSizeValidation == true">Required</span>
+                <span class="field-validation-error" ng-show="batchSizeWithIndexValidation == true">Max Batch Size must be 1 when Index File is enabled</span>
+            </div>
+        </div>
+        <div class="row padding-bottom-ten">
+            <div class="col-lg-4 text-right">
+                <label class="control-label">File Path</label>
+            </div>
+            <div class="col-lg-8">
+                <cl-folder-picker class="col-lg-7" isrequired="true" formvalid="validationService.pageValidations.batchProcessingSettingsValid" uploadpath="modelCopy.filePath"></cl-folder-picker>
+            </div>
+        </div>
+        <div class="row padding-bottom-ten">
+            <div class="col-lg-4 text-right">
+                <label class="control-label">File Name Format</label>
+            </div>
+            <div class="col-lg-8">
+                <input type="text" class="form-control" id="fileNameFormat" name="fileNameFormat" ng-model="modelCopy.fileNameFormat" />
+            </div>
+        </div>
+        <div class="row padding-bottom-ten">
+            <div class="col-lg-4 text-right">
+                <label class="control-label">Batch Execution Minutes</label>
+            </div>
+            <div class="col-lg-8">
+                <input type="text" id="batchExecutionMinutes" name="batchExecutionMinutes" kendo-numeric-text-box k-format="'n0'" k-min="1" ng-model="modelCopy.batchExecutionMinutes" required />
+                <span class="field-validation-error" ng-show="batchExecutionMinutesValidation == true">Required</span>
+            </div>
+        </div>
+        <div class="row padding-bottom-ten">
+            <div class="col-lg-4 text-right">
+                <label class="control-label">Index File</label>
+            </div>
+            <div class="col-lg-8">
+                <input type="radio" ng-value="true" ng-model="modelCopy.indexFileEnabled" style="width: 20px">Yes
+                <input type="radio" ng-value="false" ng-model="modelCopy.indexFileEnabled" style="width: 20px">No
+            </div>
+        </div>
+        <div ng-if="modelCopy.indexFileEnabled">
+            <div class="row padding-bottom-ten">
+                <div class="col-lg-4 text-right">
+                    <label class="control-label">File Definition Name</label>
+                </div>
+                <div class="col-lg-8">
+                    <input type="text" class="form-control" id="fileDefinitionName" name="fileDefinitionName" ng-model="modelCopy.fileDefinitionName" />
+                    <span class="field-validation-error" ng-show="batchFileDefinitionNameValidation == true">Required</span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <input type="button" id="button-field-search-cancel" class="btn btn-light" value="Cancel" ng-click="$dismiss()" />
+    <input type="button" id="button-field-search-save" class="btn btn-primary" value="Save" ng-click="save()" />
+</div>

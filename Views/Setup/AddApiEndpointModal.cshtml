@@ -1,0 +1,77 @@
+﻿<div class="modal-header"><h4>{{modalType}} Endpoint</h4></div>
+<div class="modal-body">
+    <form>
+        <div class="row padding-bottom-ten">
+            <div class="col-lg-3 text-right">
+                <label class="control-label">Name</label>
+            </div>
+            <div class="col-lg-9">
+                <input type="text" class="form-control" id="name" name="name" ng-model="modelCopy.name" required />
+                <span class="field-validation-error" ng-show="endpointNameIsValid == false">Required</span>
+                <span class="field-validation-error" ng-show="endpointNameIsDuplicate == true">Name must be unique</span>
+            </div>
+        </div>
+        <div class="row padding-bottom-ten">
+            <div class="col-lg-3 text-right">
+                <label class="control-label">Endpoint</label>
+            </div>
+            <div class="col-lg-9">
+                <input type="text" class="form-control" id="endpoint" name="endpoint" ng-model="modelCopy.endpoint" ng-disabled="endpointReadonly" required />
+            </div>
+        </div>
+        <div class="row padding-bottom-ten">
+            <div class="col-lg-3 text-right">
+                <label class="control-label">Method</label>
+            </div>
+            <div class="col-lg-9">
+                <select id="method" required kendo-drop-down-list name="method" k-data-source="methods" k-data-text-field="'text'" k-data-value-field="'value'" ng-model="modelCopy.method" ng-disabled="endpointReadonly">
+                </select>
+            </div>
+        </div>
+        <div class="row padding-bottom-ten" ng-if="modelCopy.method == 'POST' || modelCopy.method == 'PUT'">
+            <div class="col-lg-3 text-right">
+                <label class="control-label">MIME Type</label>
+            </div>
+            <div class="col-lg-9">
+                <input type="text" class="form-control" id="mimeType" name="mimeType" ng-model="modelCopy.mimeType" ng-disabled="endpointReadonly" required />
+                <span class="field-validation-error" ng-show="mimeTypeIsValid == false">Required</span>
+            </div>
+        </div>
+        <div class="row"><div class="col-lg-12"><hr /></div></div>
+        <table style="width:100%;margin-top:0;">
+            <tr>
+                <th>Parameter Mappings</th>
+            </tr>
+            <tr ng-repeat="parameterMapping in parameterMappings">
+                <td>
+                    <div><hr /></div>
+                    <div class="row padding-bottom-ten">
+                        <div class="col-lg-3 text-right">
+                            <label class="control-label">Parameter</label>
+                        </div>
+                        <div class="col-lg-7">
+                            <input type="text" class="form-control" ng-model="parameterMapping.parameter" ng-change="newParameterMapping()" ng-blur="newParameterMapping()" />
+                        </div>
+                        <div class="col-lg-2">
+                            <button class="btn btn-light pull-right" title="Delete" ng-hide="$first" ng-click="deleteParameterMapping($index)"><i class="fa fa-close"></i></button>
+                        </div>
+                    </div>
+                    <div class="row padding-bottom-ten">
+                        <div class="col-lg-3 text-right">
+                            <label class="control-label">Maps To</label>
+                        </div>
+                        <div class="col-lg-7">
+                            <select required kendo-drop-down-list name="eventData" ng-model="parameterMapping.eventData" k-options="dropdown">
+                            </select>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <span class="field-validation-error" ng-show="hasParameters == false">At least one parameter is required</span>
+    </form>
+</div>
+<div class="modal-footer">
+    <input type="button" id="button-field-search-cancel" class="btn btn-light" value="Cancel" ng-click="$dismiss()" />
+    <input type="button" id="button-field-search-save" class="btn btn-primary" value="Save" ng-click="save()" />
+</div>
