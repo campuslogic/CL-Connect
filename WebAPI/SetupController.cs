@@ -535,6 +535,10 @@ namespace CampusLogicEvents.Web.WebAPI
                     {
                         appSettings.Settings["GwWebApiUrl"].Value = ApiUrlConstants.GW_URL_PROD;
                     }
+                    else if (appSettings.Settings["Environment"].Value == EnvironmentConstants.PRODUCTION_CA)
+                    {
+                        appSettings.Settings["GwWebApiUrl"].Value = ApiUrlConstants.GW_URL_PROD_CA;
+                    }
                     else
                     {
                         appSettings.Settings["GwWebApiUrl"].Value = ApiUrlConstants.GW_URL_SANDBOX;

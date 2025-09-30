@@ -15,7 +15,8 @@
         $scope.disableAutoUpdate = false;
         $scope.environments = [
             { text: "Sandbox", value: "sandbox" },
-            { text: "Production", value: "production" }
+            { text: "Production", value: "production" },
+            { text: "Production (Canada)", value: "production-ca"}
         ];
 
         if (!$scope.service.configurationModel) {

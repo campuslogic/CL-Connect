@@ -111,6 +111,10 @@ namespace CampusLogicEvents.Web
                         {
                             config.AppSettings.Settings.Add("GwWebApiUrl", ApiUrlConstants.GW_URL_PROD);
                         }
+                        else if (environment == EnvironmentConstants.PRODUCTION_CA)
+                        {
+                            config.AppSettings.Settings.Add("GwWebApiUrl", ApiUrlConstants.GW_URL_PROD_CA);
+                        }
                         else
                         {
                             config.AppSettings.Settings.Add("GwWebApiUrl", ApiUrlConstants.GW_URL_SANDBOX);
@@ -121,6 +125,10 @@ namespace CampusLogicEvents.Web
                         if (environment == EnvironmentConstants.PRODUCTION)
                         {
                             config.AppSettings.Settings["GwWebApiUrl"].Value = ApiUrlConstants.GW_URL_PROD;
+                        }
+                        else if (environment == EnvironmentConstants.PRODUCTION_CA)
+                        {
+                            config.AppSettings.Settings.Add("GwWebApiUrl", ApiUrlConstants.GW_URL_PROD_CA);
                         }
                         else
                         {
