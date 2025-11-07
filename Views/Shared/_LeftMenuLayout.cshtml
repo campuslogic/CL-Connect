@@ -16,9 +16,14 @@
                         <b> Setup Wizard</b>
                     </h3>
                 </div>
-                <div class="col-lg-5 col-md-6 col-sm-12">
+                <div class="col-lg-6 col-md-6 col-sm-12">
                     <h3>
-                        <b class="important-color" ng-if="service.configurationModel.appSettingsSection.environment != 'initial'"> Current Environment: {{service.configurationModel.appSettingsSection.environment | capitalize}}</b>
+                        <b class="important-color" ng-if="service.configurationModel.appSettingsSection.environment != 'initial'"> 
+                            Current Environment: 
+                            <span ng-if="service.configurationModel.appSettingsSection.environment == 'sandbox'">Sandbox</span>
+                            <span ng-if="service.configurationModel.appSettingsSection.environment == 'production'">Production</span>
+                            <span ng-if="service.configurationModel.appSettingsSection.environment == 'production-ca'">Production (Canada)</span>
+                        </b>
                     </h3>
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-12">

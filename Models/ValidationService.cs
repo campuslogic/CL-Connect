@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using CampusLogicEvents.Implementation;
 using CampusLogicEvents.Implementation.Configurations;
 using CampusLogicEvents.Implementation.Models;
-using Microsoft.Ajax.Utilities;
 
 namespace CampusLogicEvents.Web.Models
 {
@@ -400,7 +399,8 @@ namespace CampusLogicEvents.Web.Models
 
             //Ensure that the environment was set appropriately
             if (applicationAppSettingsSection["environment"] != EnvironmentConstants.SANDBOX
-                && applicationAppSettingsSection["environment"] != EnvironmentConstants.PRODUCTION)
+                && applicationAppSettingsSection["environment"] != EnvironmentConstants.PRODUCTION
+                && applicationAppSettingsSection["environment"] != EnvironmentConstants.PRODUCTION_CA)
             {
                 LogManager.FatalLog($"Environment required to save new configurations, environment: {applicationAppSettingsSection["environment"] } is invalid");
                 return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);

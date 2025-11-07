@@ -8,13 +8,13 @@
     exportController.$inject = ['$scope', 'exportservice', 'setupservice', 'configurations'];
 
     function exportController($scope, exportservice, setupservice, configurations) {
-        $scope.days = 7;
+        $scope.days = { input : 7 };
         $scope.tables = [];
         $scope.addRemove = addRemove;
         $scope.setupservice = setupservice;
         $scope.exportLogs = function () {
             var request = {
-                Days: $scope.days,
+                Days: $scope.days.input,
                 Tables: $scope.tables
             };
 

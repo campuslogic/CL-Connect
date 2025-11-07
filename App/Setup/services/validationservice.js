@@ -724,7 +724,8 @@
                 return true;
             } else {
                 return (setupservice.configurationModel.appSettingsSection.environment === 'sandbox'
-                    || setupservice.configurationModel.appSettingsSection.environment === 'production');
+                    || setupservice.configurationModel.appSettingsSection.environment === 'production'
+                    || setupservice.configurationModel.appSettingsSection.environment === 'production-ca');
             }
         }
 
