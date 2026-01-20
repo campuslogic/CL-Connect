@@ -192,6 +192,11 @@ namespace CampusLogicEvents.Web.Models
                                     {
                                         callbackInfo.Property("StudentId").Remove();
                                     }
+                                    // Prevent overriding the base event Id with callback-specific Id.
+                                    if (callbackInfo["Id"] != null)
+                                    {
+                                        callbackInfo.Property("Id").Remove();
+                                    }
                                     eventData.PropertyValues.Merge(callbackInfo, new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Concat });
                                 }
 
