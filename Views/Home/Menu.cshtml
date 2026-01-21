@@ -8,7 +8,7 @@
             </hgroup>
             <p>
                 Please see GitHub for the latest version of the application
-                <a href="https://github.com/campuslogic/CampusLogicEvents" target="_blank" title="ASP.NET Web API Website">GitHub Application Files</a>.
+                <a href="https://github.com/campuslogic/CL-Connect" target="_blank" title="ASP.NET Web API Website">GitHub Application Files</a>.
             </p>
         </div>
     </section>
@@ -35,7 +35,15 @@
                 Events received and process are captured and can be seen by
                 <a href="~/Home/Events">Clicking Here…</a>
             </li>
+            <li class="five">
+                <h5>Export Data</h5>
+                Export data from CL Connect to Secure File Transfer for support by
+                <a class="pointer" cl-link-to="/export">Clicking Here…</a>
+            </li>
         </ol>
+        <div ng-controller="dbcontroller as vm">
+            <p ng-if="vm.isLocal">Size of database is {{vm.dbSize}}</p>
+        </div>
     </section>
     <div class="site-footer" ng-controller="versioncontroller as vm">
         <div class="container">Version {{vm.version}}</div>

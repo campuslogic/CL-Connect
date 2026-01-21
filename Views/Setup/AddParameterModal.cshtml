@@ -2,20 +2,20 @@
 <div class="modal-body">
     <form name="fieldItemForm">
         <div class="row padding-bottom-ten">
-            <div class="col-md-4 text-right">
+            <div class="col-lg-4 text-right">
                 <label class="control-label">Name</label>
             </div>
-            <div class="col-md-8">
+            <div class="col-lg-8">
                 <input type="text" class="form-control" id="inputFieldSize" name="inputFieldSize" ng-model="modelCopy.name" required />
                 <span class="field-validation-error" ng-show="nameValidation == true">Required</span>
                 <span class="field-validation-error" ng-show="nameDuplicateValidation == true">Two parameter names can not be the same.</span>
             </div>
         </div>
         <div class="row padding-bottom-ten">
-            <div class="col-md-4 text-right">
+            <div class="col-lg-4 text-right">
                 <label class="control-label">Data Type</label>
             </div>
-            <div class="col-md-8">
+            <div class="col-lg-8">
                 <select required kendo-drop-down-list name="dataType" ng-model="modelCopy.dataType">
                     <option value="int">Int</option>
                     <option value="varchar">VARCHAR</option>
@@ -23,30 +23,28 @@
                     <option value="boolean">Boolean</option>
                     <option value="numeric">Numeric</option>
                     <option value="float">Float</option>
+                    <option value="datetime">DateTime</option>
                     <option value="date">Date</option>
                     <option value="time">Time</option>
                 </select>
                 <span class="field-validation-error" ng-show="dataTypeValidation == true">Required</span>
             </div>
         </div>
-        <div class="row padding-bottom-ten">
-            <div ng-if="modelCopy.dataType!=='int'">
-                <div class="col-md-4 text-right">
-                    <label class="control-label">Length:</label>
-                </div>
-                <div class="col-md-8">
-                    <input name="length" type="number" ng-model="modelCopy.length" class="form-control">
-                    <span class="field-validation-error" ng-show="lengthValidation == true">Required</span>
-                </div>
+        <div ng-if="modelCopy.dataType!=='int'" class="row padding-bottom-ten">
+            <div class="col-lg-4 text-right">
+                <label class="control-label">Length:</label>
+            </div>
+            <div class="col-lg-8">
+                <input name="length" type="number" ng-model="modelCopy.length" class="form-control">
+                <span class="field-validation-error" ng-show="lengthValidation == true">Required</span>
             </div>
         </div>
         <div class="row padding-bottom-ten">
-            <div class="col-md-4 text-right">
+            <div class="col-lg-4 text-right">
                 <label class="control-label">Source Field</label>
             </div>
-            <div class="col-md-8">
-                <select style="width: 100%;" id="inputPropertyFieldValue" required kendo-drop-down-list name="inputPropertyFieldValue" ng-model="modelCopy.source">
-                    <option ng-repeat="value in dropdown.eventPropertyValues" value="{{value}}">{{value}}</option>
+            <div class="col-lg-8">
+                <select style="width: 100%;" id="inputPropertyFieldValue" required kendo-drop-down-list name="inputPropertyFieldValue" ng-model="modelCopy.source" k-data-source="dropdown.eventPropertyValues">
                 </select>
                 <span class="field-validation-error" ng-show="sourceValidation == true">Required</span>
             </div>
@@ -54,6 +52,6 @@
     </form>
 </div>
 <div class="modal-footer">
-    <input type="button" id="button-field-search-cancel" class="btn btn-default" value="Cancel" ng-click="$dismiss()" />
+    <input type="button" id="button-field-search-cancel" class="btn btn-light" value="Cancel" ng-click="$dismiss()" />
     <input type="button" id="button-field-search-save" class="btn btn-primary" value="Save" ng-click="save()" />
 </div>

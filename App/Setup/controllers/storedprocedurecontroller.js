@@ -85,7 +85,8 @@
         }
 
         function refreshGrid(storedProcedure) {
-            $('#' + storedProcedure).data('kendoGrid').dataSource.read();
+            
+            $('#' + storedProcedure.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).data('kendoGrid').dataSource.read();
         }
 
         $scope.add = function () {

@@ -1,20 +1,17 @@
 ﻿using System;
-using System.Configuration;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using CampusLogicEvents.Implementation;
-using CampusLogicEvents.Implementation.Configurations;
 using CampusLogicEvents.Implementation.Models;
 using Hangfire;
-using log4net;
 
 namespace CampusLogicEvents.Web.Models
 {
-    public static class UploadService
+	public static class UploadService
     {
-        private static readonly ILog logger = LogManager.GetLogger("AdoNetAppender");
-
+        
         /// <summary>
         /// File Upload - Run on a scheduled basis.  Configured in the Startup.cs and the web.config
         /// Checks specified folder to see if files are present, if so uploads and moves to archive
@@ -38,17 +35,43 @@ namespace CampusLogicEvents.Web.Models
                 //Check permissions on upload path first
                 if (!manager.ValidateDirectory(uploadSettings.UploadFilePath))
                 {
-                    NotificationService.ErrorNotification($"Automated {uploadSettings.UploadType} Upload Process", $"The upload file path {uploadSettings.UploadFilePath} does not authroize read and write updates");
-                    throw new Exception($"The upload file path {uploadSettings.UploadFilePath} does not authroize read and write updates");
+                    NotificationService.ErrorNotification($"Automated {uploadSettings.UploadType} Upload Process", $"The upload file path {uploadSettings.UploadFilePath} does not authorize read and write updates");
+                    throw new Exception($"The upload file path {uploadSettings.UploadFilePath} does not authorize read and write updates");
                 }
 
-                //Get list of files to upload
-                var fileNamesList = Directory.GetFiles(uploadSettings.UploadFilePath);
+                //Get list of files to upload, ignore base folder for data files, we only accept sub folder items
+                var filesToUpload = new List<string>();
+                if (uploadSettings.UploadType != UploadSettings.DataFile)
+                {
+                    filesToUpload.AddRange(Directory.GetFiles(uploadSettings.UploadFilePath));
+                }
+
+                if ((uploadSettings.UploadType == UploadSettings.AwardLetter || uploadSettings.UploadType == UploadSettings.DataFile)
+                   && uploadSettings.CheckSubDirectories == true)
+                {
+                    //Get files from first level sub-folders as well except the archive folder - these will be files that are not the default FileType
+                    // also skipping secure files transfer folder
+                    foreach (var dir in Directory.GetDirectories(uploadSettings.UploadFilePath))
+                    {
+                        if (dir.Equals(uploadSettings.ArchiveFilePath, StringComparison.CurrentCultureIgnoreCase) == true)
+                        {
+                            continue;
+                        }
+
+                        if (dir.Equals($"{uploadSettings.UploadFilePath}\\{UploadSettings.SecureFileTransfer}")
+                            && uploadSettings.UploadType != UploadSettings.SecureFileTransfer)
+                        {
+                            continue;
+                        }
+
+                        filesToUpload.AddRange(Directory.GetFiles(dir));
+                    }
+                }
 
                 //If no files exist end process
-                if (fileNamesList.Any())
+                if (filesToUpload.Any())
                 {
-                    foreach (var fileName in fileNamesList)
+                    foreach (var fileName in filesToUpload)
                     {
                         //Upload each File
                         var result = manager.UploadFile(fileName, uploadSettings, false).Result;
@@ -58,7 +81,7 @@ namespace CampusLogicEvents.Web.Models
                         if (result != HttpStatusCode.Accepted)
                         {
                             DataService.LogNotification(notificationManager.SendErrorNotification($"Automated {uploadSettings.UploadType} Upload Service", $"File upload attempt for filename {fileName} failed").Result);
-                            logger.ErrorFormat("File upload attempt for filename {0} failed", fileName);
+                            LogManager.ErrorLogFormat("File upload attempt for filename {0} failed", fileName);
                         }
                         //If there was an issue with the service, stop processing and try again 
                         //on next configured time
@@ -73,7 +96,7 @@ namespace CampusLogicEvents.Web.Models
             catch (Exception ex)
             {
                 DataService.LogNotification(notificationManager.SendErrorNotification($"Automated {uploadSettings.UploadType} Upload Service", ex).Result);
-                logger.ErrorFormat("UploadService Upload {1} Error: {0}", ex, uploadSettings.UploadType);
+                LogManager.ErrorLogFormat("UploadService Upload {1} Error: {0}", ex, uploadSettings.UploadType);
             }
 
         }

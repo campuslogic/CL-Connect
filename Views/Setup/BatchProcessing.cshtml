@@ -1,0 +1,62 @@
+﻿@{
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+}
+<div>
+    <h2>
+        <b>Batch Processing Settings</b>
+    </h2>
+    <section>
+        This step will allow you to configure Batch Processing options.
+        You may define one or many Batch Processes for a specific Batch Processing Type. The Batch Name must be unique. 
+        A Batch Process will run on the interval defined by the Batch Execution Minutes setting.
+        Each batch execution will process the records in the given max batch size increments until all records have been processed.
+        For additional help on this page please see <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_set_up_cc_event_notifications.html" target="_blank">Batch Processing Help.</a>
+    </section>
+    <hr />
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="col-lg-4">
+                <label class="control-label">Batch Processing Type</label>
+                <select id="batchProcessingType" required kendo-drop-down-list name="batchProcessingType" ng-model="model.batchProcessingType">                    
+                    <option value="awardLetterPrint">AwardLetter Print</option>
+                </select>
+                <span ng-show="bpvalidation" class="important-color"><b>This batch processing type already exists.</b></span>
+            </div>
+            <div class="col-lg-12">
+                <div class="padding-top-twenty pull-right">
+                    <button class="btn btn-light btn-lg" ng-click="add()">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row"><div class="col-lg-12"><hr /></div></div>
+
+    <div ng-if="batchProcessingTypesList.length > 0" ng-repeat="batchProcessingType in batchProcessingTypesList">
+        <div class="col-lg-12">
+            <h3><b>{{getDisplayName(batchProcessingType.typeName)}} - Batch Processes</b><i class="fa fa-trash-o pointer padding-left-fifteen" aria-hidden="true" ng-click="deleteBatchProcessingType(batchProcessingType)" title="Delete"></i></h3>
+        </div>
+        <div class="col-lg-12 padding-bottom-ten">
+            <div id="{{batchProcessingType.typeName}}" kendo-grid
+                 data-role="grid"
+                 data-editable="false"
+                 k-data-source="batchProcessingType.batchProcesses"
+                 k-options="gridOptions['{{batchProcessingType.typeName}}']">
+            </div>
+            <div class="row padding-top-ten">
+                <div class="col-lg-12">
+                    <button class="btn btn-light" ng-click="addBatchProcess(batchProcessingType)">Add</button>
+                </div>
+                <div class="col-lg-12 padding-top-ten">
+                    <span class="field-validation-error" ng-show="batchProcessingType.batchProcesses.length === 0 && !pageValid">At least one batch process is required.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="add-batch-process-collection-template" type="text/x-kendo-template">
+    <button class="btn btn-light" ng-click="editBatchProcess(batchProcessingType, dataItem)" title="Edit"><i class="fa fa-pencil"></i></button>
+    <button class="btn btn-light" ng-click="deleteBatchProcess(batchProcessingType, dataItem)" title="Delete"><i class="fa fa-trash"></i></button>
+</script>

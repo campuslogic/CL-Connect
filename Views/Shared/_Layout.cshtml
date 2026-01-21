@@ -1,38 +1,38 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
+    <base href="@Request.Url.Scheme://@Request.Url.Authority@Request.ApplicationPath.TrimEnd('/')/" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width"/>
     <title>@ViewBag.Title</title>
     @Styles.Render("~/Content/css")
-    @Styles.Render("~/Content/kendo/2014.3.1316/css")
+    @Styles.Render("~/Content/kendo/css")
     @Styles.Render("~/Content/toastr")
     @Scripts.Render("~/bundles/modernizr")
- 
-
 </head>
 <body>
-    <header>
-        <div class="content-wrapper">
-            <div class="float-left">
-                <p class="site-title">
-                    <a href="~/">CL Connect</a></p>
-            </div>
-            <div class="float-right">
-                <nav>
-                    <ul id="menu">
-                        <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, null)</li>
-                        <li>@Html.ActionLink("API", "Index", "Help", new { area = "" }, null)</li>
-                    </ul>
-                </nav>
-            </div>
+<header>
+    <div class="content-wrapper">
+        <div class="float-left">
+            <p class="site-title">
+                <a href="~/">CL Connect</a>
+            </p>
         </div>
-    </header>
+        <div class="float-right">
+            <nav>
+                <ul id="menu">
+                    <li>@Html.ActionLink("Home", "Index", "Home", new {area = ""}, null)</li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
     @RenderBody()
+    @Scripts.Render("~/Content/bootstrap")
     @Scripts.Render("~/Content/js")
     @Scripts.Render("~/Content/angular")
-    @Scripts.Render("~/bundles/clConnect.main.js")
-    @Scripts.Render("~/bundles/clConnect.setup.js")
+    @Scripts.Render("~/bundles/clConnectmain")
+    @Scripts.Render("~/bundles/clConnectsetup")
     @RenderSection("scripts", required: false)
 </body>
 </html>

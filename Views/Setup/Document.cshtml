@@ -7,96 +7,34 @@
     </h2>
     <section>
         This step will allow you to configure Document Imaging options.
-        If the path you wish to use is not available for selection, you may also enter the path below. For additional information, please click <a href="https://campuslogicinc.freshdesk.com/support/solutions/articles/5000701741" target="_blank">File Path Permissions.</a>
-        For addional help on this page please see <a href="https://campuslogicinc.freshdesk.com/support/solutions/articles/5000707060-document-settings/" target="_blank">Document Settings Help.</a>
+        If the path you wish to use is not available for selection, you may also enter the path below. For additional information, please click <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_set_file_permissions.html" target="_blank">File Path Permissions.</a>
+        For addional help on this page please see <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_set_up_document_imaging_in_cl_connect.html/" target="_blank">Document Settings Help.</a>
     </section>
     <hr>
     <div class="row padding-bottom-ten">
-        <div class="col-md-8">
-            <div class="form-group">
+        <div class="col-lg-8">
+            <div class="row form-group mb-3">
                 <label>Document Storage File Path</label>
                 <cl-folder-picker isrequired="vm.service.configurationModel.campusLogicSection.documentSettings.indexFileEnabled" formvalid="validationService.pageValidations.documentSettingsValid" uploadpath="vm.service.configurationModel.campusLogicSection.documentSettings.documentStorageFilePath"></cl-folder-picker>
             </div>
         </div>
     </div>
-    <div class="row"><div class="col-md-12 padding-left-10 padding-right-10"><hr /></div></div>
     <div class="row padding-bottom-ten">
-        <div class="col-md-5" align="right">
-            <label class="control-label">Index File Enabled</label>
-        </div>
-        <div class="col-md-3">
+        <div class="col-lg-5">
+            <label class="control-label">Index File Enabled</label><br />
             <input type="radio" ng-value="true" ng-model="vm.service.configurationModel.campusLogicSection.documentSettings.indexFileEnabled" style="width: 20px">True
             <input type="radio" ng-value="false" ng-model="vm.service.configurationModel.campusLogicSection.documentSettings.indexFileEnabled" style="width: 20px">False
         </div>
     </div>
     <div ng-if="vm.service.configurationModel.campusLogicSection.documentSettings.indexFileEnabled">
         <div class="row padding-bottom-ten">
-            <div class="form-group">
-                <label class="control-label col-md-5" for="inputFileNameFormat" align="right">File Name Format</label>
-                <div class="col-md-4">
-                    <input type="text" class="form-control" id="inputFileNameFormat" name="inputFileNameFormat" ng-model="vm.service.configurationModel.campusLogicSection.documentSettings.fileNameFormat" required />
-                    <span class="field-validation-error" ng-show="(vm.documentForm.inputFileNameFormat.$dirty || vm.service.pageValidations.documentSettingsValid == false) && vm.documentForm.inputFileNameFormat.$error.required">Required</span>
+            <div class="col-lg-5">
+                <div class="row form-group mb-3">
+                    <label class="control-label" for="fileDefinitionName">*File Definition Name</label>
+                    <input type="text" class="form-control" id="fileDefinitionName" name="fileDefinitionName" ng-model="vm.service.configurationModel.campusLogicSection.documentSettings.fileDefinitionName" required />
+                    <span class="field-validation-error" ng-show="(vm.documentForm.fileDefinitionName.$dirty || vm.documentSettingsValid == false) && vm.documentForm.fileDefinitionName.$error.required">Required</span>
                 </div>
-            </div>
-        </div>
-        <div class="row padding-bottom-ten">
-            <div class="col-md-5" align="right">
-                <label class="control-label">Include Header Record</label>
-            </div>
-            <div class="col-md-3">
-                <input type="radio" ng-value="true" ng-model="vm.service.configurationModel.campusLogicSection.documentSettings.includeHeaderRecord" style="width: 20px">True
-                <input type="radio" ng-value="false" ng-model="vm.service.configurationModel.campusLogicSection.documentSettings.includeHeaderRecord" style="width: 20px">False
-            </div>
-        </div>
-        <div class="row padding-bottom-ten">
-            <div class="form-group">
-                <label class="control-label col-md-5" for="inputIndexFileExtension" align="right">Index File Extension (txt, csv, etc)</label>
-                <div class="col-md-4">
-                    <input type="text" class="form-control" id="inputIndexFileExtension" name="inputIndexFileExtension" ng-model="vm.service.configurationModel.campusLogicSection.documentSettings.indexFileExtension" required />
-                    <span class="field-validation-error" ng-show="(vm.documentForm.inputIndexFileExtension.$dirty || vm.service.pageValidations.documentSettingsValid == false) && vm.documentForm.inputIndexFileExtension.$error.required">Required</span>
-                </div>
-            </div>
-        </div>
-        <div class="row padding-bottom-ten">
-            <div class="form-group">
-                <label class="control-label col-md-5" for="inputIndexFileFormat" align="right">Index File Format</label>
-            </div>
-            <div class="col-md-4">
-                <select id="inputIndexFileFormat" required kendo-drop-down-list name="indexFileFormat" ng-model="vm.service.configurationModel.campusLogicSection.documentSettings.indexFileFormat">
-                    <option value="csv">CSV</option>
-                    <option value="csvnoquotes">CSV No Quotes</option>
-                    <option value="tabdelimited">Tab Delimited</option>
-                    <option value="fixedwidth">Fixed Width</option>
-                </select>
-            </div>
-        </div>
-        <div class="row padding-bottom-ten">
-        </div>
-        <div class="row">
-            <div class="col-md-12 padding-left-10 padding-right-10">
-                <hr />
-            </div>
-        </div>
-        <div class="row padding-bottom-ten">
-            <label class="control-label col-md-5">Field Mapping Collection</label>
-        </div>
-        <div class="row padding-bottom-ten">
-            <div class="col-md-12">
-                <div id="field-mapping-collection-grid" kendo-grid k-options="vm.fieldMappingCollectionGridOptions"></div>
-            </div>
-        </div>
-        <div class="row padding-bottom-ten">
-            <div class="col-md-12">
-                <button class="btn btn-default" ng-click="vm.addFieldMapping()">Add</button>
             </div>
         </div>
     </div>
 </form>
-
-
-<script id="add-field-mapping-collection-template" type="text/x-kendo-template">
-    <button class="btn btn-default" ng-click="vm.moveUpFieldMappingItem(dataItem)"><i class="fa fa-arrow-up"></i></button>
-    <button class="btn btn-default" ng-click="vm.moveDownFieldMappingItem(dataItem)"><i class="fa fa-arrow-down"></i></button>
-    <button class="btn btn-default" ng-click="vm.editFieldMappingItem(dataItem)"><i class="fa fa-pencil"></i></button>
-    <button class="btn btn-default" ng-click="vm.deleteFieldMappingItem(dataItem)"><i class="fa fa-trash"></i></button>
-</script>

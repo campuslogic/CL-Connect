@@ -1,0 +1,73 @@
+﻿
+@{
+    ViewBag.Title = "Export";
+
+    var tables = new List<string>
+{
+        "BatchProcessRecord",
+        "EventNotification",
+        "EventNotificationDefinition",
+        "EventNotificationEventProperty",
+        "EventProperty",
+        "Log",
+        "NotificationLog",
+        "PowerFaidsRecord",
+        "ReceivedEvent"
+    };
+}
+
+<style>
+    .padtop {
+        padding-top: 20px;
+    }
+
+    input {
+        width: auto;
+    }
+</style>
+<div id="body">
+    <div class="padtop container-fluid justify-content-center wizard-tab-container content-wrapper">
+        <h2><b>Export Data</b></h2>
+        <p>This will create logs and drop them in a Secure File Transfer folder to be picked up and sent to the Platform Management Secure File Transfer screen.
+        This automated process will occur at the same interval set for the Data File Upload process.</p>
+        <hr />
+        <div ng-if="!dataFileUploadEnabled" class="padding-bottom-ten">
+            <label>
+                This feature requires DataFile Uploads in the Setup Wizard to be enabled.
+            </label>
+        </div>
+        <form ng-submit="exportLogs()" ng-if="dataFileUploadEnabled">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="row">
+                        <label>Enter number of days logs should go back</label>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4 control-label">
+                            <label class="" for="exportToDate">Days:</label>
+                        </div>
+                        <div class="col-lg-8">
+                            <input type="number" id="exportToDate" ng-model="days.input" min="1" max="30" required />
+                            Max: 30 Min: 1
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <label>Select tables to export:</label>
+                    @foreach (var table in tables)
+                    {
+                        <div>
+                            <input type="checkbox" id="@table" name="@table" value="@table" ng-click="addRemove('@table')" />
+                            <label for="@table">@table</label>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="row padding-bottom-ten">
+                <div style="text-align: right;" class="col-md-12 padding-top-twenty">
+                    <button value="Export" class="btn btn-light btn-lg next">Export</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -5,72 +5,72 @@
 <form class="form-horizontal" name="formAppSettings">
     <h2><b>Application Settings</b></h2>
     <p>
-        This step will allow you to change global application settings for CL Connect. 
-        For further detail on the application settings section please click <a href="https://campuslogicinc.freshdesk.com/support/solutions/articles/5000706485-application-settings" target="_blank">Application Settings Help.</a>
+        This step will allow you to change global application settings for CL Connect.
+        For further detail on the application settings section please click <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_setup_api_credentials.html" target="_blank">Application Settings Help.</a>
     </p>
     <hr>
-    <div class="col-md-12 padding-top-ten">
-        <div class="col-md-6">
+    <div class="row padding-top-ten">
+        <div class="col-lg-6">
             <label>Data purge thresholds</label>
             <p>These settings help control when data is removed from the local data store, please enter in days. </p>
-            <div class="form-group">
-                <label class="control-label col-md-4" for="inputPurgeReceivedEventsAfterDays"><span class="form-required" aria-hidden="true">*</span> Events</label>
-                <div class="col-md-3">
+            <div class="row form-group mb-3">
+                <label class="control-label col-lg-4" for="inputPurgeReceivedEventsAfterDays"><span class="form-required" aria-hidden="true">*</span> Events</label>
+                <div class="col-lg-3">
                     <input type="text" id="inputPurgeReceivedEventsAfterDays" name="inputPurgeReceivedEventsAfterDays" kendo-numeric-text-box k-format="'n0'" k-min="1" k-max="365" ng-model="vm.appSettings.purgeReceivedEventsAfterDays" required />
                     <span class="field-validation-error" ng-show="( !vm.appSettingsPageValid ||formAppSettings.inputPurgeReceivedEventsAfterDays.$dirty) && formAppSettings.inputPurgeReceivedEventsAfterDays.$error.required">Required</span>
                 </div>
             </div>
-            <div class="form-group">
-                <label class="control-label col-md-4" for="inputPurgeLogRecordsAfterDays"><span class="form-required" aria-hidden="true">*</span> Logs</label>
-                <div class="col-md-3">
+            <div class="row form-group mb-3">
+                <label class="control-label col-lg-4" for="inputPurgeLogRecordsAfterDays"><span class="form-required" aria-hidden="true">*</span> Logs</label>
+                <div class="col-lg-3">
                     <input type="text" id="inputPurgeLogRecordsAfterDays" name="inputPurgeLogRecordsAfterDays" kendo-numeric-text-box k-format="'n0'" k-min="1" k-max="365" ng-model="vm.appSettings.purgeLogRecordsAfterDays" required />
                     <span class="field-validation-error" ng-show="( !vm.appSettingsPageValid ||formAppSettings.inputPurgeLogRecordsAfterDays.$dirty) && formAppSettings.inputPurgeLogRecordsAfterDays.$error.required">Required</span>
                 </div>
             </div>
-            <div class="form-group">
-                <label class="control-label col-md-4" for="inputPurgeNotificationLogRecordsAfterDays"><span class="form-required" aria-hidden="true">*</span> Notifications</label>
-                <div class="col-md-3">
+            <div class="row form-group mb-3">
+                <label class="control-label col-lg-4" for="inputPurgeNotificationLogRecordsAfterDays"><span class="form-required" aria-hidden="true">*</span> Notifications</label>
+                <div class="col-lg-3">
                     <input type="text" id="inputPurgeNotificationLogRecordsAfterDays" name="inputPurgeNotificationLogRecordsAfterDays" kendo-numeric-text-box k-format="'n0'" k-min="1" k-max="365" ng-model="vm.appSettings.purgeNotificationLogRecordsAfterDays" required />
                     <span class="field-validation-error" ng-show="( !vm.appSettingsPageValid ||formAppSettings.inputPurgeNotificationLogRecordsAfterDays.$dirty) && formAppSettings.inputPurgeNotificationLogRecordsAfterDays.$error.required">Required</span>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-lg-6">
             <label>Worker process</label>
             <p>These settings control the worker process which executes incoming requests.</p>
-            <div class="form-group">
-                <label class="control-label col-md-4" for="inputBackgroundWorkerCount"><span class="form-required" aria-hidden="true">*</span> Worker Count</label>
-                <div class="col-md-3">
-                    <input type="text" id="inputBackgroundWorkerCount" name="inputBackgroundWorkerCount" kendo-numeric-text-box k-format="'n0'" k-min="1" k-max="5" ng-model="vm.appSettings.backgroundWorkerCount" required/>
+            <div class="row form-group mb-3">
+                <label class="control-label col-lg-4" for="inputBackgroundWorkerCount"><span class="form-required" aria-hidden="true">*</span> Worker Count</label>
+                <div class="col-lg-3">
+                    <input type="text" id="inputBackgroundWorkerCount" name="inputBackgroundWorkerCount" kendo-numeric-text-box k-format="'n0'" k-min="1" k-max="5" ng-model="vm.appSettings.backgroundWorkerCount" required />
                     <span class="field-validation-error" ng-show="( !vm.appSettingsPageValid || formAppSettings.inputBackgroundWorkerCount.$dirty) && formAppSettings.inputBackgroundWorkerCount.$error.required">Required</span>
                 </div>
             </div>
-            <div class="form-group">
-                <label class="control-label col-md-4" for="inputBackgroundWorkerRetryAttempts"><span class="form-required" aria-hidden="true">*</span> Retry Attempts</label>
-                <div class="col-md-3">
-                    <input type="text" id="inputBackgroundWorkerRetryAttempts" name="inputBackgroundWorkerRetryAttempts" kendo-numeric-text-box k-format="'n0'" k-min="1" k-max="20" ng-model="vm.appSettings.backgroundWorkerRetryAttempts" required/>
+            <div class="row form-group mb-3">
+                <label class="control-label col-lg-4" for="inputBackgroundWorkerRetryAttempts"><span class="form-required" aria-hidden="true">*</span> Retry Attempts</label>
+                <div class="col-lg-3">
+                    <input type="text" id="inputBackgroundWorkerRetryAttempts" name="inputBackgroundWorkerRetryAttempts" kendo-numeric-text-box k-format="'n0'" k-min="1" k-max="20" ng-model="vm.appSettings.backgroundWorkerRetryAttempts" required />
                     <span class="field-validation-error" ng-show="( !vm.appSettingsPageValid ||formAppSettings.inputBackgroundWorkerRetryAttempts.$dirty) && formAppSettings.inputBackgroundWorkerRetryAttempts.$error.required">Required</span>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-12 padding-top-twenty">
-        <div class="col-md-6">
-        <label>Incoming API</label>
-        <p>These settings are used for authenticating incoming request from the CampusLogic servers.</p>
-        <div class="form-group">
-            <label class="control-label col-md-4" for="inputIncomingApiUsername"><span class="form-required" aria-hidden="true">*</span> Username</label>
-            <div class="col-md-8">
-                <input type="text" class="form-control" id="inputIncomingApiUsername" name="inputIncomingApiUsername" ng-model="vm.appSettings.incomingApiUsername" required/>
-                <span class="field-validation-error" ng-show="( !vm.appSettingsPageValid || formAppSettings.inputIncomingApiUsername.$dirty) && formAppSettings.inputIncomingApiUsername.$error.required">Required</span>
+    <div class="row padding-top-twenty">
+        <div class="col-lg-6">
+            <label>Incoming API</label>
+            <p>These settings are used for authenticating incoming request from the CampusLogic servers.</p>
+            <div class="row form-group mb-3">
+                <label class="control-label col-lg-4" for="inputIncomingApiUsername"><span class="form-required" aria-hidden="true">*</span> Username</label>
+                <div class="col-lg-8">
+                    <input type="text" class="form-control" id="inputIncomingApiUsername" name="inputIncomingApiUsername" ng-model="vm.appSettings.incomingApiUsername" required />
+                    <span class="field-validation-error" ng-show="( !vm.appSettingsPageValid || formAppSettings.inputIncomingApiUsername.$dirty) && formAppSettings.inputIncomingApiUsername.$error.required">Required</span>
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <label class="control-label col-md-4" for="inputIncomingApiPassword"><span class="form-required" aria-hidden="true">*</span> Password</label>
-            <div class="col-md-8">
-                <input type="password" class="form-control" id="inputIncomingApiPassword" name="inputIncomingApiPassword" ng-model="vm.appSettings.incomingApiPassword" required/>
-                <span class="field-validation-error" ng-show="( !vm.appSettingsPageValid || formAppSettings.inputIncomingApiPassword.$dirty) && formAppSettings.inputIncomingApiPassword.$error.required">Required</span>
-            </div>
+            <div class="row form-group mb-3">
+                <label class="control-label col-lg-4" for="inputIncomingApiPassword"><span class="form-required" aria-hidden="true">*</span> Password</label>
+                <div class="col-lg-8">
+                    <input type="password" class="form-control" id="inputIncomingApiPassword" name="inputIncomingApiPassword" ng-model="vm.appSettings.incomingApiPassword" required />
+                    <span class="field-validation-error" ng-show="( !vm.appSettingsPageValid || formAppSettings.inputIncomingApiPassword.$dirty) && formAppSettings.inputIncomingApiPassword.$error.required">Required</span>
+                </div>
             </div>
         </div>
     </div>

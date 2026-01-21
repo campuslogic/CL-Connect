@@ -5,14 +5,16 @@ var clConnectServices = angular.module("clConnectServices");
 clConnectServices.factory("addfieldmappingmodalcontroller", ["$modal",
     function ($modal) {
 
+        var urlRoot = '';
+        urlRoot = $("base").first().attr("href");
+
         var service = {
 
             modalController: ["$rootScope", "$scope", "$modalInstance", "modalParams",
                 function ($rootScope, $scope, $modalInstance, modalParams) {
                     $scope.dropdown = { eventPropertyValueAvailableProperties: modalParams.eventPropertyValueAvailableProperties };
-                    $scope.valueType = { valueTypes: ["Basic Property Value", "Constant Value", "Database Command", "Dynamic Field Value"] }
                     $scope.selectedValueType = selectedValueType();
-                    $scope.onSelectedValueType = onSelectedValueType;
+                    $scope.onSelectedValueChange = onSelectedValueChange;
                     $scope.theItem = modalParams.theItem;
                     $scope.theList = modalParams.theList;
 
@@ -52,13 +54,13 @@ clConnectServices.factory("addfieldmappingmodalcontroller", ["$modal",
                             return "Database Command";
                         }
                         else if (modalParams.theItem.dynamicFieldValue) {
-                            return "Database Command";
+                            return "Dynamic Field Value";
                         }
                         return "";
                     }
 
-                    function onSelectedValueType(valueType) {
-                        switch (valueType) {
+                    function onSelectedValueChange() {
+                        switch ($scope.selectedValueType) {
                             case "Basic Property Value":
                                 $scope.modelCopy.constantFieldValue = null;
                                 $scope.modelCopy.dbCommandFieldValue = null;
@@ -128,10 +130,9 @@ clConnectServices.factory("addfieldmappingmodalcontroller", ["$modal",
                 }],
 
             open: function (theItem, fieldPosition, theList, eventPropertyValueAvailableProperties) {
-
                 //Open modal
                 var $modalInstance = $modal.open({
-                    templateUrl: "/setup/template?templateName=AddFieldMappingModal",
+                    templateUrl: urlRoot + "/setup/template?templateName=AddFieldMappingModal",
                     controller: service.modalController,
                     resolve: {
                         modalParams: function () {
@@ -139,12 +140,12 @@ clConnectServices.factory("addfieldmappingmodalcontroller", ["$modal",
                                 theItem: theItem,
                                 fieldPosition: fieldPosition,
                                 theList: theList,
-                                eventPropertyValueAvailableProperties: eventPropertyValueAvailableProperties
+                                eventPropertyValueAvailableProperties: eventPropertyValueAvailableProperties.sort()
                             };
                         }
                     },
-                    backdrop: 'static'//,
-                    //windowClass: "full-screen-modal"
+                    backdrop: 'static',
+                    windowClass: "show"
                 });
 
                 //Done
