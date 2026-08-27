@@ -1,14 +1,15 @@
-﻿<div class="modal-header"><h4>{{modalType}} Parameter</h4></div>
+﻿
+<div class="modal-header"><h4 id="parameterModalTitle"></h4></div>
 <div class="modal-body">
-    <form name="fieldItemForm">
+    <form id="parameterModalForm" novalidate>
         <div class="row padding-bottom-ten">
             <div class="col-lg-4 text-right">
                 <label class="control-label">Name</label>
             </div>
             <div class="col-lg-8">
-                <input type="text" class="form-control" id="inputFieldSize" name="inputFieldSize" ng-model="modelCopy.name" required />
-                <span class="field-validation-error" ng-show="nameValidation == true">Required</span>
-                <span class="field-validation-error" ng-show="nameDuplicateValidation == true">Two parameter names can not be the same.</span>
+                <input type="text" class="form-control" id="inputFieldSize" name="parameter.name" required />
+                <span class="field-validation-error" id="parameterNameRequired" hidden>Required</span>
+                <span class="field-validation-error" id="parameterNameDuplicate" hidden>Two parameter names can not be the same.</span>
             </div>
         </div>
         <div class="row padding-bottom-ten">
@@ -16,7 +17,7 @@
                 <label class="control-label">Data Type</label>
             </div>
             <div class="col-lg-8">
-                <select required kendo-drop-down-list name="dataType" ng-model="modelCopy.dataType">
+                <select required class="form-select" name="parameter.dataType">
                     <option value="int">Int</option>
                     <option value="varchar">VARCHAR</option>
                     <option value="binary">Binary</option>
@@ -27,16 +28,16 @@
                     <option value="date">Date</option>
                     <option value="time">Time</option>
                 </select>
-                <span class="field-validation-error" ng-show="dataTypeValidation == true">Required</span>
+                <span class="field-validation-error" id="parameterDataTypeRequired" hidden>Required</span>
             </div>
         </div>
-        <div ng-if="modelCopy.dataType!=='int'" class="row padding-bottom-ten">
+        <div id="parameterLengthRow" class="row padding-bottom-ten" hidden>
             <div class="col-lg-4 text-right">
                 <label class="control-label">Length:</label>
             </div>
             <div class="col-lg-8">
-                <input name="length" type="number" ng-model="modelCopy.length" class="form-control">
-                <span class="field-validation-error" ng-show="lengthValidation == true">Required</span>
+                <input name="parameter.length" type="number" class="form-control">
+                <span class="field-validation-error" id="parameterLengthRequired" hidden>Required</span>
             </div>
         </div>
         <div class="row padding-bottom-ten">
@@ -44,14 +45,14 @@
                 <label class="control-label">Source Field</label>
             </div>
             <div class="col-lg-8">
-                <select style="width: 100%;" id="inputPropertyFieldValue" required kendo-drop-down-list name="inputPropertyFieldValue" ng-model="modelCopy.source" k-data-source="dropdown.eventPropertyValues">
+                <select class="form-select" id="inputPropertyFieldValue" required name="parameter.source">
                 </select>
-                <span class="field-validation-error" ng-show="sourceValidation == true">Required</span>
+                <span class="field-validation-error" id="parameterSourceRequired" hidden>Required</span>
             </div>
         </div>
     </form>
 </div>
 <div class="modal-footer">
-    <input type="button" id="button-field-search-cancel" class="btn btn-light" value="Cancel" ng-click="$dismiss()" />
-    <input type="button" id="button-field-search-save" class="btn btn-primary" value="Save" ng-click="save()" />
+    <input type="button" id="button-field-search-cancel" class="btn btn-light" value="Cancel" data-action="cancel" />
+    <input type="button" id="button-field-search-save" class="btn btn-primary" value="Save" data-action="save" />
 </div>

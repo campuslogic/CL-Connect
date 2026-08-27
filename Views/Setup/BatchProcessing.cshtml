@@ -7,7 +7,7 @@
     </h2>
     <section>
         This step will allow you to configure Batch Processing options.
-        You may define one or many Batch Processes for a specific Batch Processing Type. The Batch Name must be unique. 
+        You may define one or many Batch Processes for a specific Batch Processing Type. The Batch Name must be unique.
         A Batch Process will run on the interval defined by the Batch Execution Minutes setting.
         Each batch execution will process the records in the given max batch size increments until all records have been processed.
         For additional help on this page please see <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_set_up_cc_event_notifications.html" target="_blank">Batch Processing Help.</a>
@@ -18,14 +18,14 @@
         <div class="col-lg-12">
             <div class="col-lg-4">
                 <label class="control-label">Batch Processing Type</label>
-                <select id="batchProcessingType" required kendo-drop-down-list name="batchProcessingType" ng-model="model.batchProcessingType">                    
-                    <option value="awardLetterPrint">AwardLetter Print</option>
+                <select id="batchProcessingType" required class="form-select" name="batchProcessingType">
+                    <option value="awardLetterPrint">Communication Print</option>
                 </select>
-                <span ng-show="bpvalidation" class="important-color"><b>This batch processing type already exists.</b></span>
+                <span id="duplicateType" class="important-color" hidden><b>This batch processing type already exists.</b></span>
             </div>
             <div class="col-lg-12">
                 <div class="padding-top-twenty pull-right">
-                    <button class="btn btn-light btn-lg" ng-click="add()">Add</button>
+                    <button type="button" id="addBatchProcessingType" class="btn btn-light btn-lg">Add</button>
                 </div>
             </div>
         </div>
@@ -33,30 +33,52 @@
 
     <div class="row"><div class="col-lg-12"><hr /></div></div>
 
-    <div ng-if="batchProcessingTypesList.length > 0" ng-repeat="batchProcessingType in batchProcessingTypesList">
+    <div id="batchProcessingTypeList"></div>
+</div>
+
+<template id="batchProcessingTypeTemplate">
+    <div data-type-index>
         <div class="col-lg-12">
-            <h3><b>{{getDisplayName(batchProcessingType.typeName)}} - Batch Processes</b><i class="fa fa-trash-o pointer padding-left-fifteen" aria-hidden="true" ng-click="deleteBatchProcessingType(batchProcessingType)" title="Delete"></i></h3>
+            <h3><b><span class="cl-type-display-name"></span> - Batch Processes</b><i class="fa fa-trash-o pointer padding-left-fifteen" aria-hidden="true" data-action="delete-type" title="Delete"></i></h3>
         </div>
         <div class="col-lg-12 padding-bottom-ten">
-            <div id="{{batchProcessingType.typeName}}" kendo-grid
-                 data-role="grid"
-                 data-editable="false"
-                 k-data-source="batchProcessingType.batchProcesses"
-                 k-options="gridOptions['{{batchProcessingType.typeName}}']">
-            </div>
+            <table class="cl-grid">
+                <thead>
+                    <tr>
+                        <th>Batch Name</th>
+                        <th>Max Batch Size</th>
+                        <th>File Path</th>
+                        <th>File Name Format</th>
+                        <th>Batch Execution Minutes</th>
+                        <th>File Definition</th>
+                        <th class="cl-grid-commands"></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
             <div class="row padding-top-ten">
                 <div class="col-lg-12">
-                    <button class="btn btn-light" ng-click="addBatchProcess(batchProcessingType)">Add</button>
+                    <button type="button" class="btn btn-light" data-action="add-process">Add</button>
                 </div>
                 <div class="col-lg-12 padding-top-ten">
-                    <span class="field-validation-error" ng-show="batchProcessingType.batchProcesses.length === 0 && !pageValid">At least one batch process is required.</span>
+                    <span class="field-validation-error cl-no-processes" hidden>At least one batch process is required.</span>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</template>
 
-<script id="add-batch-process-collection-template" type="text/x-kendo-template">
-    <button class="btn btn-light" ng-click="editBatchProcess(batchProcessingType, dataItem)" title="Edit"><i class="fa fa-pencil"></i></button>
-    <button class="btn btn-light" ng-click="deleteBatchProcess(batchProcessingType, dataItem)" title="Delete"><i class="fa fa-trash"></i></button>
-</script>
+<template id="batchProcessRowTemplate">
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="cl-grid-commands">
+            <button type="button" class="btn btn-light" data-action="edit-process" title="Edit"><i class="fa fa-pencil"></i></button>
+            <button type="button" class="btn btn-light" data-action="delete-process" title="Delete"><i class="fa fa-trash"></i></button>
+        </td>
+    </tr>
+</template>

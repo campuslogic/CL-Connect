@@ -312,8 +312,8 @@ namespace CampusLogicEvents.Web
             //validation
             if (campusLogicSection.AwardLetterUploadSettings == null)
             {
-                NotificationService.ErrorNotification("Automated AwardLetter Upload", "The award letter upload settings are missing");
-                LogManager.ErrorLog("Award Letter Upload settings are missing");
+                NotificationService.ErrorNotification("Automated Communication Upload", "The communcication upload settings are missing");
+                LogManager.ErrorLog("Communication Upload settings are missing");
                 return;
             }
 
@@ -339,8 +339,8 @@ namespace CampusLogicEvents.Web
             //validation
             if (campusLogicSection.FileMappingUploadSettings == null)
             {
-                NotificationService.ErrorNotification("Automated AwardLetter File Mapping Upload", "The award letter file mapping settings are missing");
-                LogManager.ErrorLog("Award Letter File Mapping Upload settings are missing");
+                NotificationService.ErrorNotification("Automated Communication File Mapping Upload", "The communication file mapping settings are missing");
+                LogManager.ErrorLog("Communication File Mapping Upload settings are missing");
                 return;
             }
 
@@ -520,7 +520,14 @@ namespace CampusLogicEvents.Web
                 }
 
                 //Converting hours to military time
-                var hour = (campusLogicSection.ISIRCorrectionsSettings.TimeToRun.Substring(0, campusLogicSection.ISIRCorrectionsSettings.TimeToRun.IndexOf(":")) == "12" && amOrPm == "AM") ? "0" : amOrPm == "PM" ? (int.Parse(campusLogicSection.ISIRCorrectionsSettings.TimeToRun.Substring(0, campusLogicSection.ISIRCorrectionsSettings.TimeToRun.IndexOf(":"))) + 12).ToString() : campusLogicSection.ISIRCorrectionsSettings.TimeToRun.Substring(0, campusLogicSection.ISIRCorrectionsSettings.TimeToRun.IndexOf(":"));
+                var timeToRun = campusLogicSection.ISIRCorrectionsSettings.TimeToRun;
+                var separatorIndex = timeToRun.IndexOf(':');
+                var parsedHour = int.Parse(timeToRun.Substring(0, separatorIndex), CultureInfo.InvariantCulture);
+
+                // 12 AM => 0, 12 PM => 12, 1-11 PM => +12
+                var hour = (amOrPm == "AM")
+                    ? (parsedHour == 12 ? "0" : parsedHour.ToString(CultureInfo.InvariantCulture))
+                    : (parsedHour == 12 ? "12" : (parsedHour + 12).ToString(CultureInfo.InvariantCulture));
                 var minutes = campusLogicSection.ISIRCorrectionsSettings.TimeToRun.Substring(campusLogicSection.ISIRCorrectionsSettings.TimeToRun.IndexOf(":") + 1, 2) == "00" ? "0" : campusLogicSection.ISIRCorrectionsSettings.TimeToRun.Substring(campusLogicSection.ISIRCorrectionsSettings.TimeToRun.IndexOf(":") + 1, 2);
 
                 if (!IsDigitsOnly(hour) || !IsDigitsOnly(minutes))
@@ -543,7 +550,7 @@ namespace CampusLogicEvents.Web
 
         /// <summary>
         /// Validate all of the configurations for a
-        /// file upload process (ISIR or Award Letter)
+        /// file upload process (ISIR or Student Aid Communication)
         /// </summary>
         /// <param name="uploadSettings"></param>
         private void UploadConfigurationValidation(UploadSettings uploadSettings)

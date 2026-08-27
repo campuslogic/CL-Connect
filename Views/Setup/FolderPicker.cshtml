@@ -1,25 +1,24 @@
-﻿<div ng-form name="folderPickerForm">
+<div class="cl-folder-picker-body cl-field">
     <div class="row">
         <div class="col-lg-9">
-            <input id="folderPath" class="input-lg col-lg-12" name="folderPath" ng-model="uploadpath" ng-required="isrequired" ng-blur="validateFolderPathUnique()"/>
+            <input class="input-lg col-lg-12" type="text" aria-label="Folder path" />
             <div class="pull-right">
-                <span class="field-validation-error" ng-show="(folderPickerForm.folderPath.$dirty && folderPickerForm.folderPath.$error.required) ||(!formvalid && (uploadpath === '' || !uploadpath))">Required</span>
-                <span class="field-validation-error" ng-hide="folderPathUnique">All folder paths must be unique across all sections.</span>
+                <span class="field-validation-error cl-required">Required</span>
+                <span class="field-validation-error cl-path-not-unique" hidden>All folder paths must be unique across all sections.</span>
             </div>
         </div>
         <div class="col-lg-3">
-            <button class="btn btn-light btn-lg" ng-click="openFolderExplorer()">Select</button>
+            <button class="btn btn-light btn-lg" type="button" data-action="browse">Select</button>
         </div>
     </div>
     <div class="row">
         <div class="col-lg-12">
             <div class="pull-left">
-                <button class="btn btn-light btn-lg" type="submit" name="testButton" ng-click="testReadWritePermissions()">Test</button>
-                <span class="alert alert-success" role="alert" ng-show="validPath && pathValidated">Path is valid</span>
-                <span class="alert alert-danger" role="alert" ng-show="!validPath && pathValidated">Invalid Path</span>
+                <button class="btn btn-light btn-lg" type="button" data-action="test">Test</button>
+                <span class="alert alert-success cl-path-valid" role="alert" hidden>Path is valid</span>
+                <span class="alert alert-danger cl-path-invalid" role="alert" hidden>Invalid Path</span>
             </div>
         </div>
     </div>
     <div class="padding-top-twenty"></div>
 </div>
-

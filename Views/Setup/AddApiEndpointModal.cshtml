@@ -1,14 +1,15 @@
-﻿<div class="modal-header"><h4>{{modalType}} Endpoint</h4></div>
+﻿
+<div class="modal-header"><h4 id="apiEndpointModalTitle"></h4></div>
 <div class="modal-body">
-    <form>
+    <form id="apiEndpointModalForm" novalidate>
         <div class="row padding-bottom-ten">
             <div class="col-lg-3 text-right">
                 <label class="control-label">Name</label>
             </div>
             <div class="col-lg-9">
-                <input type="text" class="form-control" id="name" name="name" ng-model="modelCopy.name" required />
-                <span class="field-validation-error" ng-show="endpointNameIsValid == false">Required</span>
-                <span class="field-validation-error" ng-show="endpointNameIsDuplicate == true">Name must be unique</span>
+                <input type="text" class="form-control" id="name" name="apiEndpoint.name" required />
+                <span class="field-validation-error" id="endpointNameRequired" hidden>Required</span>
+                <span class="field-validation-error" id="endpointNameDuplicate" hidden>Name must be unique</span>
             </div>
         </div>
         <div class="row padding-bottom-ten">
@@ -16,7 +17,7 @@
                 <label class="control-label">Endpoint</label>
             </div>
             <div class="col-lg-9">
-                <input type="text" class="form-control" id="endpoint" name="endpoint" ng-model="modelCopy.endpoint" ng-disabled="endpointReadonly" required />
+                <input type="text" class="form-control" id="endpoint" name="apiEndpoint.endpoint" required />
             </div>
         </div>
         <div class="row padding-bottom-ten">
@@ -24,17 +25,20 @@
                 <label class="control-label">Method</label>
             </div>
             <div class="col-lg-9">
-                <select id="method" required kendo-drop-down-list name="method" k-data-source="methods" k-data-text-field="'text'" k-data-value-field="'value'" ng-model="modelCopy.method" ng-disabled="endpointReadonly">
+                <select id="method" required class="form-select" name="apiEndpoint.method">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
                 </select>
             </div>
         </div>
-        <div class="row padding-bottom-ten" ng-if="modelCopy.method == 'POST' || modelCopy.method == 'PUT'">
+        <div class="row padding-bottom-ten" id="mimeTypeRow" hidden>
             <div class="col-lg-3 text-right">
                 <label class="control-label">MIME Type</label>
             </div>
             <div class="col-lg-9">
-                <input type="text" class="form-control" id="mimeType" name="mimeType" ng-model="modelCopy.mimeType" ng-disabled="endpointReadonly" required />
-                <span class="field-validation-error" ng-show="mimeTypeIsValid == false">Required</span>
+                <input type="text" class="form-control" id="mimeType" name="apiEndpoint.mimeType" required />
+                <span class="field-validation-error" id="endpointMimeTypeRequired" hidden>Required</span>
             </div>
         </div>
         <div class="row"><div class="col-lg-12"><hr /></div></div>
@@ -42,36 +46,41 @@
             <tr>
                 <th>Parameter Mappings</th>
             </tr>
-            <tr ng-repeat="parameterMapping in parameterMappings">
-                <td>
-                    <div><hr /></div>
-                    <div class="row padding-bottom-ten">
-                        <div class="col-lg-3 text-right">
-                            <label class="control-label">Parameter</label>
-                        </div>
-                        <div class="col-lg-7">
-                            <input type="text" class="form-control" ng-model="parameterMapping.parameter" ng-change="newParameterMapping()" ng-blur="newParameterMapping()" />
-                        </div>
-                        <div class="col-lg-2">
-                            <button class="btn btn-light pull-right" title="Delete" ng-hide="$first" ng-click="deleteParameterMapping($index)"><i class="fa fa-close"></i></button>
-                        </div>
-                    </div>
-                    <div class="row padding-bottom-ten">
-                        <div class="col-lg-3 text-right">
-                            <label class="control-label">Maps To</label>
-                        </div>
-                        <div class="col-lg-7">
-                            <select required kendo-drop-down-list name="eventData" ng-model="parameterMapping.eventData" k-options="dropdown">
-                            </select>
-                        </div>
-                    </div>
-                </td>
-            </tr>
+            <tbody id="parameterMappingRows"></tbody>
         </table>
-        <span class="field-validation-error" ng-show="hasParameters == false">At least one parameter is required</span>
+        <span class="field-validation-error" id="endpointNoParameters" hidden>At least one parameter is required</span>
     </form>
 </div>
 <div class="modal-footer">
-    <input type="button" id="button-field-search-cancel" class="btn btn-light" value="Cancel" ng-click="$dismiss()" />
-    <input type="button" id="button-field-search-save" class="btn btn-primary" value="Save" ng-click="save()" />
+    <input type="button" id="button-field-search-cancel" class="btn btn-light" value="Cancel" data-action="cancel" />
+    <input type="button" id="button-field-search-save" class="btn btn-primary" value="Save" data-action="save" />
 </div>
+
+<template id="parameterMappingRowTemplate">
+    <tr data-mapping-index>
+        <td>
+            <div><hr /></div>
+            <div class="row padding-bottom-ten">
+                <div class="col-lg-3 text-right">
+                    <label class="control-label">Parameter</label>
+                </div>
+                <div class="col-lg-7">
+                    <input type="text" class="form-control cl-parameter" />
+                </div>
+                <div class="col-lg-2">
+                    <button type="button" class="btn btn-light pull-right cl-delete-mapping" title="Delete" data-action="delete-mapping"><i class="fa fa-close"></i></button>
+                </div>
+            </div>
+            <div class="row padding-bottom-ten">
+                <div class="col-lg-3 text-right">
+                    <label class="control-label">Maps To</label>
+                </div>
+                <div class="col-lg-7">
+                    <select required class="form-select cl-event-data">
+                        <option value="">Select property...</option>
+                    </select>
+                </div>
+            </div>
+        </td>
+    </tr>
+</template>

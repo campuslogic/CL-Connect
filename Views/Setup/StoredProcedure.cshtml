@@ -2,7 +2,6 @@
     Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
 }
 
-
 <div class="form-horizontal" name="storedprocedureForm">
     <h2>
         <b>Stored Procedure Setting</b>
@@ -15,41 +14,59 @@
         <div class="col-lg-8">
             <label class="control-label col-lg-4"><span class="form-required" aria-hidden="true">* </span> Stored Procedure Name</label>
             <div class="col-lg-6">
-                <input type="text" class="form-control" ng-model="model.storedProcedureName" ng-blur="storedProcedureNameChange(model)"/>
-                <span ng-show="spvalidation">You cannot add two stored procedures with same name.</span>
+                <input type="text" class="form-control" id="storedProcedureName" name="storedProcedureName" />
+                <span id="duplicateStoredProcedure" hidden>You cannot add two stored procedures with same name.</span>
                 <div class="padding-top-twenty">
-                    <button class="btn btn-light pull-right" ng-click="add()" ng-disabled="model.storedProcedureName===null">Add Stored Procedure</button>
+                    <button type="button" id="addStoredProcedure" class="btn btn-light pull-right" disabled>Add Stored Procedure</button>
                 </div>
             </div>
         </div>
     </div>
-    <div ng-if="storedProcedureList.length > 0" ng-repeat="storedProcedure in storedProcedureList">
+    <div id="storedProcedureList"></div>
+    <span class="field-validation-error" id="noStoredProcedures" hidden>At least one Stored Procedure is required.</span>
+</div>
+
+<template id="storedProcedureTemplate">
+    <div data-stored-procedure-index>
         <div class="col-lg-12">
-            <h3><b>Stored Procedure Name: {{storedProcedure.name}}</b> <i class="fa fa-trash-o pointer padding-left-fifteen" aria-hidden="true" ng-click="deleteStoredProcedure(storedProcedure)"></i>
+            <h3><b>Stored Procedure Name: <span class="cl-stored-procedure-name"></span></b> <i class="fa fa-trash-o pointer padding-left-fifteen" aria-hidden="true" data-action="delete-stored-procedure"></i>
             </h3>
             <p>Please note that the order of the parameters added here must match the exact order of your stored procedure(type and order identify the parameter, not name).</p>
         </div>
         <div class="col-lg-12">
-            <label class="control-label" id="parameterValue">Parameter values</label>
+            <label class="control-label">Parameter values</label>
         </div>
         <div class="col-lg-12 padding-bottom-ten">
-            <div id="{{storedProcedure.storedProcedureGridName}}" kendo-grid
-                 data-role="grid"
-                 data-editable="false"
-                 k-data-source="storedProcedure.parameterList"
-                 k-options="gridOptions">
-            </div>
+            <table class="cl-grid">
+                <thead>
+                    <tr>
+                        <th style="width: 270px">Name</th>
+                        <th>Data Type</th>
+                        <th>Length</th>
+                        <th>Source</th>
+                        <th class="cl-grid-commands" style="width: 20%"></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
             <div class="row padding-top-ten">
                 <div class="col-lg-12">
-                    <button class="btn btn-light" ng-click="addParameter(storedProcedure)">Add</button>
+                    <button type="button" class="btn btn-light" data-action="add-parameter">Add</button>
                 </div>
             </div>
         </div>
     </div>
-    <span class="field-validation-error" ng-show="storedProcedureList.length === 0 && !pageValid">At least one Stored Procedure is required.</span>
-</div>
+</template>
 
-<script id="add-parameter-collection-template" type="text/x-kendo-template">
-    <button class="btn btn-light" ng-click="editParameter(storedProcedure, dataItem)"><i class="fa fa-pencil"></i></button>
-    <button class="btn btn-light" ng-click="deleteParameter(storedProcedure, dataItem)"><i class="fa fa-trash"></i></button>
-</script>
+<template id="parameterRowTemplate">
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="cl-grid-commands">
+            <button type="button" class="btn btn-light" data-action="edit-parameter"><i class="fa fa-pencil"></i></button>
+            <button type="button" class="btn btn-light" data-action="delete-parameter"><i class="fa fa-trash"></i></button>
+        </td>
+    </tr>
+</template>

@@ -1,13 +1,14 @@
-﻿<div class="modal-header"><h4>{{modalType}} Field Mapping Item</h4></div>
+﻿
+<div class="modal-header"><h4 id="fieldMappingModalTitle"></h4></div>
 <div class="modal-body">
-    <form name="fieldItemForm">
+    <form id="fieldMappingModalForm" novalidate>
         <div class="row padding-bottom-ten">
             <div class="col-lg-4 text-right">
                 <label class="control-label">Field Size</label>
             </div>
             <div class="col-lg-8">
-                <input type="number" class="form-control" id="inputFieldSize" name="inputFieldSize" ng-model="modelCopy.fieldSize" required/>
-                <span class="field-validation-error" ng-show="fieldSizeValidation == true">Required</span>
+                <input type="number" class="form-control" id="inputFieldSize" name="fieldMapping.fieldSize" required />
+                <span class="field-validation-error" id="fieldSizeRequired" hidden>Required</span>
             </div>
         </div>
         <div class="row padding-bottom-ten">
@@ -15,8 +16,8 @@
                 <label class="control-label">Data Type</label>
             </div>
             <div class="col-lg-8">
-                <input type="text" class="form-control" id="inputDataType" name="inputDataType" ng-model="modelCopy.dataType" required ng-readonly="true"/>
-                <span class="field-validation-error" ng-show="dataTypeValidation == true">Required</span>
+                <input type="text" class="form-control" id="inputDataType" name="fieldMapping.dataType" required readonly />
+                <span class="field-validation-error" id="fieldDataTypeRequired" hidden>Required</span>
             </div>
         </div>
         <div class="row padding-bottom-ten">
@@ -24,8 +25,8 @@
                 <label class="control-label">Field Name</label>
             </div>
             <div class="col-lg-8">
-                <input type="text" class="form-control" id="inputFileFieldName" name="inputFileFieldName" ng-model="modelCopy.fileFieldName" required/>
-                <span class="field-validation-error" ng-show="fileFieldNameValidation == true">Required</span>
+                <input type="text" class="form-control" id="inputFileFieldName" name="fieldMapping.fileFieldName" required />
+                <span class="field-validation-error" id="fieldNameRequired" hidden>Required</span>
             </div>
         </div>
         <div class="row padding-bottom-ten">
@@ -33,7 +34,7 @@
                 <label class="control-label">Value Type</label>
             </div>
             <div class="col-lg-8">
-                <select style="width: 100%;" id="inputValueType" required kendo-drop-down-list name="inputValueType" ng-model="selectedValueType" ng-change="onSelectedValueChange()">
+                <select class="form-select" id="inputValueType" required name="valueType">
                     <option value="">No Value</option>
                     <option value="Basic Property Value">Basic Property Value</option>
                     <option value="Constant Value">Constant Value</option>
@@ -42,41 +43,43 @@
                 </select>
             </div>
         </div>
-        <div class="row padding-bottom-ten" ng-if="selectedValueType === 'Basic Property Value'">
+        <div class="row padding-bottom-ten" id="basicPropertyValueRow" hidden>
             <div class="col-lg-4 text-right">
                 <label class="control-label">Basic Property Value</label>
             </div>
             <div class="col-lg-8">
-                <input placeholder="'Enter Event Property Value...'" style="width: 100%;" id="inputPropertyFieldValue" required kendo-auto-complete ng-model="modelCopy.propertyFieldValue" k-data-source="dropdown.eventPropertyValueAvailableProperties"/>
+                <input placeholder="'Enter Event Property Value...'" style="width: 100%;" id="inputPropertyFieldValue" required
+                       name="fieldMapping.propertyFieldValue" list="eventPropertyValues" />
+                <datalist id="eventPropertyValues"></datalist>
             </div>
         </div>
-        <div class="row padding-bottom-ten" ng-if="selectedValueType === 'Constant Value'">
+        <div class="row padding-bottom-ten" id="constantValueRow" hidden>
             <div class="col-lg-4 text-right">
                 <label class="control-label">Constant Value</label>
             </div>
             <div class="col-lg-8">
-                <input type="text" class="form-control" id="inputConstantFieldValue" name="inputConstantFieldValue" ng-model="modelCopy.constantFieldValue"/>
+                <input type="text" class="form-control" id="inputConstantFieldValue" name="fieldMapping.constantFieldValue" />
             </div>
         </div>
-        <div class="row padding-bottom-ten" ng-if="selectedValueType === 'Database Command'">
+        <div class="row padding-bottom-ten" id="dbCommandValueRow" hidden>
             <div class="col-lg-4 text-right">
                 <label class="control-label">Database Command</label>
             </div>
             <div class="col-lg-8">
-                <textarea class="form-control" id="inputDbCommandFieldValue" name="inputDbCommandFieldValue" ng-model="modelCopy.dbCommandFieldValue"> </textarea>
+                <textarea class="form-control" id="inputDbCommandFieldValue" name="fieldMapping.dbCommandFieldValue"> </textarea>
             </div>
         </div>
-        <div class="row padding-bottom-ten" ng-if="selectedValueType === 'Dynamic Field Value'">
+        <div class="row padding-bottom-ten" id="dynamicValueRow" hidden>
             <div class="col-lg-4 text-right">
                 <label class="control-label">Dynamic Value</label>
             </div>
             <div class="col-lg-8">
-                <textarea class="form-control" id="inputDynamicFieldValue" name="inputDynamicFieldValue" ng-model="modelCopy.dynamicFieldValue"> </textarea>
+                <textarea class="form-control" id="inputDynamicFieldValue" name="fieldMapping.dynamicFieldValue"> </textarea>
             </div>
         </div>
     </form>
 </div>
 <div class="modal-footer">
-    <input type="button" id="button-field-search-cancel" class="btn btn-light" value="Cancel" ng-click="$dismiss()"/>
-    <input type="button" id="button-field-search-save" class="btn btn-primary" value="Save" ng-click="save()"/>
+    <input type="button" id="button-field-search-cancel" class="btn btn-light" value="Cancel" data-action="cancel" />
+    <input type="button" id="button-field-search-save" class="btn btn-primary" value="Save" data-action="save" />
 </div>

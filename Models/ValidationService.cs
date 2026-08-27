@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Configuration;
@@ -116,6 +117,61 @@ namespace CampusLogicEvents.Web.Models
             return response;
         }
         
+        /// <summary>
+        /// Validates one of the folders named in the configuration that was posted to us.
+        /// The paths arrive on the request and ValidateDirectory creates the folder when it is
+        /// missing, so vet each one first and hand the manager only the value that comes back.
+        /// An unusable path throws, which the callers already treat as a failed validation.
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <param name="requestedPath"></param>
+        /// <returns></returns>
+        private static bool ValidateConfiguredDirectory(BaseManager manager, string requestedPath)
+        {
+            if (string.IsNullOrWhiteSpace(requestedPath)
+                || requestedPath.IndexOfAny(Path.GetInvalidPathChars()) >= 0
+                || !IsCompletePath(requestedPath))
+            {
+                throw new ArgumentException("The folder path requested is not a complete, valid path.", nameof(requestedPath));
+            }
+
+            //GetFullPath works out where the path really points, so shortcuts like "..\.." that
+            //back out of a folder are gone by the time we use it. Anything it cannot make sense
+            //of at all (wildcards, a path that is too long) throws, which the callers treat the
+            //same as any other invalid path.
+            var directory = Path.GetFullPath(requestedPath);
+
+            if (!IsCompletePath(directory))
+            {
+                throw new ArgumentException("The folder path requested is not a complete, valid path.", nameof(requestedPath));
+            }
+
+            return manager.ValidateDirectory(directory);
+        }
+
+        /// <summary>
+        /// A complete path names its own drive (c:\...) or a network share (\\server\share).
+        /// Something like \folder or folder\sub is not complete: Windows fills in the missing part
+        /// from wherever the web application happens to be running, which is never what we want.
+        /// This is checked both before and after the path is normalized: before, because
+        /// normalizing an incomplete path is exactly what fills that missing part in, and after,
+        /// because the normalized value is the one we hand on to be used.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private static bool IsCompletePath(string path)
+        {
+            if (path.StartsWith(@"\\", StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            return path.Length >= 3
+                   && char.IsLetter(path[0])
+                   && path[1] == ':'
+                   && (path[2] == Path.DirectorySeparatorChar || path[2] == Path.AltDirectorySeparatorChar);
+        }
+
         public static bool FileDefinitionExistsForName(string name, IList<FileDefinitionDto> fileDefinitions)
         {
             foreach (var fileDefinition in fileDefinitions)
@@ -464,7 +520,7 @@ namespace CampusLogicEvents.Web.Models
             try
             {
                 DocumentManager documentManager = new DocumentManager();
-                if (documentManager.ValidateDirectory(directoryPath))
+                if (ValidateConfiguredDirectory(documentManager, directoryPath))
                 {
                     return new HttpResponseMessage(HttpStatusCode.OK);
                 }
@@ -486,7 +542,7 @@ namespace CampusLogicEvents.Web.Models
             try
             {
                 DocumentManager documentManager = new DocumentManager();
-                if (documentManager.ValidateDirectory(directoryPath))
+                if (ValidateConfiguredDirectory(documentManager, directoryPath))
                 {
                     return new HttpResponseMessage(HttpStatusCode.OK);
                 }
@@ -507,11 +563,11 @@ namespace CampusLogicEvents.Web.Models
             try
             {
                 DocumentManager documentManager = new DocumentManager();
-                if (!documentManager.ValidateDirectory(settings.DataFileUploadFilePath))
+                if (!ValidateConfiguredDirectory(documentManager, settings.DataFileUploadFilePath))
                 {
                     return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
                 }
-                if (!documentManager.ValidateDirectory(settings.DataFileArchiveFilePath))
+                if (!ValidateConfiguredDirectory(documentManager, settings.DataFileArchiveFilePath))
                 {
                     return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
                 }
@@ -529,8 +585,8 @@ namespace CampusLogicEvents.Web.Models
             try
             {
                 DocumentManager documentManager = new DocumentManager();
-                if (documentManager.ValidateDirectory(settings.FileDirectory) &&
-                    documentManager.ValidateDirectory(settings.ArchiveDirectory))
+                if (ValidateConfiguredDirectory(documentManager, settings.FileDirectory) &&
+                    ValidateConfiguredDirectory(documentManager, settings.ArchiveDirectory))
                 {
                     return new HttpResponseMessage(HttpStatusCode.OK);
                 }
@@ -557,12 +613,12 @@ namespace CampusLogicEvents.Web.Models
             try
             {
                 DocumentManager documentManager = new DocumentManager();
-                if (documentManager.ValidateDirectory(isirCorrectionsSettings.CorrectionsFilePath))
+                if (ValidateConfiguredDirectory(documentManager, isirCorrectionsSettings.CorrectionsFilePath))
                 {
                     if (isirCorrectionsSettings.TdClientEnabled.HasValue && isirCorrectionsSettings.TdClientEnabled.Value == true)
                     {
-                        if (documentManager.ValidateDirectory(isirCorrectionsSettings.TdClientExecutablePath) &&
-                            documentManager.ValidateDirectory(isirCorrectionsSettings.TdClientArchiveFilePath))
+                        if (ValidateConfiguredDirectory(documentManager, isirCorrectionsSettings.TdClientExecutablePath) &&
+                            ValidateConfiguredDirectory(documentManager, isirCorrectionsSettings.TdClientArchiveFilePath))
                         {
                             return new HttpResponseMessage(HttpStatusCode.OK);
                         }
@@ -607,7 +663,7 @@ namespace CampusLogicEvents.Web.Models
                     else
                     {
                         DocumentManager documentManager = new DocumentManager();
-                        if (!documentManager.ValidateDirectory(settings.DocumentStorageFilePath))
+                        if (!ValidateConfiguredDirectory(documentManager, settings.DocumentStorageFilePath))
                         {
                             throw new Exception();
                         }
@@ -647,7 +703,7 @@ namespace CampusLogicEvents.Web.Models
                 else
                 {
                     FileStoreManager documentManager = new FileStoreManager();
-                    if (!documentManager.ValidateDirectory(settings.FileStorePath))
+                    if (!ValidateConfiguredDirectory(documentManager, settings.FileStorePath))
                     {
                         throw new Exception();
                     }
@@ -693,7 +749,7 @@ namespace CampusLogicEvents.Web.Models
                 else
                 {
                     FileStoreManager documentManager = new FileStoreManager();
-                    if (!documentManager.ValidateDirectory(settings.AwardLetterPrintFilePath))
+                    if (!ValidateConfiguredDirectory(documentManager, settings.AwardLetterPrintFilePath))
                     {
                         throw new Exception();
                     }
@@ -731,7 +787,7 @@ namespace CampusLogicEvents.Web.Models
                         else
                         {
                             FileStoreManager documentManager = new FileStoreManager();
-                            if (!documentManager.ValidateDirectory(path))
+                            if (!ValidateConfiguredDirectory(documentManager, path))
                             {
                                 throw new Exception();
                             }

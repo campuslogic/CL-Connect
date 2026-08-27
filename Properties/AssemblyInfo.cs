@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("CampusLogicEvents.Web")]
-[assembly: AssemblyDescription("Build: 4.0.22.41665 - Commit: 41389")]
+[assembly: AssemblyDescription("Build: 4.0.23.48785 - Commit: 2b96439ade6d623376623579b15aef6200650deb")]
 [assembly: AssemblyConfiguration("release")]
 [assembly: AssemblyCompany("CampusLogic")]
 [assembly: AssemblyProduct("CL Connect")]
@@ -30,6 +30,6 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("4.0.22")]
-[assembly: AssemblyFileVersion("4.0.22.0")]
-[assembly: AssemblyInformationalVersion("4.0.22.0")]
+[assembly: AssemblyVersion("4.0.23")]
+[assembly: AssemblyFileVersion("4.0.23.0")]
+[assembly: AssemblyInformationalVersion("4.0.23.0")]

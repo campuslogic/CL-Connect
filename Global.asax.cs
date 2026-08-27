@@ -40,8 +40,8 @@ namespace CampusLogicEvents.Web
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            // Allow TLS 1.0, 1.1 and 1.2 for outbound requests
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11;
+            // Allow 1.2 for outbound requests
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
         }
 
         protected void Application_End()

@@ -1,0 +1,576 @@
+/* ============================================================================
+   Content/app.css — the front end's own styles. Loaded in the ~/Content/css bundle, after
+   Site.css and before bootstrap.min.css.
+
+   EVERYTHING HERE THAT MUST OUTRANK BOOTSTRAP OR Site.css DOES SO ON SPECIFICITY, not on source
+   order, so the relationships hold wherever the bundle puts this file.
+
+   Contents
+     1. [hidden] — a correctness requirement, not styling
+     2. Busy overlay            (core/overlay.js)
+     3. Step error message      (the #stepError element pages/shell.js fills)
+     4. Days-of-week picker     (components/daysPicker.js)
+     5. Modals                  (core/modal.js, native <dialog>)
+     6. Checkbox                (the k-checkbox / k-checkbox-label classes the views still use)
+     7. Folder tree             (components/tree.js)
+     8. Folder picker           (components/folderPicker.js — the custom element's display)
+     9. Native popovers         (ISIRCorrection's seven help bubbles)
+    10. Classes the views use that nothing defines — and why they stay undefined
+    11. Native form validation  (what makes the "Required" messages work)
+    12. Grids                   (the read-only <table class="cl-grid"> every grid page renders)
+   ========================================================================== */
+
+/* --- 1. [hidden] -----------------------------------------------------------
+   Showing and hiding is `el.hidden = …` throughout the app — the 21 wizard step links, the 11
+   save banners, the conditional field groups, every JS-driven message. The user-agent rule
+   `[hidden] { display:none }` LOSES to any author rule, and these are applied to Bootstrap
+   `.row`, `.nav-link` and `.alert` elements, whose own `display` would win. Without this rule
+   hiding is silently inert on all of them. This is correctness, not cosmetics. */
+[hidden] {
+    display: none !important;
+}
+
+/* --- 2. Busy overlay -----------------------------------------------------
+   A FULLY TRANSPARENT blocker — it blocks input and darkens nothing — plus a 250px centred box at
+   70% opacity. core/overlay.js supplies the behaviour and this is all of the appearance. */
+.cl-busy {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: #000;
+    opacity: 0;                 /* overlayCSS opacity: 0.0 — intentionally invisible */
+    cursor: wait;
+}
+
+.cl-busy-box {
+    position: fixed;
+    top: 40%;
+    left: calc(50% - 125px);
+    width: 250px;
+    z-index: 2011;              /* baseZ + 11 */
+    margin: 0;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: #000;
+    color: #fff;
+    text-align: center;
+    cursor: wait;
+    opacity: 0;
+    transition: opacity 100ms linear;   /* fadeIn: 100 */
+}
+
+.cl-busy-box.is-in {
+    opacity: .7;                /* cssCenterBlock opacity */
+}
+
+.cl-busy-box:not(.is-in) {
+    transition-duration: 400ms; /* fadeOut: 400 */
+}
+
+.cl-busy-msg {
+    height: 150px;              /* the original message div height */
+}
+
+.cl-busy-box h2 {
+    margin: 0;
+    color: #fff;
+    text-align: center;
+}
+
+/* One element, not thirteen dots: steps(13) gives the stepped rotation. */
+.cl-spinner {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 8px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg,
+        rgba(255, 255, 255, 0) 0deg 90deg,
+        rgba(255, 255, 255, .25) 90deg,
+        #fff 360deg);
+    -webkit-mask: radial-gradient(farthest-side, transparent 58%, #000 59%);
+            mask: radial-gradient(farthest-side, transparent 58%, #000 59%);
+    animation: cl-spin 1s steps(13) infinite;
+}
+
+@keyframes cl-spin {
+    to { transform: rotate(1turn); }
+}
+
+/* --- 3. Step error message ----------------------------------------------
+   Replaces the old corner toasts. A step whose validator can throw carries one
+   `<... class="alert alert-danger cl-step-error" id="stepError" hidden>`; pages/shell.js fills its
+   textContent from validation.state.stepErrors on every repaint. Bootstrap's .alert supplies the
+   colours, so this section only fixes the layout of the two forms the element takes: an inline
+   <span> beside a Test button (Credentials, SMTP), and a full-width <div> under the rule
+   (Documents, File Store). Hiding is `el.hidden`, which §1 above makes stick on .alert. */
+.cl-step-error {
+    word-wrap: break-word;
+}
+
+div.cl-step-error {
+    margin-bottom: 10px;
+}
+
+/* --- 4. Days-of-week picker --------------------------------------------
+   Site.css has aggressive element rules that fight this component:
+     label { display:block; font-size:1.2em; font-weight:600 }
+     input { border:1px solid #e2e2e2; font-size:1.2em; margin:5px 0 6px; padding:5px }
+     @media (max-width:850px) { input { width:90% } }
+   Two classes beat an element selector at every breakpoint, so no media query is needed here. */
+.cl-days {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .25rem 1rem;
+}
+
+.cl-days .cl-days-item {
+    display: inline-flex;
+    align-items: center;
+    gap: .25rem;
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 400;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.cl-days .cl-check {
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+    padding: 0;
+    flex: none;
+}
+
+/* [data-empty] on the fieldset is a styling hook for pages; intentionally unstyled here. */
+
+/* --- 5. Modals ---------------------------------------------------------
+   Each caller passes a windowClass ("show modal-medium", "modal-wide show", "full-screen-modal
+   show") which lands on the <dialog>. Site.css defines .modal-medium / .modal-wide targeting a
+   descendant .modal-dialog, so the rules below are dialog-scoped twins of those. `show` is a
+   Bootstrap 3 leftover with no rule anywhere and stays undefined. */
+dialog.cl-modal {
+    max-width: 90vw;
+    max-height: 90vh;
+    padding: 0;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+    background: #fff;
+    color: #333;
+}
+
+dialog.cl-modal::backdrop {
+    background: rgba(0, 0, 0, .5);
+}
+
+dialog.cl-modal .modal-dialog {
+    margin: 0;
+    max-width: none;
+    pointer-events: auto;
+}
+
+dialog.cl-modal .modal-content {
+    border: 0;
+    padding: 15px;
+}
+
+dialog.modal-medium {
+    width: 600px;
+}
+
+dialog.modal-wide {
+    width: 90vw;
+}
+
+/* A native <dialog> has no Bootstrap .modal-dialog to inherit sizing from, so without this the
+   folder picker would shrink-wrap to its content. */
+dialog.full-screen-modal {
+    width: 90vw;
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+}
+
+dialog.full-screen-modal .modal-dialog,
+dialog.full-screen-modal .modal-content {
+    flex: 1;
+    min-height: 0;
+}
+
+dialog.full-screen-modal .modal-body {
+    flex: 1;
+    overflow: auto;
+}
+
+/* --- 6. Checkbox -------------------------------------------------------
+   The views still spell these classes in markup — class="k-checkbox" on the input and
+   class="k-checkbox-label" on its label — so the names stay even though the theme they came from
+   is gone. This is now the whole definition, sizing included.
+
+   The native input is NOT hidden: the class goes on the <input> itself with appearance:none and an
+   SVG check on :checked. */
+.k-checkbox,
+.cl-check {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    width: 1rem;                /* k-checkbox-md */
+    height: 1rem;
+    line-height: initial;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;      /* k-rounded-md */
+    background-color: #fff;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    display: inline-block;
+    flex: none;
+    vertical-align: middle;
+    position: relative;
+    cursor: pointer;
+    outline: 0;
+    -webkit-appearance: none;
+            appearance: none;
+}
+
+.k-checkbox:checked,
+.cl-check:checked {
+    border-color: #0d6efd;
+    background-color: #0d6efd;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e");
+}
+
+.k-checkbox:focus,
+.cl-check:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .25);
+}
+
+.k-checkbox:checked:focus,
+.cl-check:checked:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .25);
+}
+
+.k-checkbox:disabled,
+.cl-check:disabled {
+    outline: none;
+    cursor: default;
+    opacity: .65;
+    filter: grayscale(.1);
+    pointer-events: none;
+    box-shadow: none;
+}
+
+/* Defeats Site.css's `label { display:block }`. The views place the label immediately after the
+   input, so the SIBLING rule is the one that applies and the effective display is `inline`, not
+   `inline-flex`. Both rules are kept, in this order. Deliberately does NOT reset
+   font-size/font-weight: these labels inherit 1.2em/600 from Site.css and must keep doing so. */
+.k-checkbox-label {
+    margin: 0;
+    padding: 0;
+    display: inline-flex;
+    align-items: flex-start;
+    gap: .25rem;
+    vertical-align: middle;
+    position: relative;
+    cursor: pointer;
+}
+
+.k-checkbox + .k-checkbox-label {
+    display: inline;
+    margin-inline-start: .25rem;
+}
+
+.k-checkbox-label:empty {
+    display: none !important;
+}
+
+/* --- 7. Folder tree (components/tree.js) -------------------------------
+   The whole visual definition of the control. Its dialog is sized at §5, and .cl-tree-frame
+   supplies the scroll box: the tree can be arbitrarily deep and the dialog must not grow with it. */
+.cl-tree-frame {
+    max-height: 60vh;
+    overflow: auto;
+    border: 1px solid #e2e2e2;
+    border-radius: 4px;
+    padding: .5rem;
+    background: #fff;
+}
+
+.cl-tree,
+.cl-tree .cl-tree-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Indentation is per level and comes from nesting, so depth needs no class or inline style. */
+.cl-tree .cl-tree-list .cl-tree-list {
+    padding-left: 1.25rem;
+}
+
+.cl-tree-item > .cl-tree-line {
+    display: flex;
+    align-items: center;
+    gap: .25rem;
+    padding: 1px 2px;
+    border-radius: 3px;
+}
+
+.cl-tree-item.is-selected > .cl-tree-line {
+    background: #cde8ff;
+}
+
+.cl-tree-item > .cl-tree-line:hover {
+    background: #ebf5ff;
+}
+
+/* Both controls are <button>s so they are keyboard reachable. Site.css styles button heavily, so
+   every inherited property has to be reset explicitly. */
+.cl-tree-toggle,
+.cl-tree-label {
+    background: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.cl-tree-toggle {
+    width: 1rem;
+    flex: none;
+    color: #6c757d;
+    line-height: 1;
+}
+
+/* The caret is a border triangle rather than a font glyph, so it needs no icon font. */
+.cl-tree-toggle::before {
+    content: "";
+    display: inline-block;
+    border: .3rem solid transparent;
+    border-left-color: currentColor;
+    border-right-width: 0;
+    transform: translateY(-1px);
+}
+
+.cl-tree-item[aria-expanded="true"] > .cl-tree-line > .cl-tree-toggle::before {
+    transform: rotate(90deg) translateX(-1px);
+}
+
+/* Collapsing only flips aria-expanded — a loaded subtree stays in the DOM so it is not refetched
+   (see tree.js), so the collapsed state has to be what hides it. The error box is deliberately not
+   hidden: a failed expand also sets aria-expanded="false", and the Retry row must survive that. */
+.cl-tree-item[aria-expanded="false"] > .cl-tree-list,
+.cl-tree-item[aria-expanded="false"] > .cl-tree-empty {
+    display: none;
+}
+
+/* EVERY node claims children, because the server computes hasChildren as "is this a directory",
+   so an empty folder can only be discovered by expanding it. Hence a visible empty state. */
+.cl-tree-empty {
+    padding-left: 1.5rem;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Every server-side failure is an indistinguishable bodiless 417, so the message can only name the
+   folder it could not read. */
+.cl-tree-error {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .125rem 0 .125rem 1.5rem;
+    color: #a94442;
+}
+
+.cl-tree-retry {
+    background: none;
+    border: 1px solid currentColor;
+    border-radius: 3px;
+    padding: 0 .35rem;
+    font: inherit;
+    font-size: .85em;
+    color: inherit;
+    cursor: pointer;
+}
+
+.cl-tree.is-busy > .cl-tree-list,
+.cl-tree-item.is-busy > .cl-tree-list {
+    opacity: .6;
+}
+
+/* --- 8. Folder picker (components/folderPicker.js) ---------------------
+   FolderPicker.cshtml already carries the Bootstrap classes that lay the picker out. The only thing
+   needed here is to stop the custom element being display:inline — an unknown element defaults to
+   inline, and the two .row children inside would then not take the element's col-lg-* width. */
+cl-folder-picker,
+cl-days-picker,
+cl-tree {
+    display: block;
+}
+
+/* --- 9. Native popovers (ISIRCorrection's seven help bubbles) ----------
+   The browser supplies the top layer, light dismiss and Esc, and :popover-open is what makes one
+   visible — so there is no JavaScript and no class toggling. Bootstrap's own .popover rules are
+   present but have never styled these. */
+.cl-popover[popover] {
+    width: max-content;
+    max-width: 20rem;
+    margin: auto; /* with the UA's inset:0, this is what centres the bubble in the viewport */
+    padding: .5rem .75rem;
+    border: 1px solid rgba(0, 0, 0, .2);
+    border-radius: 6px;
+    background: #fff;
+    box-shadow: 0 5px 12px rgba(0, 0, 0, .18);
+    font-size: .95rem;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #333;
+}
+
+/* The trigger is a <button> so it is keyboard reachable; these rules keep it looking like the bare
+   icon it is. Site.css's button rules are aggressive, hence the full reset. */
+.cl-help {
+    background: none;
+    border: 0;
+    padding: 0 0 0 .25rem;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    line-height: inherit;
+    cursor: pointer;
+    vertical-align: baseline;
+}
+
+/* --- 10. Undefined-on-purpose ------------------------------------------
+   form-required  About 20 views use <span class="form-required">*</span>, plus one
+                  <b class="form-required">* = Required</b> in the wizard shell. NO stylesheet
+                  defines it. Styling it would change ~20 pages at once, so it is a product
+                  decision and belongs in its own commit.
+   full-width     Site.css already has `#myWizard.full-width { width:100% }`, and #myWizard is the
+                  only element carrying the class, so a bare .full-width rule would be a no-op today
+                  and a trap for future markup.
+   show           Bootstrap 3 leftover passed in windowClass; no rule anywhere.
+   col-md-offset-1  Bootstrap 3; does nothing under Bootstrap 5.
+   ====================================================================== */
+
+/* --- 11. Native form validation ------------------------------------------
+   THIS SECTION IS WHY THERE IS NO VALIDATION STATE IN JAVASCRIPT. Every "Required" message in the
+   app is decided by two things the browser already tracks:
+
+     :user-invalid  matches only after the user has interacted with a failing control — that is the
+                    pseudo-class's whole purpose — so an untouched empty field stays silent.
+     .show-errors   is the other half. The wizard must ALSO light up untouched fields when a page is
+                    already known to be invalid, because entering a step runs its validator and Save
+                    runs all of them. pages/shell.js puts this class on the view root whenever the
+                    current step's validation flag is false. See core/model.js showErrors().
+
+   TWO KINDS OF MESSAGE, and the distinction is the class, not where the markup sits:
+
+     .cl-required         the BROWSER decides. Hidden by default, revealed by the rules below.
+     bare span + hidden   JAVASCRIPT decides — a uniqueness check, a permissions test result, a
+                          days-picker count, none of which a constraint can express. §1's
+                          `[hidden] { display:none !important }` keeps those authoritative.
+
+   .cl-required NORMALLY SITS RIGHT AFTER ITS CONTROL, which is all the first rule needs. Where the
+   markup puts it elsewhere — Credentials wraps its input in a column div, the folder picker groups
+   both its messages in a .pull-right — mark the nearest element containing both with .cl-field and
+   the second rule reaches inside.
+
+   Requires :user-invalid and :has(). The app already relies on native popover, which is newer than
+   both. There is no IE target. */
+.cl-required {
+    display: none;
+}
+
+:is(input, select, textarea):user-invalid + .cl-required,
+.show-errors :is(input, select, textarea):invalid + .cl-required {
+    display: inline;
+}
+
+/* Exactly one control per .cl-field, so :has() is unambiguous. */
+.cl-field:has(:user-invalid) .cl-required,
+.show-errors .cl-field:has(:invalid) .cl-required {
+    display: inline;
+}
+
+/* --- 12. Grids --------------------------------------------------------
+   Every grid in this app is a read-only list with an Edit and a Delete button per row, so each is a
+   plain <table class="cl-grid"> rendered by its page module. This is the whole visual definition.
+
+   NOT named .table, and NOT namespaced further: Bootstrap's .table sets its own padding,
+   border-collapse and --bs-table-* variables, and mixing the two would leave these values fighting
+   rules from another stylesheet. .cl-grid owns its entire appearance.
+
+   No column resize or reorder handles and no sort indicators, because no grid here is sortable; the
+   table sizes to its content rather than to a fixed width per column. */
+.cl-grid {
+    width: 100%;
+    border: 1px solid #dee2e6;
+    border-collapse: collapse;
+    background-color: #fff;
+    color: #212529;
+    line-height: 1.5;
+}
+
+.cl-grid th,
+.cl-grid td {
+    padding: .5rem;
+    border-left: 1px solid #dee2e6;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.cl-grid th:first-child,
+.cl-grid td:first-child {
+    border-left: 0;
+}
+
+.cl-grid thead th {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    font-weight: 600;
+}
+
+/* Striping and hover apply to the body only, never the header. */
+.cl-grid tbody tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, .04);
+}
+
+.cl-grid tbody tr:hover {
+    background-color: rgba(0, 0, 0, .08);
+}
+
+/* The command column. The buttons set the height, so the cell only needs to stop the browser
+   giving this column a share of the spare width. */
+.cl-grid .cl-grid-commands {
+    width: 120px;
+    white-space: nowrap;
+}
+
+/* "No records available." is a real <tr> built by pages/grid.js, not a pseudo-element, so a screen
+   reader announces it and the string lives in one place rather than in this stylesheet. */
+.cl-grid .cl-grid-empty {
+    text-align: center;
+    color: #6c757d;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cl-spinner {
+        animation-duration: 3s;
+        animation-timing-function: linear;
+    }
+
+    .cl-busy-box {
+        transition: none;
+    }
+}

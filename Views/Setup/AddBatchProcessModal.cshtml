@@ -1,15 +1,16 @@
-﻿<div class="modal-header"><h4>{{modalType}} {{displayName}} Batch Process</h4></div>
+﻿
+<div class="modal-header"><h4 id="batchProcessModalTitle"></h4></div>
 <div class="modal-body">
-    <form ng-if="typeName == 'awardLetterPrint'">
+    <form id="awardLetterPrintFields" hidden>
         <div class="row padding-bottom-ten">
             <div class="col-lg-4 text-right">
                 <label class="control-label">Batch Name</label>
             </div>
             <div class="col-lg-8">
-                <input type="text" class="form-control" id="batchName" name="batchName" ng-model="modelCopy.batchName" required />
-                <span class="field-validation-error" ng-show="batchNameValidation == true">Required</span>
-                <span class="field-validation-error" ng-show="batchNameDuplicateValidation == true">No two batch processes of the same type may have the same name</span>
-                <span class="field-validation-error" ng-show="batchNameLengthValidation == true">Name cannot be longer than 25 characters</span>
+                <input type="text" class="form-control" id="batchName" name="batchProcess.batchName" required />
+                <span class="field-validation-error" id="batchNameRequired" hidden>Required</span>
+                <span class="field-validation-error" id="batchNameDuplicate" hidden>No two batch processes of the same type may have the same name</span>
+                <span class="field-validation-error" id="batchNameLength" hidden>Name cannot be longer than 25 characters</span>
             </div>
         </div>
         <div class="row padding-bottom-ten">
@@ -17,9 +18,9 @@
                 <label class="control-label">Max Batch Size</label>
             </div>
             <div class="col-lg-8">
-                <input type="text" id="maxBatchSize" name="maxBatchSize" kendo-numeric-text-box k-format="'n0'" k-min="1" k-max="200" ng-model="modelCopy.maxBatchSize" required /><br />
-                <span class="field-validation-error" ng-show="maxBatchSizeValidation == true">Required</span>
-                <span class="field-validation-error" ng-show="batchSizeWithIndexValidation == true">Max Batch Size must be 1 when Index File is enabled</span>
+                <input type="number" class="form-control" id="maxBatchSize" name="batchProcess.maxBatchSize" min="1" max="200" step="1" required /><br />
+                <span class="field-validation-error" id="maxBatchSizeRequired" hidden>Required</span>
+                <span class="field-validation-error" id="batchSizeWithIndex" hidden>Max Batch Size must be 1 when Index File is enabled</span>
             </div>
         </div>
         <div class="row padding-bottom-ten">
@@ -27,7 +28,7 @@
                 <label class="control-label">File Path</label>
             </div>
             <div class="col-lg-8">
-                <cl-folder-picker class="col-lg-7" isrequired="true" formvalid="validationService.pageValidations.batchProcessingSettingsValid" uploadpath="modelCopy.filePath"></cl-folder-picker>
+                <cl-folder-picker class="col-lg-7" required data-path="batchProcess.filePath"></cl-folder-picker>
             </div>
         </div>
         <div class="row padding-bottom-ten">
@@ -35,7 +36,7 @@
                 <label class="control-label">File Name Format</label>
             </div>
             <div class="col-lg-8">
-                <input type="text" class="form-control" id="fileNameFormat" name="fileNameFormat" ng-model="modelCopy.fileNameFormat" />
+                <input type="text" class="form-control" id="fileNameFormat" name="batchProcess.fileNameFormat" />
             </div>
         </div>
         <div class="row padding-bottom-ten">
@@ -43,8 +44,8 @@
                 <label class="control-label">Batch Execution Minutes</label>
             </div>
             <div class="col-lg-8">
-                <input type="text" id="batchExecutionMinutes" name="batchExecutionMinutes" kendo-numeric-text-box k-format="'n0'" k-min="1" ng-model="modelCopy.batchExecutionMinutes" required />
-                <span class="field-validation-error" ng-show="batchExecutionMinutesValidation == true">Required</span>
+                <input type="number" class="form-control" id="batchExecutionMinutes" name="batchProcess.batchExecutionMinutes" min="1" step="1" required />
+                <span class="field-validation-error" id="batchExecutionMinutesRequired" hidden>Required</span>
             </div>
         </div>
         <div class="row padding-bottom-ten">
@@ -52,24 +53,24 @@
                 <label class="control-label">Index File</label>
             </div>
             <div class="col-lg-8">
-                <input type="radio" ng-value="true" ng-model="modelCopy.indexFileEnabled" style="width: 20px">Yes
-                <input type="radio" ng-value="false" ng-model="modelCopy.indexFileEnabled" style="width: 20px">No
+                <input type="radio" name="batchProcess.indexFileEnabled" value="true" style="width: 20px">Yes
+                <input type="radio" name="batchProcess.indexFileEnabled" value="false" style="width: 20px">No
             </div>
         </div>
-        <div ng-if="modelCopy.indexFileEnabled">
+        <div id="fileDefinitionNameRow" hidden>
             <div class="row padding-bottom-ten">
                 <div class="col-lg-4 text-right">
                     <label class="control-label">File Definition Name</label>
                 </div>
                 <div class="col-lg-8">
-                    <input type="text" class="form-control" id="fileDefinitionName" name="fileDefinitionName" ng-model="modelCopy.fileDefinitionName" />
-                    <span class="field-validation-error" ng-show="batchFileDefinitionNameValidation == true">Required</span>
+                    <input type="text" class="form-control" id="fileDefinitionName" name="batchProcess.fileDefinitionName" />
+                    <span class="field-validation-error" id="fileDefinitionNameRequired" hidden>Required</span>
                 </div>
             </div>
         </div>
     </form>
 </div>
 <div class="modal-footer">
-    <input type="button" id="button-field-search-cancel" class="btn btn-light" value="Cancel" ng-click="$dismiss()" />
-    <input type="button" id="button-field-search-save" class="btn btn-primary" value="Save" ng-click="save()" />
+    <input type="button" id="button-field-search-cancel" class="btn btn-light" value="Cancel" data-action="cancel" />
+    <input type="button" id="button-field-search-save" class="btn btn-primary" value="Save" data-action="save" />
 </div>

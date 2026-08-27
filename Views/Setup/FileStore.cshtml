@@ -1,7 +1,7 @@
 ﻿@{
     Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
 }
-<form name="vm.fileStoreForm">
+<form name="fileStoreForm" novalidate>
     <h2>
         <b>File Store Settings</b>
     </h2>
@@ -11,11 +11,12 @@
         For additional help on this page please see <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_int_event_notes_file_store.html" target="_blank">File Store Help.</a>
     </section>
     <hr>
+    <div class="alert alert-danger cl-step-error" role="alert" id="stepError" hidden></div>
     <div class="row padding-bottom-ten">
         <div class="col-lg-8">
             <div class="form-group">
                 <label><span class="form-required" aria-hidden="true">*</span>File Store Path</label>
-                <cl-folder-picker class="col-lg-7" isrequired="true" formvalid="validationService.pageValidations.fileStoreSettingsValid" uploadpath="vm.service.configurationModel.campusLogicSection.fileStoreSettings.fileStorePath"></cl-folder-picker>
+                <cl-folder-picker class="col-lg-7" required data-path="campusLogicSection.fileStoreSettings.fileStorePath"></cl-folder-picker>
             </div>
         </div>
     </div>
@@ -23,8 +24,8 @@
         <div class="col-lg-8">
             <label class="control-label" for="fileStoreMinutes"><span class="form-required" aria-hidden="true">*</span>File Store Minutes</label><br />
             <div class="col-lg-2">
-                <input type="text" id="fileStoreMinutes" name="fileStoreMinutes" kendo-numeric-text-box k-format="'n0'" k-min="1" ng-model="vm.service.configurationModel.campusLogicSection.fileStoreSettings.fileStoreMinutes" required /><br />
-                <span class="field-validation-error" ng-show="(vm.fileStoreForm.fileStoreMinutes.$dirty || vm.service.pageValidations.fileStoreSettingsValid == false) && vm.fileStoreForm.fileStoreMinutes.$error.required">Required</span>
+                <input type="number" id="fileStoreMinutes" name="campusLogicSection.fileStoreSettings.fileStoreMinutes" min="1" step="1" required /><br />
+                <span class="field-validation-error cl-required">Required</span>
             </div>
         </div>
     </div>
@@ -32,8 +33,8 @@
     <div class="row padding-bottom-ten">
         <div class="col-lg-8">
             <label class="control-label" for="fileDefinitionName"><span class="form-required" aria-hidden="true">*</span>File Definition Name</label><br />
-            <input type="text" id="fileDefinitionName" name="fileDefinitionName" ng-model="vm.service.configurationModel.campusLogicSection.fileStoreSettings.fileDefinitionName" required /><br />
-            <span class="field-validation-error" ng-show="(vm.fileStoreForm.fileDefinitionName.$dirty || vm.fileStoreSettingsValid == false) && vm.fileStoreForm.fileDefinitionName.$error.required">Required</span>
+            <input type="text" id="fileDefinitionName" name="campusLogicSection.fileStoreSettings.fileDefinitionName" required /><br />
+            <span class="field-validation-error cl-required">Required</span>
         </div>
     </div>
 </form>

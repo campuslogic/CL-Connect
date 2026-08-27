@@ -6,9 +6,7 @@
     <meta name="viewport" content="width=device-width"/>
     <title>@ViewBag.Title</title>
     @Styles.Render("~/Content/css")
-    @Styles.Render("~/Content/kendo/css")
-    @Styles.Render("~/Content/toastr")
-    @Scripts.Render("~/bundles/modernizr")
+    @Styles.Render("~/Content/fontawesome/css")
 </head>
 <body>
 <header>
@@ -28,11 +26,6 @@
     </div>
 </header>
     @RenderBody()
-    @Scripts.Render("~/Content/bootstrap")
-    @Scripts.Render("~/Content/js")
-    @Scripts.Render("~/Content/angular")
-    @Scripts.Render("~/bundles/clConnectmain")
-    @Scripts.Render("~/bundles/clConnectsetup")
     @RenderSection("scripts", required: false)
 </body>
 </html>

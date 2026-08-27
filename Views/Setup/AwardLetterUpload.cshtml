@@ -1,15 +1,15 @@
-﻿@{
+@{
     Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
 }
 <form class="form-horizontal" name="awardLetterUploadForm" novalidate>
     <h2>
-        <b>AwardLetter Upload</b>
+        <b>Communication Upload</b>
     </h2>
     <section>
-        This step will allow you to select the configurations for the Award Letter Upload process.
+        This step will allow you to select the configurations for the Communication Upload process.
         If the file path you wish to use is not available for selection, you may also enter the path below.
         For assistance in giving appropriate file path permissions, please click <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_set_file_permissions.html" target="_blank">File Path Permissions.</a>
-        For further detail on the Award Letter Upload section please click <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_configure_cc_uploads.html/" target="_blank">AwardLetter Upload Details.</a>
+        For further detail on the Communication Upload section please click <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_configure_cc_uploads.html/" target="_blank">Communication Upload Details.</a>
     </section>
     <hr>
     <div class="row padding-top-ten">
@@ -17,7 +17,7 @@
             <div class="row form-group mb-3">
                 <label class="col-lg-5 control-label"><span class="form-required" aria-hidden="true">* </span>Upload Frequency</label>
                 <div class="col-lg-7 ">
-                    <select required kendo-drop-down-list name="uploadFrequencyType" ng-model="vm.service.configurationModel.campusLogicSection.awardLetterUploadSettings.awardLetterUploadFrequencyType">
+                    <select required class="form-select" name="campusLogicSection.awardLetterUploadSettings.awardLetterUploadFrequencyType">
                         <option value="daily">Daily</option>
                         <option value="weekly">Weekly</option>
                         <option value="minutes">Minutely</option>
@@ -28,23 +28,23 @@
             <div class="form-group row mb-3 padding-top-one-hundred">
                 <label class="col-lg-5 control-label"><span class="form-required" aria-hidden="true">* </span>Days to Run</label>
                 <div class="col-lg-7 ">
-                    <select kendo-multi-select k-options="vm.daysToRunOptions" k-ng-model="vm.service.configurationModel.campusLogicSection.awardLetterUploadSettings.awardLetterUploadDaysToRun"></select>
-                    <span class="field-validation-error" ng-show="vm.service.configurationModel.campusLogicSection.awardLetterUploadSettings.awardLetterUploadDaysToRun.length <= 0">Required</span>
+                    <cl-days-picker name="awardLetterUploadDaysToRun" data-path="campusLogicSection.awardLetterUploadSettings.awardLetterUploadDaysToRun"></cl-days-picker>
+                    <span class="field-validation-error cl-days-required" hidden>Required</span>
                 </div>
             </div>
         </div>
         <div class="col-lg-7">
             <div class="row form-group mb-3">
                 <label class="col-lg-3 control-label "><span class="form-required" aria-hidden="true">* </span>Upload Path</label>
-                <cl-folder-picker class="col-lg-7" isrequired="true" formvalid="validationService.pageValidations.awardLetterUploadValid" uploadpath="vm.service.configurationModel.campusLogicSection.awardLetterUploadSettings.awardLetterUploadFilePath"></cl-folder-picker>
+                <cl-folder-picker class="col-lg-7" required data-path="campusLogicSection.awardLetterUploadSettings.awardLetterUploadFilePath"></cl-folder-picker>
                 <div class="padding-five col-lg-12 offset-lg-3">
-                    <input type="checkbox" id="chekcSubDir" class="k-checkbox" ng-model="vm.service.configurationModel.campusLogicSection.awardLetterUploadSettings.awardLetterUploadCheckSubDirectories">
+                    <input type="checkbox" id="chekcSubDir" class="k-checkbox" name="campusLogicSection.awardLetterUploadSettings.awardLetterUploadCheckSubDirectories">
                     <label class="k-checkbox-label" for="chekcSubDir" data-toggle="tooltip" data-trigger="mouseenter" data-placement="right" title="Check sub-folders of the upload path for files to upload. The archive path is excluded.">Check Sub-Folders</label>
                 </div>
             </div>
             <div class="row form-group mb-3">
                 <label class="col-lg-3 control-label "><span class="form-required" aria-hidden="true">* </span>Archive Path</label>
-                <cl-folder-picker class="col-lg-7" isrequired="true" formvalid="validationService.pageValidations.awardLetterUploadValid" uploadpath="vm.service.configurationModel.campusLogicSection.awardLetterUploadSettings.awardLetterArchiveFilePath"></cl-folder-picker>
+                <cl-folder-picker class="col-lg-7" required data-path="campusLogicSection.awardLetterUploadSettings.awardLetterArchiveFilePath"></cl-folder-picker>
             </div>
         </div>
     </div>

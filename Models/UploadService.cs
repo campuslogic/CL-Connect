@@ -15,7 +15,7 @@ namespace CampusLogicEvents.Web.Models
         /// <summary>
         /// File Upload - Run on a scheduled basis.  Configured in the Startup.cs and the web.config
         /// Checks specified folder to see if files are present, if so uploads and moves to archive
-        /// --This currently works for both ISIR Upload and Award Letter
+        /// --This currently works for both ISIR Upload and Communication Upload
         /// </summary>
         [AutomaticRetry(Attempts = 0)]
         public static void Upload(UploadSettings uploadSettings)
