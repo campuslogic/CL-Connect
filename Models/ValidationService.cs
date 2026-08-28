@@ -486,6 +486,17 @@ namespace CampusLogicEvents.Web.Models
             const string FileStoreAndDocumentRetrieval = "FileStoreAndDocumentRetrieval";
             const string BatchProcessingAwardLetterPrint = "BatchProcessingAwardLetterPrint";
             const string ApiIntegration = "ApiIntegration";
+            var acceptedHandleMethods = new List<string>
+            {
+                DatabaseCommandNonQuery,
+                DatabaseStoredProcedure,
+                DocumentRetrievalAndStoredProc,
+                DocumentRetrievalAndNonQuery,
+                FileStore,
+                FileStoreAndDocumentRetrieval,
+                BatchProcessingAwardLetterPrint,
+                ApiIntegration
+            };
 
             try
             {
@@ -501,10 +512,11 @@ namespace CampusLogicEvents.Web.Models
                     }
 
                     var handleMethod = eventNotification.HandleMethod;
+                    
 
-                    if (string.IsNullOrWhiteSpace(handleMethod))
+                    if (string.IsNullOrWhiteSpace(handleMethod) || !acceptedHandleMethods.Contains(handleMethod))
                     {
-                        throw new Exception($"Event notification {eventNotification.EventNotificationId} is missing its handle method.");
+                        throw new Exception($"Event notification {eventNotification.EventNotificationId} is missing its handle method or the handle method is not accepted.");
                     }
 
                     if (handleMethod == DatabaseCommandNonQuery
