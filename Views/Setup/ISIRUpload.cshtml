@@ -12,10 +12,10 @@
     </section>
     <hr>
     <div class="row padding-top-ten">
-        <div class="col-lg-6">
+        <div class="col-lg-5">
             <div class="row form-group mb-3">
                 <label class="col-lg-5 control-label"><span class="form-required" aria-hidden="true">* </span>Upload Frequency</label>
-                <div class="col-lg-7 no-gutter">
+                <div class="col-lg-7">
                     <select required class="form-select" name="campusLogicSection.isirUploadSettings.isirUploadFrequencyType">
                         <option value="daily">Daily</option>
                         <option value="weekly">Weekly</option>
@@ -24,15 +24,15 @@
                     </select>
                 </div>
             </div>
-            <div class="form-group padding-top-one-hundred">
+            <div class="row form-group mb-3 padding-top-one-hundred">
                 <label class="col-lg-5 control-label"><span class="form-required" aria-hidden="true">* </span>Days to Run</label>
-                <div class="col-lg-7 no-gutter">
+                <div class="col-lg-7">
                     <cl-days-picker name="isirUploadDaysToRun" data-path="campusLogicSection.isirUploadSettings.isirUploadDaysToRun"></cl-days-picker>
                     <span class="field-validation-error cl-days-required" hidden>Required</span>
                 </div>
             </div>
         </div>
-        <div class="col-lg-6">
+        <div class="col-lg-7">
             <div class="row form-group mb-3">
                 <label class="col-lg-3 control-label no-gutter"><span class="form-required" aria-hidden="true">* </span>Upload Path</label>
                 <cl-folder-picker class="col-lg-9" required data-path="campusLogicSection.isirUploadSettings.isirUploadFilePath"></cl-folder-picker>

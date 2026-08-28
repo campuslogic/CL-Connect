@@ -647,6 +647,7 @@ namespace CampusLogicEvents.Web.WebAPI
                 if (response.DuplicateEvent || response.DuplicatePath
                     || !response.EnvironmentValid
                     || !response.ApiCredentialsValid
+                    || !response.ApplicationSettingsValid
                     || (response.SMTPValid != null && (bool)!response.SMTPValid)
                     || (response.ISIRUploadValid != null && (bool)!response.ISIRUploadValid)
                     || (response.AwardLetterUploadValid != null && (bool)!response.AwardLetterUploadValid)
@@ -662,7 +663,6 @@ namespace CampusLogicEvents.Web.WebAPI
                     || (response.StoredProcedureValid != null && (bool)!response.StoredProcedureValid)
                     || (response.FileDefinitionSettingsValid != null && (bool)!response.FileDefinitionSettingsValid)
                     || (response.PowerFaidsSettingsValid != null && (bool)!response.PowerFaidsSettingsValid)
-                    || !response.ApiCredentialsValid
                     || response.InvalidBatchName
                     || response.MissingBatchName
                     || response.MissingApiEndpointName
