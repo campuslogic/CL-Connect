@@ -69,7 +69,7 @@ stepRoute('/powerfaids', 'setup/powerfaids', () => import('./pages/powerFaids.js
 stepRoute('/storedprocedure', 'setup/storedprocedure', () => import('./pages/storedProcedure.js'));
 stepRoute('/filedefinitions', 'setup/filedefinitions', () => import('./pages/fileDefinitions.js'));
 stepRoute('/document', 'setup/document', () => import('./pages/document.js'));
-stepRoute('/filestore', 'setup/filestore');
+stepRoute('/filestore', 'setup/filestore', () => import('./pages/fileStore.js'));
 stepRoute('/awardLetterPrint', 'setup/awardLetterPrint');
 stepRoute('/environment', 'setup/environment', () => import('./pages/environment.js'));
 

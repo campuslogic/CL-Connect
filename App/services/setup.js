@@ -41,6 +41,9 @@ function splitDaysToRun(model) {
     }
 }
 
+/** The handle methods that write to a file store, and so carry a fileStoreName. */
+const FILE_STORE_METHODS = ['FileStore', 'FileStoreAndDocumentRetrieval'];
+
 /**
  * The server serialises these three collections under one name and the views read another. Runs on
  * first load only.
@@ -56,6 +59,23 @@ function applyDeserializationWorkaround(model) {
     }
     if (s.documentSettings) {
         s.documentSettings.fieldMappingCollection = s.documentSettings.fieldMappingCollectionConfig;
+    }
+    backfillFileStoreNames(s);
+}
+
+/**
+ * Points every file store event at the first file store name when it does not have one defined
+ */
+function backfillFileStoreNames(s) {
+    const stores = s.fileStoreSettings && s.fileStoreSettings.fileStores;
+    if (!Array.isArray(stores) || stores.length === 0) {
+        return;
+    }
+    for (const notification of s.eventNotifications || []) {
+        if (FILE_STORE_METHODS.indexOf(notification.handleMethod) !== -1
+            && !notification.fileStoreName) {
+            notification.fileStoreName = stores[0].name;
+        }
     }
 }
 

@@ -65,7 +65,10 @@ namespace CampusLogicEvents.Web.Models
                 }
                 if (configurationModel.CampusLogicSection.FileStoreSettings.FileStoreEnabled ?? false)
                 {
-                    response.FileStoreSettingsValid = ValidateFileStoreSettings(configurationModel.CampusLogicSection.FileStoreSettings).IsSuccessStatusCode;
+                    response.MissingFileStore = !ValidateFileStoreNames(configurationModel.CampusLogicSection.EventNotificationsList, configurationModel.CampusLogicSection.FileStoreSettings);
+
+                    response.FileStoreSettingsValid = ValidateFileStoreSettings(configurationModel.CampusLogicSection.FileStoreSettings).IsSuccessStatusCode
+                                                      && !response.MissingFileStore;
                 }
                 if (configurationModel.CampusLogicSection.AwardLetterPrintSettings.AwardLetterPrintEnabled ?? false)
                 {
@@ -130,7 +133,8 @@ namespace CampusLogicEvents.Web.Models
                                                    && !response.DuplicateEvent
                                                    && !response.InvalidBatchName
                                                    && !response.MissingBatchName
-                                                   && !response.MissingApiEndpointName;
+                                                   && !response.MissingApiEndpointName
+                                                   && !response.MissingFileStore;
             }
 
             return response;
@@ -240,9 +244,12 @@ namespace CampusLogicEvents.Web.Models
             var fileStoreSettings = campusLogicSection.FileStoreSettings;
             if (fileStoreSettings.FileStoreEnabled ?? false)
             {
-                if (!FileDefinitionExistsForName(fileStoreSettings.FileDefinitionName, fileDefinitions))
+                foreach (var store in fileStoreSettings.GetFileStores())
                 {
-                    return true;
+                    if (!FileDefinitionExistsForName(store.FileDefinitionName, fileDefinitions))
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -321,7 +328,10 @@ namespace CampusLogicEvents.Web.Models
             }
             if (configuration.CampusLogicSection.FileStoreSettings.FileStoreEnabled ?? false)
             {
-                pathsToValidate.Add(configuration.CampusLogicSection.FileStoreSettings.FileStorePath);
+                foreach (var store in configuration.CampusLogicSection.FileStoreSettings.GetFileStores())
+                {
+                    pathsToValidate.Add(store.FileStorePath);
+                }
             }
             if (configuration.CampusLogicSection.AwardLetterPrintSettings.AwardLetterPrintEnabled ?? false)
             {
@@ -391,6 +401,41 @@ namespace CampusLogicEvents.Web.Models
             var apiEndpointNames = apiEndpointNamesDictionary["endpoint"];
 
             if (eventNotificationApiEndpointNames.Except(apiEndpointNames).Any()) return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// The handle methods that write to a file store, and so carry a FileStoreName.
+        /// </summary>
+        private static readonly string[] FileStoreHandleMethods = { "FileStore", "FileStoreAndDocumentRetrieval" };
+
+        /// <summary>
+        /// False when an event notification names a file store the File Store section does not define.
+        ///
+        /// A blank name is ignored: FileStoreSettings.ResolveStore reads it as the first store, which
+        /// is what every event carries in a configuration written before stores could be named.
+        ///
+        /// Compared case-insensitively, because FileStoresCollection keys on the lowered name — a
+        /// name differing only in case IS the same store to Web.config.
+        /// </summary>
+        public static bool ValidateFileStoreNames(IList<EventNotificationHandler> eventNotifications, FileStoreSettings fileStoreSettings)
+        {
+            var definedNames = fileStoreSettings.GetFileStores()
+                .Select(store => store.Name)
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Select(name => name.ToLower())
+                .ToList();
+
+            foreach (var eventNotification in eventNotifications)
+            {
+                if (FileStoreHandleMethods.Contains(eventNotification.HandleMethod)
+                    && !string.IsNullOrWhiteSpace(eventNotification.FileStoreName)
+                    && !definedNames.Contains(eventNotification.FileStoreName.ToLower()))
+                {
+                    return false;
+                }
+            }
 
             return true;
         }
@@ -535,6 +580,14 @@ namespace CampusLogicEvents.Web.Models
                         if (string.IsNullOrWhiteSpace(eventNotification.FileStoreType))
                         {
                             throw new Exception($"Event notification {eventNotification.EventNotificationId} is missing its file store type.");
+                        }
+
+                        //A blank name resolves to the first store, so this only fires for a name that
+                        //no longer matches any store — a store renamed or deleted after the event was
+                        //pointed at it.
+                        if (configurationModel.CampusLogicSection.FileStoreSettings.ResolveStore(eventNotification.FileStoreName) == null)
+                        {
+                            throw new Exception($"Event notification {eventNotification.EventNotificationId} names a file store that does not exist.");
                         }
                     }
 
@@ -912,27 +965,48 @@ namespace CampusLogicEvents.Web.Models
                     throw new Exception();
                 }
 
-                if (string.IsNullOrEmpty(settings.FileStorePath))
-                {
-                    throw new Exception();
-                }
-                else
-                {
-                    FileStoreManager documentManager = new FileStoreManager();
-                    if (!ValidateConfiguredDirectory(documentManager, settings.FileStorePath))
-                    {
-                        throw new Exception();
-                    }
-                }
-                
-                if (string.IsNullOrEmpty(settings.FileStoreMinutes))
+                var stores = settings.GetFileStores();
+                if (!stores.Any())
                 {
                     throw new Exception();
                 }
 
-                if (string.IsNullOrEmpty(settings.FileDefinitionName))
+                var names = new List<string>();
+                foreach (var store in stores)
                 {
-                    throw new Exception();
+                    if (string.IsNullOrWhiteSpace(store.Name))
+                    {
+                        throw new Exception();
+                    }
+
+                    if (names.Contains(store.Name.ToLower()))
+                    {
+                        throw new Exception();
+                    }
+                    names.Add(store.Name.ToLower());
+
+                    if (string.IsNullOrEmpty(store.FileStorePath))
+                    {
+                        throw new Exception();
+                    }
+                    else
+                    {
+                        FileStoreManager documentManager = new FileStoreManager();
+                        if (!ValidateConfiguredDirectory(documentManager, store.FileStorePath))
+                        {
+                            throw new Exception();
+                        }
+                    }
+
+                    if (string.IsNullOrEmpty(store.FileStoreMinutes))
+                    {
+                        throw new Exception();
+                    }
+
+                    if (string.IsNullOrEmpty(store.FileDefinitionName))
+                    {
+                        throw new Exception();
+                    }
                 }
             }
             catch (Exception exception)

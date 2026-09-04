@@ -26,6 +26,9 @@
         <div style="padding-top:36px;" id="invalidApiEndpointName" hidden>
             <span class="alert alert-danger" role="alert">API Endpoint names cannot be blank.</span>
         </div>
+        <div style="padding-top:36px;" id="missingFileStore" hidden>
+            <span class="alert alert-danger" role="alert">An event names a file store that does not exist, please choose one that does.</span>
+        </div>
     </div>
     <div class="padding-top-twenty">
         <label>Database Connection</label>
@@ -83,7 +86,7 @@
 
 <template id="eventNotificationRowTemplate">
     <div class="row form-group mb-3" data-event-index>
-        <div class="col-lg-4">
+        <div class="col-lg-3">
             <select class="form-select cl-event-id"></select>
         </div>
         <div class="col-lg-2">
@@ -97,7 +100,10 @@
             <input class="form-control cl-batch-name" placeholder="Batch Name" hidden disabled />
             <input class="form-control cl-api-endpoint-name" placeholder="Endpoint Name" hidden disabled />
         </div>
-        <div class="col-lg-3">
+        <div class="col-lg-2">
+            <input class="form-control cl-file-store-name" placeholder="File Store Name" hidden disabled />
+        </div>
+        <div class="col-lg-2">
             <input class="form-control cl-db-command" placeholder="Database Command" />
             <span class="field-validation-error cl-required">Required</span>
         </div>

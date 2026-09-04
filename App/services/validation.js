@@ -112,22 +112,16 @@ function fileDefinitionExistsForName(name, fileDefinitions) {
     return fileDefinitions.some((definition) => definition.name === name);
 }
 
+/** The handle methods that write to a file store, and so carry a fileStoreName. */
+const FILE_STORE_METHODS = ['FileStore', 'FileStoreAndDocumentRetrieval'];
+
 /**
- * Checks for File Definitions that have been defined for a File Store, Batch, Document
+ * Checks for File Definitions that have been defined for a Batch or Document process
  * and ensures all processes have a defined and unique File Definition name.
  */
 export function hasImproperFileDefinitions() {
     const campusLogicSection = cm().campusLogicSection;
     const fileDefinitions = campusLogicSection.fileDefinitionsList;
-
-    const fileStoreSettings = campusLogicSection.fileStoreSettings;
-    if (fileStoreSettings.fileStoreEnabled) {
-        if (!fileDefinitionExistsForName(fileStoreSettings.fileDefinitionName, fileDefinitions)) {
-            // Need to set to false to disable save button
-            pv().fileDefinitionSettingsValid = false;
-            return true;
-        }
-    }
 
     const documentSettings = campusLogicSection.documentSettings;
     if (documentSettings.documentsEnabled) {
@@ -193,6 +187,41 @@ export function checkForMissingBatchName() {
         return true;
     }
     return false;
+}
+
+/**
+ * The first file store name an event notification uses that the File Store step does not define, or
+ * null when every name resolves.
+ *
+ * A blank name is ignored: it resolves to the first store server-side, which is what every event
+ * carries in a configuration written before file stores were named.
+ *
+ * Compared case-insensitively, because FileStoresCollection keys on the lowered name — a name that
+ * differs only in case IS the same file store in the Web.config
+ */
+function firstMissingFileStoreName() {
+    const { eventNotificationsList, fileStoreSettings } = cm().campusLogicSection;
+
+    const defined = (fileStoreSettings.fileStores || [])
+        .map((store) => store.name).filter(Boolean).map((name) => name.toLowerCase());
+
+    const wanted = eventNotificationsList
+        .filter((n) => FILE_STORE_METHODS.indexOf(n.handleMethod) !== -1)
+        .map((n) => n.fileStoreName)
+        .filter((name) => !isEmptyString(name));
+
+    return wanted.find((name) => defined.indexOf(name.toLowerCase()) === -1) ?? null;
+}
+
+/**
+ * `missingFileStore` arrives on the ConfigurationValidationModel, so the
+ * alert cannot appear until ValidateConfigurations has actually failed on it — a store an event
+ * names may simply not have been added yet, and nagging about that mid-setup is what this replaced.
+ * Once reported, the same check runs client-side on every keystroke in the store-name box, so the
+ * alert clears as soon as the name resolves instead of waiting for another round trip.
+ */
+export function hasMissingFileStore() {
+    return !!pv().missingFileStore && firstMissingFileStoreName() !== null;
 }
 
 export function checkForInvalidBatchName() {
@@ -305,7 +334,9 @@ export function folderPathUnique(uploadpath) {
     }
 
     if (s.fileStoreSettings.fileStoreEnabled) {
-        filePathValues.push(s.fileStoreSettings.fileStorePath);
+        for (const store of s.fileStoreSettings.fileStores || []) {
+            filePathValues.push(store.fileStorePath);
+        }
     }
 
     if (s.awardLetterPrintSettings.awardLetterPrintEnabled) {
@@ -370,7 +401,8 @@ const NON_PAGE_KEYS = new Set([
     'missingBatchName',
     'invalidApiEndpointName',
     'missingApiEndpointName',
-    'improperFileDefinitions'
+    'improperFileDefinitions',
+    'missingFileStore'
 ]);
 
 /**
@@ -481,7 +513,17 @@ const ALL_STEPS = [
     [testPowerFaids, (s) => s.powerFaidsEnabled]
 ];
 
+/**
+ * Cross-page checks that must not nag mid-setup, armed by reaching the Save step. An event may name
+ * a file store that has not been added yet, and a store may name a file definition that has not been
+ * added yet; both are normal orders to work in, so neither is reported until the wizard has been
+ * walked to the end. Once armed it stays armed for the rest of the session, so the report re-renders
+ * every time the File Store step revalidates and clears itself as soon as the names resolve.
+ */
+let crossPageChecksArmed = false;
+
 export function validateAllSteps() {
+    crossPageChecksArmed = true;
     const section = cm().campusLogicSection;
     for (const [validate, isEnabled] of ALL_STEPS) {
         if (!isEnabled || isEnabled(section)) {
@@ -806,30 +848,73 @@ function testDocumentSettings(form) {
     }
 }
 
-function testFileStoreSettings(form) {
+/**
+ * Takes no `form`: the step is a grid, and each file store's own fields are checked in the dialog that
+ * edits it. Every file store is validated here, and one bad file store fails the step.
+ */
+function testFileStoreSettings() {
     try {
         clearError('/filestore');
-        pv().fileStoreSettingsValid = form ? isValid(form) : pv().fileStoreSettingsValid;
-        if (!form || isValid(form)) {
+        pv().fileStoreSettingsValid = true;
 
-            pv().fileStoreSettingsValid = true;
-            const settings = cm().campusLogicSection.fileStoreSettings;
-            if (settings.fileStoreEnabled === null) {
+        const settings = cm().campusLogicSection.fileStoreSettings;
+        if (settings.fileStoreEnabled === null) {
+            pv().fileStoreSettingsValid = false;
+        }
+
+        const stores = settings.fileStores || [];
+        if (stores.length === 0) {
+            pv().fileStoreSettingsValid = false;
+        }
+
+        // The two cross-page relationships this screen owns: every file store an event notification names
+        // has to be defined here, and every definition name a file store carries has to exist on the File
+        // Definitions step. Both are reported here because this is the screen that defines them —
+        // deleting or renaming a store is what orphans an event — and both wait for
+        // crossPageChecksArmed, so neither interrupts a setup that is still being filled in.
+        if (crossPageChecksArmed) {
+            const problems = [];
+
+            const orphan = firstMissingFileStoreName();
+            if (orphan !== null) {
+                problems.push(`An event notification uses the file store "${orphan}", which is not defined below.`);
+            }
+
+            const definitions = cm().campusLogicSection.fileDefinitionsList || [];
+            for (const store of stores) {
+                if (!util.isNullOrWhitespace(store.fileDefinitionName)
+                    && !fileDefinitionExistsForName(store.fileDefinitionName, definitions)) {
+                    problems.push(`The file store "${store.name}" uses the file definition `
+                        + `"${store.fileDefinitionName}", which does not exist.`);
+                }
+            }
+
+            if (problems.length > 0) {
+                fail('/filestore', 'fileStoreSettingsValid', problems.join(' '));
+            }
+        }
+
+        const names = [];
+        for (const store of stores) {
+            if (util.isNullOrWhitespace(store.name.trim())) {
+                pv().fileStoreSettingsValid = false;
+            } else if (names.indexOf(store.name.trim().toLowerCase()) !== -1) {
+                pv().fileStoreSettingsValid = false;
+            } else {
+                names.push(store.name.trim().toLowerCase());
+            }
+
+            if (util.isNullOrWhitespace(store.fileStorePath)) {
+                pv().fileStoreSettingsValid = false;
+            } else if (store.fileStoreMinutes === undefined || store.fileStoreMinutes === null
+                || store.fileStoreMinutes === '') {
+                pv().fileStoreSettingsValid = false;
+            } else if (util.isNullOrWhitespace(store.fileDefinitionName)) {
                 pv().fileStoreSettingsValid = false;
             }
-            if (settings.fileStorePath === undefined || settings.fileStorePath === null
-                || settings.fileStorePath === '') {
-                pv().fileStoreSettingsValid = false;
-            } else if (settings.fileStoreMinutes === undefined || settings.fileStoreMinutes === null
-                || settings.fileStoreMinutes === '') {
-                pv().fileStoreSettingsValid = false;
-            } else if (settings.fileDefinitionName === undefined || settings.fileDefinitionName === null
-                || settings.fileDefinitionName === '') {
-                pv().fileStoreSettingsValid = false;
-            }
-            if (testFolderPath(settings.fileStorePath)) {
 
-                testWritePermissions(settings.fileStorePath, function () { }, function () {
+            if (testFolderPath(store.fileStorePath)) {
+                testWritePermissions(store.fileStorePath, function () { }, function () {
                     pv().fileStoreSettingsValid = false;
                 });
             } else {

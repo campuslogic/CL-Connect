@@ -54,6 +54,7 @@ const NO_DATABASE_METHODS = ['DocumentRetrieval', 'FileStore', 'FileStoreAndDocu
  */
 const DEPENDENT_CONTROLS = [
     { selector: '.cl-file-store-type', flag: 'isFileStoreTypeRequired' },
+    { selector: '.cl-file-store-name', flag: 'isFileStoreTypeRequired' },
     { selector: '.cl-batch-name', flag: 'isBatchProcessingRequired' },
     { selector: '.cl-api-endpoint-name', flag: 'isApiIntegrationRequired' }
 ];
@@ -62,6 +63,7 @@ export function mount(view, locals) {
     return mountStep(view, locals, ({ config, form, refresh }) => {
         const notifications = config.campusLogicSection.eventNotifications;
         const connection = config.campusLogicSection.clientDatabaseConnection;
+        const fileStores = config.campusLogicSection.fileStoreSettings.fileStores || [];
         const types = locals.eventNotificationTypes || [];
         const definitions = locals.eventNotificationDefinitions || [];
 
@@ -136,6 +138,7 @@ export function mount(view, locals) {
                 }
 
                 row.querySelector('.cl-file-store-type').name = path + 'fileStoreType';
+                row.querySelector('.cl-file-store-name').name = path + 'fileStoreName';
                 row.querySelector('.cl-batch-name').name = path + 'batchName';
                 row.querySelector('.cl-api-endpoint-name').name = path + 'apiEndpointName';
                 row.querySelector('.cl-db-command').name = path + 'dbCommandFieldValue';
@@ -144,7 +147,7 @@ export function mount(view, locals) {
 
                 host.appendChild(row);
             });
-            // Fills every control just created, including the rows' six each.
+            // Fills every control just created, including the rows' seven each.
             model.load(view, config);
             refreshRows();
         }
@@ -156,15 +159,20 @@ export function mount(view, locals) {
             return el;
         }
 
-        /* --------------------------------------------------------- the three cross-page alerts */
+        /* --------------------------------------------------------- the four cross-page alerts */
 
         /**
-         * The three cross-page alerts, each one `hidden` toggle.
+         * The four cross-page alerts, each one `hidden` toggle.
+         *
+         * The last one differs from the other three: it stays hidden until ValidateConfigurations
+         * has reported missingFileStore, because a store an event names may not have been added
+         * yet. See validation.hasMissingFileStore.
          */
         function refreshAlerts() {
             view.querySelector('#duplicateEvent').hidden = !validation.checkForDuplicateEvent();
             view.querySelector('#invalidBatchName').hidden = !validation.checkForInvalidBatchName();
             view.querySelector('#invalidApiEndpointName').hidden = !validation.hasInvalidApiEndpointName();
+            view.querySelector('#missingFileStore').hidden = !validation.hasMissingFileStore();
         }
 
         /* --------------------------------------------------------- the connection block */
@@ -283,10 +291,12 @@ export function mount(view, locals) {
                 }
                 refresh();
             }),
-            // The batch name and endpoint name boxes, and only those two.
+            // The three typed name boxes, and only those three. Each one has a cross-page alert that
+            // has to keep up with what is being typed.
             dom.on(host, 'input', (event) => {
                 if (event.target.classList.contains('cl-batch-name')
-                    || event.target.classList.contains('cl-api-endpoint-name')) {
+                    || event.target.classList.contains('cl-api-endpoint-name')
+                    || event.target.classList.contains('cl-file-store-name')) {
                     refreshAlerts();
                 }
             }),
@@ -345,8 +355,13 @@ export function mount(view, locals) {
             }
             if (FILE_STORE_METHODS.indexOf(notification.handleMethod) === -1) {
                 notification.fileStoreType = '';
+                notification.fileStoreName = '';
             } else {
                 notification.fileStoreType = 'Shared';
+                // Seeded with the first store rather than left blank, so the common single-store
+                // case needs no typing and the name is one that exists. Blank still resolves to the
+                // first store server-side, so clearing it is not an error.
+                notification.fileStoreName = fileStores.length > 0 ? fileStores[0].name : '';
             }
             if (notification.handleMethod !== 'BatchProcessingAwardLetterPrint') {
                 notification.batchName = '';

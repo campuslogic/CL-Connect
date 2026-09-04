@@ -1,6 +1,6 @@
 /**
  * pages/shell.js — the wizard shell: 21 step links and their warning icons, the environment
- * banner, Continue/Save, the 11 result messages, and the active step's own #stepError message.
+ * banner, Continue/Save, the 12 result messages, and the active step's own #stepError message.
  *
  * Every Setup step view sets `Layout = _LeftMenuLayout.cshtml` and SetupController returns
  * PartialView(), which still honours an explicit view-level Layout. So the template the router
@@ -45,7 +45,7 @@ const ENVIRONMENTS = {
     'production-ca': 'Production (Canada)'
 };
 
-/** The 11 result banners, in _LeftMenuLayout.cshtml's order. */
+/** The 12 result banners, in _LeftMenuLayout.cshtml's order. */
 const BANNERS = [
     'msgInvalidPages',
     'msgDuplicatePath',
@@ -54,6 +54,7 @@ const BANNERS = [
     'msgMissingBatchName',
     'msgInvalidApiEndpointName',
     'msgMissingApiEndpointName',
+    'msgMissingFileStore',
     'msgImproperFileDefinitions',
     'msgErrorCopying',
     'msgSuccess',
@@ -73,13 +74,8 @@ function warnOnce(message, error) {
 /**
  * Which named <form> each step hands to its validator.
  *
- * THREE DEFECTS USED TO BE VISIBLE HERE, which is the point of using a table. Two are fixed:
- *   '/awardLetterPrint' named the FILE STORE form instead of its own. Inert either way —
- *   testAwardLetterPrintSettings takes no arguments — but the table now says what it means.
- *   '/document' and '/filestore' named forms whose markup spelt them "vm.documentForm" and
- *   "vm.fileStoreForm", an AngularJS leftover, so the lookups found nothing and their validators
- *   ran with no form and skipped the native required-field check. Both views dropped the "vm."
- *   prefix; those two steps now honour required fields the way every other step does. Guide §7.46.
+ * '/filestore' has no entry at all any more: it became a grid of named stores with no form of its
+ * own, so its required fields are checked in the dialog, the way '/filedefinitions' does it.
  *
  * STILL PRESERVED: '/dataFileUpload' is in NOT_VALIDATED, so clicking its step link validates
  * nothing — Save validates it. And '/batchprocessing' names a form BatchProcessing.cshtml does not
@@ -96,7 +92,6 @@ const STEP_FORMS = {
     '/eventnotifications': 'formEventNotifications',
     '/smtp': 'smtpForm',
     '/document': 'documentForm',
-    '/filestore': 'fileStoreForm',
     '/awardLetterPrint': 'awardLetterPrintForm',
     '/awardLetterFileMappingUpload': 'awardLetterFileMappingUploadForm',
     '/batchprocessing': 'batchProcessingForm',
@@ -184,6 +179,7 @@ function refreshShell(view, activeStep, flags) {
             msgMissingBatchName: flags.missingBatchName || validation.checkForMissingBatchName(),
             msgInvalidApiEndpointName: flags.invalidApiEndpointName || validation.hasInvalidApiEndpointName(),
             msgMissingApiEndpointName: flags.missingApiEndpointName || validation.hasMissingApiEndpointName(),
+            msgMissingFileStore: flags.missingFileStore,
             msgImproperFileDefinitions: flags.improperFileDefinitions || validation.hasImproperFileDefinitions(),
             msgErrorCopying: flags.errorCopying,
             msgSuccess: flags.success,
@@ -262,11 +258,6 @@ function goNext(view, activeStep, flags, refresh) {
 }
 
 function saveConfigurations(view, flags, refresh) {
-    // §7.12, FIXED. This read `validation.invalidPages.length` — the zero-arity FUNCTION, not a
-    // call — so .length was Function.prototype.length === 0 and the guard was always true: Save
-    // never blocked on an invalid page, while refresh() above used the correct `invalidPages()`
-    // to grey the button out. The button looked disabled and fired anyway. Now an invalid page
-    // genuinely stops the Save, which is what the greyed-out button has always claimed.
     if (!(validation.invalidPages().length === 0 || flags.disableSave)) {
         return;
     }
@@ -309,6 +300,7 @@ function saveConfigurations(view, flags, refresh) {
         flags.missingBatchName = error.data.missingBatchName;
         flags.missingApiEndpointName = error.data.missingApiEndpointName;
         flags.improperFileDefinitions = error.data.improperFileDefinitions;
+        flags.missingFileStore = error.data.missingFileStore;
         flags.disableSave = false;
         refresh();
     }).catch(function (e) {
@@ -355,7 +347,8 @@ export function mountStep(view, locals, init) {
         missingBatchName: false,
         invalidApiEndpointName: false,
         missingApiEndpointName: false,
-        improperFileDefinitions: false
+        improperFileDefinitions: false,
+        missingFileStore: false
     };
 
     const refresh = () => {
