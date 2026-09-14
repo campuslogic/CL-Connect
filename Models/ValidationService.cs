@@ -523,24 +523,30 @@ namespace CampusLogicEvents.Web.Models
         /// <returns></returns>
         public static HttpResponseMessage ValidateEventNotifications(ConfigurationModel configurationModel)
         {
+            const string AwardLetterPrint = "AwardLetterPrint";
             const string DatabaseCommandNonQuery = "DatabaseCommandNonQuery";
             const string DatabaseStoredProcedure = "DatabaseStoredProcedure";
+            const string DocumentRetrieval = "DocumentRetrieval";
             const string DocumentRetrievalAndStoredProc = "DocumentRetrievalAndStoredProc";
             const string DocumentRetrievalAndNonQuery = "DocumentRetrievalAndNonQuery";
             const string FileStore = "FileStore";
             const string FileStoreAndDocumentRetrieval = "FileStoreAndDocumentRetrieval";
             const string BatchProcessingAwardLetterPrint = "BatchProcessingAwardLetterPrint";
             const string ApiIntegration = "ApiIntegration";
+            const string PowerFAIDS = "PowerFAIDS";
             var acceptedHandleMethods = new List<string>
             {
+                AwardLetterPrint,
                 DatabaseCommandNonQuery,
                 DatabaseStoredProcedure,
+                DocumentRetrieval,
                 DocumentRetrievalAndStoredProc,
                 DocumentRetrievalAndNonQuery,
                 FileStore,
                 FileStoreAndDocumentRetrieval,
                 BatchProcessingAwardLetterPrint,
-                ApiIntegration
+                ApiIntegration,
+                PowerFAIDS
             };
 
             try
