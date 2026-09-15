@@ -162,30 +162,60 @@ namespace CampusLogicEvents.Web
         }
 
         /// <summary>
-        /// Job that runs when File Store is enabled
+        /// The recurring job id for one named file store. Each store runs on its own interval.
+        /// </summary>
+        private static string FileStoreJobId(string storeName)
+        {
+            return $"{FileStoreJobPrefix}{storeName}";
+        }
+
+        private const string FileStoreJobPrefix = "FileStore.";
+
+        /// <summary>
+        /// Jobs that run when File Store is enabled — one per named store.
         /// </summary>
         private void AutomatedFileStoreJob()
         {
+            //Releases before named stores registered a single job under the default id, generated from
+            //the then parameterless ProcessFileStore(). That signature no longer exists, so leaving the
+            //job behind would make it throw on every tick after an upgrade.
+            RecurringJob.RemoveIfExists("FileStoreService.ProcessFileStore");
 
             bool? filestoreEnabled = campusLogicSection.FileStoreSettings.FileStoreEnabled;
+
+            var currentJobIds = new List<string>();
 
             //Have to explicitly check for true. This value could be null if setup preferences have never been saved.
             if (filestoreEnabled == true)
             {
-                if (string.IsNullOrWhiteSpace(campusLogicSection.FileStoreSettings.FileStorePath))
+                //GetFileStores() yields the configured stores, or one built from the flat attributes of
+                //a configuration written before stores could be named.
+                foreach (var store in campusLogicSection.FileStoreSettings.GetFileStores())
                 {
-                    NotificationService.ErrorNotification("Automated File Store Job", $"The following path is either unavailable or does not have the appropriate permissions: {campusLogicSection.FileStoreSettings.FileStorePath}");
-                }
-                else
-                {
-                    string minutes = campusLogicSection.FileStoreSettings.FileStoreMinutes;
+                    if (string.IsNullOrWhiteSpace(store.FileStorePath))
+                    {
+                        NotificationService.ErrorNotification("Automated File Store Job", $"The following path is either unavailable or does not have the appropriate permissions: {store.FileStorePath}");
+                        continue;
+                    }
 
-                    RecurringJob.AddOrUpdate(() => FileStoreService.ProcessFileStore(), GetCronExpressionByMinutes(minutes));
+                    var storeName = store.Name;
+                    var jobId = FileStoreJobId(storeName);
+                    currentJobIds.Add(jobId);
+
+                    RecurringJob.AddOrUpdate(jobId, () => FileStoreService.ProcessFileStore(storeName), GetCronExpressionByMinutes(store.FileStoreMinutes));
                 }
             }
-            else
+
+            //Drop the jobs of stores that have been renamed, deleted, or disabled.
+            using (var connection = JobStorage.Current.GetConnection())
             {
-                RecurringJob.RemoveIfExists("FileStoreService.ProcessFileStore");
+                foreach (var job in connection.GetRecurringJobs())
+                {
+                    if (job.Id.StartsWith(FileStoreJobPrefix, StringComparison.Ordinal) && !currentJobIds.Contains(job.Id))
+                    {
+                        RecurringJob.RemoveIfExists(job.Id);
+                    }
+                }
             }
         }
 
@@ -312,8 +342,8 @@ namespace CampusLogicEvents.Web
             //validation
             if (campusLogicSection.AwardLetterUploadSettings == null)
             {
-                NotificationService.ErrorNotification("Automated AwardLetter Upload", "The award letter upload settings are missing");
-                LogManager.ErrorLog("Award Letter Upload settings are missing");
+                NotificationService.ErrorNotification("Automated Communication Upload", "The communcication upload settings are missing");
+                LogManager.ErrorLog("Communication Upload settings are missing");
                 return;
             }
 
@@ -339,8 +369,8 @@ namespace CampusLogicEvents.Web
             //validation
             if (campusLogicSection.FileMappingUploadSettings == null)
             {
-                NotificationService.ErrorNotification("Automated AwardLetter File Mapping Upload", "The award letter file mapping settings are missing");
-                LogManager.ErrorLog("Award Letter File Mapping Upload settings are missing");
+                NotificationService.ErrorNotification("Automated Communication File Mapping Upload", "The communication file mapping settings are missing");
+                LogManager.ErrorLog("Communication File Mapping Upload settings are missing");
                 return;
             }
 
@@ -520,7 +550,14 @@ namespace CampusLogicEvents.Web
                 }
 
                 //Converting hours to military time
-                var hour = (campusLogicSection.ISIRCorrectionsSettings.TimeToRun.Substring(0, campusLogicSection.ISIRCorrectionsSettings.TimeToRun.IndexOf(":")) == "12" && amOrPm == "AM") ? "0" : amOrPm == "PM" ? (int.Parse(campusLogicSection.ISIRCorrectionsSettings.TimeToRun.Substring(0, campusLogicSection.ISIRCorrectionsSettings.TimeToRun.IndexOf(":"))) + 12).ToString() : campusLogicSection.ISIRCorrectionsSettings.TimeToRun.Substring(0, campusLogicSection.ISIRCorrectionsSettings.TimeToRun.IndexOf(":"));
+                var timeToRun = campusLogicSection.ISIRCorrectionsSettings.TimeToRun;
+                var separatorIndex = timeToRun.IndexOf(':');
+                var parsedHour = int.Parse(timeToRun.Substring(0, separatorIndex), CultureInfo.InvariantCulture);
+
+                // 12 AM => 0, 12 PM => 12, 1-11 PM => +12
+                var hour = (amOrPm == "AM")
+                    ? (parsedHour == 12 ? "0" : parsedHour.ToString(CultureInfo.InvariantCulture))
+                    : (parsedHour == 12 ? "12" : (parsedHour + 12).ToString(CultureInfo.InvariantCulture));
                 var minutes = campusLogicSection.ISIRCorrectionsSettings.TimeToRun.Substring(campusLogicSection.ISIRCorrectionsSettings.TimeToRun.IndexOf(":") + 1, 2) == "00" ? "0" : campusLogicSection.ISIRCorrectionsSettings.TimeToRun.Substring(campusLogicSection.ISIRCorrectionsSettings.TimeToRun.IndexOf(":") + 1, 2);
 
                 if (!IsDigitsOnly(hour) || !IsDigitsOnly(minutes))
@@ -543,7 +580,7 @@ namespace CampusLogicEvents.Web
 
         /// <summary>
         /// Validate all of the configurations for a
-        /// file upload process (ISIR or Award Letter)
+        /// file upload process (ISIR or Student Aid Communication)
         /// </summary>
         /// <param name="uploadSettings"></param>
         private void UploadConfigurationValidation(UploadSettings uploadSettings)

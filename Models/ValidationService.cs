@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Configuration;
@@ -27,6 +29,7 @@ namespace CampusLogicEvents.Web.Models
         public static async Task<ConfigurationValidationModel> ValidateAll(ConfigurationModel configurationModel)
         {
             var response = new ConfigurationValidationModel();
+            response.ApplicationSettingsValid = ValidateApplicationSettings(configurationModel.AppSettingsSection).IsSuccessStatusCode;
             response.EnvironmentValid = ValidateEnvironment(configurationModel.AppSettingsSection).IsSuccessStatusCode;
             if (response.EnvironmentValid)
             {
@@ -62,7 +65,10 @@ namespace CampusLogicEvents.Web.Models
                 }
                 if (configurationModel.CampusLogicSection.FileStoreSettings.FileStoreEnabled ?? false)
                 {
-                    response.FileStoreSettingsValid = ValidateFileStoreSettings(configurationModel.CampusLogicSection.FileStoreSettings).IsSuccessStatusCode;
+                    response.MissingFileStore = !ValidateFileStoreNames(configurationModel.CampusLogicSection.EventNotificationsList, configurationModel.CampusLogicSection.FileStoreSettings);
+
+                    response.FileStoreSettingsValid = ValidateFileStoreSettings(configurationModel.CampusLogicSection.FileStoreSettings).IsSuccessStatusCode
+                                                      && !response.MissingFileStore;
                 }
                 if (configurationModel.CampusLogicSection.AwardLetterPrintSettings.AwardLetterPrintEnabled ?? false)
                 {
@@ -104,18 +110,119 @@ namespace CampusLogicEvents.Web.Models
                     response.DuplicatePath = !ValidatePathsUnique(configurationModel);
                 }
 
-                if (!(configurationModel.CampusLogicSection.EventNotificationsEnabled ?? false) || configurationModel.CampusLogicSection.EventNotificationsList.Count == 0)
+                if (!(configurationModel.CampusLogicSection.EventNotificationsEnabled ?? false))
                 {
                     return response;
                 }
 
+                if (configurationModel.CampusLogicSection.EventNotificationsList.Count == 0)
+                {
+                    //Enabled with nothing configured yet is not treated as an error.
+                    response.EventNotificationsValid = true;
+                    return response;
+                }
+
                 response.DuplicateEvent = !ValidateEventNotificationsUnique(configurationModel.CampusLogicSection.EventNotificationsList);
-                response.ConnectionStringValid = ValidateConnectionStringValid(configurationModel.CampusLogicSection.EventNotificationsList, configurationModel.CampusLogicSection.ClientDatabaseConnection.ConnectionString);                
+                response.ConnectionStringValid = ValidateConnectionStringValid(configurationModel.CampusLogicSection.EventNotificationsList, configurationModel.CampusLogicSection.ClientDatabaseConnection.ConnectionString);
+
+                //The event notifications page is only valid when each handler is filled in AND none of
+                //the cross-section checks above found a problem, so the flag agrees with the messages
+                //the client already shows for those checks. The connection string stays its own flag,
+                //because the client reports that one separately.
+                response.EventNotificationsValid = ValidateEventNotifications(configurationModel).IsSuccessStatusCode
+                                                   && !response.DuplicateEvent
+                                                   && !response.InvalidBatchName
+                                                   && !response.MissingBatchName
+                                                   && !response.MissingApiEndpointName
+                                                   && !response.MissingFileStore;
             }
 
             return response;
         }
         
+        /// <summary>
+        /// Validates one of the folders named in the configuration that was posted to us.
+        /// The paths arrive on the request and ValidateDirectory creates the folder when it is
+        /// missing, so vet each one first and hand the manager only the value that comes back.
+        /// An unusable path throws, which the callers already treat as a failed validation.
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <param name="requestedPath"></param>
+        /// <returns></returns>
+        private static bool ValidateConfiguredDirectory(BaseManager manager, string requestedPath)
+        {
+            if (string.IsNullOrWhiteSpace(requestedPath)
+                || requestedPath.IndexOfAny(Path.GetInvalidPathChars()) >= 0
+                || !IsCompletePath(requestedPath))
+            {
+                throw new ArgumentException("The folder path requested is not a complete, valid path.", nameof(requestedPath));
+            }
+
+            //GetFullPath works out where the path really points, so shortcuts like "..\.." that
+            //back out of a folder are gone by the time we use it. Anything it cannot make sense
+            //of at all (wildcards, a path that is too long) throws, which the callers treat the
+            //same as any other invalid path.
+            var directory = Path.GetFullPath(requestedPath);
+
+            if (!IsCompletePath(directory))
+            {
+                throw new ArgumentException("The folder path requested is not a complete, valid path.", nameof(requestedPath));
+            }
+
+            return manager.ValidateDirectory(directory);
+        }
+
+        /// <summary>
+        /// A complete path names its own drive (c:\...) or a network share (\\server\share).
+        /// Something like \folder or folder\sub is not complete: Windows fills in the missing part
+        /// from wherever the web application happens to be running, which is never what we want.
+        /// This is checked both before and after the path is normalized: before, because
+        /// normalizing an incomplete path is exactly what fills that missing part in, and after,
+        /// because the normalized value is the one we hand on to be used.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private static bool IsCompletePath(string path)
+        {
+            if (path.StartsWith(@"\\", StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            return path.Length >= 3
+                   && char.IsLetter(path[0])
+                   && path[1] == ':'
+                   && (path[2] == Path.DirectorySeparatorChar || path[2] == Path.AltDirectorySeparatorChar);
+        }
+
+        /// <summary>
+        /// Reads one application setting out of the dictionary that arrived on the request.
+        /// The dictionary is built from whatever was posted to us, so a setting we expect may simply
+        /// not be there, and the plain indexer would throw for that. The name is matched without
+        /// regard to case because the client sends these camel cased while Web.config holds them
+        /// capitalized.
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <param name="key"></param>
+        /// <returns>the value, or null when the setting was not sent to us</returns>
+        private static string GetSetting(Dictionary<string, string> settings, string key)
+        {
+            if (settings == null)
+            {
+                return null;
+            }
+
+            foreach (var setting in settings)
+            {
+                if (string.Equals(setting.Key, key, StringComparison.OrdinalIgnoreCase))
+                {
+                    return setting.Value;
+                }
+            }
+
+            return null;
+        }
+
         public static bool FileDefinitionExistsForName(string name, IList<FileDefinitionDto> fileDefinitions)
         {
             foreach (var fileDefinition in fileDefinitions)
@@ -137,9 +244,12 @@ namespace CampusLogicEvents.Web.Models
             var fileStoreSettings = campusLogicSection.FileStoreSettings;
             if (fileStoreSettings.FileStoreEnabled ?? false)
             {
-                if (!FileDefinitionExistsForName(fileStoreSettings.FileDefinitionName, fileDefinitions))
+                foreach (var store in fileStoreSettings.GetFileStores())
                 {
-                    return true;
+                    if (!FileDefinitionExistsForName(store.FileDefinitionName, fileDefinitions))
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -218,7 +328,10 @@ namespace CampusLogicEvents.Web.Models
             }
             if (configuration.CampusLogicSection.FileStoreSettings.FileStoreEnabled ?? false)
             {
-                pathsToValidate.Add(configuration.CampusLogicSection.FileStoreSettings.FileStorePath);
+                foreach (var store in configuration.CampusLogicSection.FileStoreSettings.GetFileStores())
+                {
+                    pathsToValidate.Add(store.FileStorePath);
+                }
             }
             if (configuration.CampusLogicSection.AwardLetterPrintSettings.AwardLetterPrintEnabled ?? false)
             {
@@ -288,6 +401,41 @@ namespace CampusLogicEvents.Web.Models
             var apiEndpointNames = apiEndpointNamesDictionary["endpoint"];
 
             if (eventNotificationApiEndpointNames.Except(apiEndpointNames).Any()) return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// The handle methods that write to a file store, and so carry a FileStoreName.
+        /// </summary>
+        private static readonly string[] FileStoreHandleMethods = { "FileStore", "FileStoreAndDocumentRetrieval" };
+
+        /// <summary>
+        /// False when an event notification names a file store the File Store section does not define.
+        ///
+        /// A blank name is ignored: FileStoreSettings.ResolveStore reads it as the first store, which
+        /// is what every event carries in a configuration written before stores could be named.
+        ///
+        /// Compared case-insensitively, because FileStoresCollection keys on the lowered name — a
+        /// name differing only in case IS the same store to Web.config.
+        /// </summary>
+        public static bool ValidateFileStoreNames(IList<EventNotificationHandler> eventNotifications, FileStoreSettings fileStoreSettings)
+        {
+            var definedNames = fileStoreSettings.GetFileStores()
+                .Select(store => store.Name)
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Select(name => name.ToLower())
+                .ToList();
+
+            foreach (var eventNotification in eventNotifications)
+            {
+                if (FileStoreHandleMethods.Contains(eventNotification.HandleMethod)
+                    && !string.IsNullOrWhiteSpace(eventNotification.FileStoreName)
+                    && !definedNames.Contains(eventNotification.FileStoreName.ToLower()))
+                {
+                    return false;
+                }
+            }
 
             return true;
         }
@@ -365,6 +513,129 @@ namespace CampusLogicEvents.Web.Models
         }
 
         /// <summary>
+        /// Validates the event notifications themselves: every handler names an event and a way to
+        /// handle it, and has filled in whichever extra field its handle method asks for. These are
+        /// the same rules the Event Notifications page applies to each row.
+        /// The checks that span sections (duplicate events, batch names, endpoint names) are done
+        /// separately by ValidateAll, which already reports each of them on its own.
+        /// </summary>
+        /// <param name="configurationModel"></param>
+        /// <returns></returns>
+        public static HttpResponseMessage ValidateEventNotifications(ConfigurationModel configurationModel)
+        {
+            const string AwardLetterPrint = "AwardLetterPrint";
+            const string DatabaseCommandNonQuery = "DatabaseCommandNonQuery";
+            const string DatabaseStoredProcedure = "DatabaseStoredProcedure";
+            const string DocumentRetrieval = "DocumentRetrieval";
+            const string DocumentRetrievalAndStoredProc = "DocumentRetrievalAndStoredProc";
+            const string DocumentRetrievalAndNonQuery = "DocumentRetrievalAndNonQuery";
+            const string FileStore = "FileStore";
+            const string FileStoreAndDocumentRetrieval = "FileStoreAndDocumentRetrieval";
+            const string BatchProcessingAwardLetterPrint = "BatchProcessingAwardLetterPrint";
+            const string ApiIntegration = "ApiIntegration";
+            const string PowerFAIDS = "PowerFAIDS";
+            var acceptedHandleMethods = new List<string>
+            {
+                AwardLetterPrint,
+                DatabaseCommandNonQuery,
+                DatabaseStoredProcedure,
+                DocumentRetrieval,
+                DocumentRetrievalAndStoredProc,
+                DocumentRetrievalAndNonQuery,
+                FileStore,
+                FileStoreAndDocumentRetrieval,
+                BatchProcessingAwardLetterPrint,
+                ApiIntegration,
+                PowerFAIDS
+            };
+
+            try
+            {
+                var eventNotifications = configurationModel.CampusLogicSection.EventNotificationsList;
+                var batchNames = new List<string>();
+
+                foreach (var eventNotification in eventNotifications)
+                {
+                    //0 is allowed as it means All events are handled in this way
+                    if (eventNotification.EventNotificationId < 0)
+                    {
+                        throw new Exception("An event notification is missing its event.");
+                    }
+
+                    var handleMethod = eventNotification.HandleMethod;
+                    
+
+                    if (string.IsNullOrWhiteSpace(handleMethod) || !acceptedHandleMethods.Contains(handleMethod))
+                    {
+                        throw new Exception($"Event notification {eventNotification.EventNotificationId} is missing its handle method or the handle method is not accepted.");
+                    }
+
+                    if (handleMethod == DatabaseCommandNonQuery
+                        || handleMethod == DatabaseStoredProcedure
+                        || handleMethod == DocumentRetrievalAndStoredProc
+                        || handleMethod == DocumentRetrievalAndNonQuery)
+                    {
+                        if (string.IsNullOrWhiteSpace(eventNotification.DbCommandFieldValue))
+                        {
+                            throw new Exception($"Event notification {eventNotification.EventNotificationId} is missing its database command.");
+                        }
+                    }
+
+                    if (handleMethod == FileStore || handleMethod == FileStoreAndDocumentRetrieval)
+                    {
+                        if (string.IsNullOrWhiteSpace(eventNotification.FileStoreType))
+                        {
+                            throw new Exception($"Event notification {eventNotification.EventNotificationId} is missing its file store type.");
+                        }
+
+                        //A blank name resolves to the first store, so this only fires for a name that
+                        //no longer matches any store — a store renamed or deleted after the event was
+                        //pointed at it.
+                        if (configurationModel.CampusLogicSection.FileStoreSettings.ResolveStore(eventNotification.FileStoreName) == null)
+                        {
+                            throw new Exception($"Event notification {eventNotification.EventNotificationId} names a file store that does not exist.");
+                        }
+                    }
+
+                    if (handleMethod == BatchProcessingAwardLetterPrint)
+                    {
+                        if (string.IsNullOrWhiteSpace(eventNotification.BatchName))
+                        {
+                            throw new Exception($"Event notification {eventNotification.EventNotificationId} is missing its batch name.");
+                        }
+
+                        if (eventNotification.BatchName.Length > 25)
+                        {
+                            throw new Exception($"Event notification {eventNotification.EventNotificationId} has a batch name longer than 25 characters.");
+                        }
+
+                        if (batchNames.Contains(eventNotification.BatchName))
+                        {
+                            throw new Exception($"Batch name {eventNotification.BatchName} is used by more than one event notification.");
+                        }
+
+                        batchNames.Add(eventNotification.BatchName);
+                    }
+
+                    if (handleMethod == ApiIntegration)
+                    {
+                        if (string.IsNullOrWhiteSpace(eventNotification.ApiEndpointName))
+                        {
+                            throw new Exception($"Event notification {eventNotification.EventNotificationId} is missing its API endpoint name.");
+                        }
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                LogManager.ErrorLog(exception);
+                return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
+            }
+
+            return new HttpResponseMessage(HttpStatusCode.OK);
+        }
+
+        /// <summary>
         /// Validating database connection
         /// if the database connection is required
         /// </summary>
@@ -430,8 +701,68 @@ namespace CampusLogicEvents.Web.Models
 
         }
 
-        public static void ValidateApplicationSettings()
+        /// <summary>
+        /// Validate the Application Settings.
+        /// These are the same rules the Application Settings page applies while the user is on it:
+        /// five whole numbers within their own ranges, and a username and password that are filled
+        /// in. The page cannot be relied on for this on its own, because a save validates every
+        /// section without a form to check against, and because the configuration can be posted to
+        /// us without going through the page at all.
+        /// </summary>
+        /// <param name="applicationAppSettingsSection"></param>
+        /// <returns></returns>
+        public static HttpResponseMessage ValidateApplicationSettings(Dictionary<string, string> applicationAppSettingsSection)
         {
+            try
+            {
+                ValidateApplicationSettingInRange(applicationAppSettingsSection, "purgeReceivedEventsAfterDays", 1, 365);
+                ValidateApplicationSettingInRange(applicationAppSettingsSection, "purgeLogRecordsAfterDays", 1, 365);
+                ValidateApplicationSettingInRange(applicationAppSettingsSection, "purgeNotificationLogRecordsAfterDays", 1, 365);
+                ValidateApplicationSettingInRange(applicationAppSettingsSection, "backgroundWorkerCount", 1, 5);
+                ValidateApplicationSettingInRange(applicationAppSettingsSection, "backgroundWorkerRetryAttempts", 1, 20);
+
+                if (string.IsNullOrWhiteSpace(GetSetting(applicationAppSettingsSection, "incomingApiUsername")))
+                {
+                    throw new Exception("Application setting incomingApiUsername is required.");
+                }
+
+                //Deliberately no value in the message: this one is a password.
+                if (string.IsNullOrWhiteSpace(GetSetting(applicationAppSettingsSection, "incomingApiPassword")))
+                {
+                    throw new Exception("Application setting incomingApiPassword is required.");
+                }
+            }
+            catch (Exception exception)
+            {
+                LogManager.FatalLog($"Application Settings are not valid: {exception.Message}");
+                return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
+            }
+
+            return new HttpResponseMessage(HttpStatusCode.OK);
+        }
+
+        /// <summary>
+        /// Checks one of the numeric application settings. A value that will not parse covers both a
+        /// setting left empty and one that is not a whole number, which is what the page asks for.
+        /// </summary>
+        /// <param name="applicationAppSettingsSection"></param>
+        /// <param name="key"></param>
+        /// <param name="minimum"></param>
+        /// <param name="maximum"></param>
+        private static void ValidateApplicationSettingInRange(Dictionary<string, string> applicationAppSettingsSection, string key, int minimum, int maximum)
+        {
+            var value = GetSetting(applicationAppSettingsSection, key);
+
+            int parsedValue;
+            if (!int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out parsedValue))
+            {
+                throw new Exception($"Application setting {key} must be a whole number, value: {value}");
+            }
+
+            if (parsedValue < minimum || parsedValue > maximum)
+            {
+                throw new Exception($"Application setting {key} must be between {minimum} and {maximum}, value: {parsedValue}");
+            }
         }
 
         /// <summary>
@@ -464,7 +795,7 @@ namespace CampusLogicEvents.Web.Models
             try
             {
                 DocumentManager documentManager = new DocumentManager();
-                if (documentManager.ValidateDirectory(directoryPath))
+                if (ValidateConfiguredDirectory(documentManager, directoryPath))
                 {
                     return new HttpResponseMessage(HttpStatusCode.OK);
                 }
@@ -486,7 +817,7 @@ namespace CampusLogicEvents.Web.Models
             try
             {
                 DocumentManager documentManager = new DocumentManager();
-                if (documentManager.ValidateDirectory(directoryPath))
+                if (ValidateConfiguredDirectory(documentManager, directoryPath))
                 {
                     return new HttpResponseMessage(HttpStatusCode.OK);
                 }
@@ -507,11 +838,11 @@ namespace CampusLogicEvents.Web.Models
             try
             {
                 DocumentManager documentManager = new DocumentManager();
-                if (!documentManager.ValidateDirectory(settings.DataFileUploadFilePath))
+                if (!ValidateConfiguredDirectory(documentManager, settings.DataFileUploadFilePath))
                 {
                     return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
                 }
-                if (!documentManager.ValidateDirectory(settings.DataFileArchiveFilePath))
+                if (!ValidateConfiguredDirectory(documentManager, settings.DataFileArchiveFilePath))
                 {
                     return new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
                 }
@@ -529,8 +860,8 @@ namespace CampusLogicEvents.Web.Models
             try
             {
                 DocumentManager documentManager = new DocumentManager();
-                if (documentManager.ValidateDirectory(settings.FileDirectory) &&
-                    documentManager.ValidateDirectory(settings.ArchiveDirectory))
+                if (ValidateConfiguredDirectory(documentManager, settings.FileDirectory) &&
+                    ValidateConfiguredDirectory(documentManager, settings.ArchiveDirectory))
                 {
                     return new HttpResponseMessage(HttpStatusCode.OK);
                 }
@@ -557,12 +888,12 @@ namespace CampusLogicEvents.Web.Models
             try
             {
                 DocumentManager documentManager = new DocumentManager();
-                if (documentManager.ValidateDirectory(isirCorrectionsSettings.CorrectionsFilePath))
+                if (ValidateConfiguredDirectory(documentManager, isirCorrectionsSettings.CorrectionsFilePath))
                 {
                     if (isirCorrectionsSettings.TdClientEnabled.HasValue && isirCorrectionsSettings.TdClientEnabled.Value == true)
                     {
-                        if (documentManager.ValidateDirectory(isirCorrectionsSettings.TdClientExecutablePath) &&
-                            documentManager.ValidateDirectory(isirCorrectionsSettings.TdClientArchiveFilePath))
+                        if (ValidateConfiguredDirectory(documentManager, isirCorrectionsSettings.TdClientExecutablePath) &&
+                            ValidateConfiguredDirectory(documentManager, isirCorrectionsSettings.TdClientArchiveFilePath))
                         {
                             return new HttpResponseMessage(HttpStatusCode.OK);
                         }
@@ -607,7 +938,7 @@ namespace CampusLogicEvents.Web.Models
                     else
                     {
                         DocumentManager documentManager = new DocumentManager();
-                        if (!documentManager.ValidateDirectory(settings.DocumentStorageFilePath))
+                        if (!ValidateConfiguredDirectory(documentManager, settings.DocumentStorageFilePath))
                         {
                             throw new Exception();
                         }
@@ -640,27 +971,48 @@ namespace CampusLogicEvents.Web.Models
                     throw new Exception();
                 }
 
-                if (string.IsNullOrEmpty(settings.FileStorePath))
-                {
-                    throw new Exception();
-                }
-                else
-                {
-                    FileStoreManager documentManager = new FileStoreManager();
-                    if (!documentManager.ValidateDirectory(settings.FileStorePath))
-                    {
-                        throw new Exception();
-                    }
-                }
-                
-                if (string.IsNullOrEmpty(settings.FileStoreMinutes))
+                var stores = settings.GetFileStores();
+                if (!stores.Any())
                 {
                     throw new Exception();
                 }
 
-                if (string.IsNullOrEmpty(settings.FileDefinitionName))
+                var names = new List<string>();
+                foreach (var store in stores)
                 {
-                    throw new Exception();
+                    if (string.IsNullOrWhiteSpace(store.Name))
+                    {
+                        throw new Exception();
+                    }
+
+                    if (names.Contains(store.Name.ToLower()))
+                    {
+                        throw new Exception();
+                    }
+                    names.Add(store.Name.ToLower());
+
+                    if (string.IsNullOrEmpty(store.FileStorePath))
+                    {
+                        throw new Exception();
+                    }
+                    else
+                    {
+                        FileStoreManager documentManager = new FileStoreManager();
+                        if (!ValidateConfiguredDirectory(documentManager, store.FileStorePath))
+                        {
+                            throw new Exception();
+                        }
+                    }
+
+                    if (string.IsNullOrEmpty(store.FileStoreMinutes))
+                    {
+                        throw new Exception();
+                    }
+
+                    if (string.IsNullOrEmpty(store.FileDefinitionName))
+                    {
+                        throw new Exception();
+                    }
                 }
             }
             catch (Exception exception)
@@ -693,7 +1045,7 @@ namespace CampusLogicEvents.Web.Models
                 else
                 {
                     FileStoreManager documentManager = new FileStoreManager();
-                    if (!documentManager.ValidateDirectory(settings.AwardLetterPrintFilePath))
+                    if (!ValidateConfiguredDirectory(documentManager, settings.AwardLetterPrintFilePath))
                     {
                         throw new Exception();
                     }
@@ -731,7 +1083,7 @@ namespace CampusLogicEvents.Web.Models
                         else
                         {
                             FileStoreManager documentManager = new FileStoreManager();
-                            if (!documentManager.ValidateDirectory(path))
+                            if (!ValidateConfiguredDirectory(documentManager, path))
                             {
                                 throw new Exception();
                             }

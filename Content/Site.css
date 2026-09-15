@@ -66,10 +66,6 @@ h4, h5, h6 {
     padding-bottom: 0;
 }
 
-.blockUI h2 {
-    color: #fff;
-}
-
 h1 {
     font-size: 2em;
 }
@@ -878,22 +874,6 @@ tr.pager td {
 
 .margin-right-10 {
     margin-right: 10px;
-}
-
-.k-multiselect.wrap {
-    height: 50px;
-}
-
-.k-dropdown .k-dropdown-wrap {
-    height: 34px;
-}
-
-.k-multiselect-wrap .k-button {
-    height: 34px;
-}
-
-.k-timepicker .k-picker-wrap {
-    height: 34px;
 }
 
 .align-right {

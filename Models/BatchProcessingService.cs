@@ -71,14 +71,14 @@ namespace CampusLogicEvents.Web.Models
 
                                     if (eventData.PropertyValues[EventPropertyConstants.AlRecordId].IsNullOrEmpty())
                                     {
-                                        SendErrorNotification("Batch AwardLetter process", $"This record has no AL-record-Id, record Id: {eventData.PropertyValues[EventPropertyConstants.Id].Value<string>()}. This likely means the notification event is not an AL event.  Please contact your CampusLogic contact for next steps.");
-                                        LogManager.ErrorLog($"Record for batch awardletter process has no AL-record-Id, with award letter record Id: {eventData.PropertyValues[EventPropertyConstants.Id].Value<string>()}.  This likely means the notification event is not an AL event");
+                                        SendErrorNotification("Batch Communication process", $"This record has no record-Id, record Id: {eventData.PropertyValues[EventPropertyConstants.Id].Value<string>()}. This likely means the notification event is not a Communication event.  Please contact your CampusLogic contact for next steps.");
+                                        LogManager.ErrorLog($"Record for batch communication process has no record-Id, with record Id: {eventData.PropertyValues[EventPropertyConstants.Id].Value<string>()}.  This likely means the notification event is not a Communication event");
                                         dbContext.Database.ExecuteSqlCommand($"DELETE FROM [dbo].[BatchProcessRecord] WHERE [ProcessGuid] = '{processGuid}' and [Id] = {record.Id}");
                                     }
                                     else if (record.RetryCount > RETRY_MAX)
                                     {
-                                        SendErrorNotification("Batch AwardLetter process", $"This record has reached it's maximum retry attempts, record Id: {record.Id}, AL-record-Id: {Guid.Parse(eventData.PropertyValues[EventPropertyConstants.AlRecordId].Value<string>())}. Please contact your CampusLogic contact for next steps.");
-                                        LogManager.ErrorLog($"Record for batch awardletter process has reached maximum retry attempts, with award letter record Id: {record.Id}, AL-record-Id: {Guid.Parse(eventData.PropertyValues[EventPropertyConstants.AlRecordId].Value<string>())}.");
+                                        SendErrorNotification("Batch Communication process", $"This record has reached it's maximum retry attempts, record Id: {record.Id}, record-Id: {Guid.Parse(eventData.PropertyValues[EventPropertyConstants.AlRecordId].Value<string>())}. Please contact your CampusLogic contact for next steps.");
+                                        LogManager.ErrorLog($"Record for batch communication process has reached maximum retry attempts, with record Id: {record.Id}, record-Id: {Guid.Parse(eventData.PropertyValues[EventPropertyConstants.AlRecordId].Value<string>())}.");
                                         dbContext.Database.ExecuteSqlCommand($"DELETE FROM [dbo].[BatchProcessRecord] WHERE [ProcessGuid] = '{processGuid}' and [Id] = {record.Id}");
                                     }
                                     else if (record.RetryCount == RETRY_MAX && retryTimeHasPassed)

@@ -44,6 +44,9 @@ namespace CampusLogicEvents.Web.WebAPI
                 fileStoreSettings.FileStoreFileFormat = null;
                 fileStoreSettings.FileExtension = null;
                 fileStoreSettings.FileStoreMappingCollectionConfig = null;
+                fileStoreSettings.FileStorePath = null;
+                fileStoreSettings.FileStoreMinutes = null;
+                fileStoreSettings.FileDefinitionName = null;
             }
 
             var documentSettings = campusLogicSection.DocumentSettings;
@@ -277,6 +280,16 @@ namespace CampusLogicEvents.Web.WebAPI
 
                 ConvertToFileDefinition(response);
 
+                // The named stores, as the only shape that crosses the wire — FileStoresConfig is
+                // [JsonIgnore]d because a ConfigurationElementCollection cannot be deserialised.
+                // GetFileStores() also folds a pre-collection (legacy) fileStoreSettings element into
+                // a single store, so this has to run AFTER ConvertToFileDefinition, which is what
+                // gives that element its FileDefinitionName.
+                var fileStoreSettingsForWire = response.CampusLogicSection.FileStoreSettings;
+                fileStoreSettingsForWire.FileStores = (fileStoreSettingsForWire.FileStoreEnabled ?? false)
+                    ? fileStoreSettingsForWire.GetFileStores()
+                    : fileStoreSettingsForWire.FileStoresConfig.GetFileStores().ToList();
+
                 if (response.CampusLogicSection.PowerFaidsSettings != null)
                 {
                     response.CampusLogicSection.PowerFaidsEnabled = response.CampusLogicSection.PowerFaidsSettings.PowerFaidsEnabled;
@@ -361,6 +374,11 @@ namespace CampusLogicEvents.Web.WebAPI
                 foreach (FieldMapSettings fieldMapSetting in configurationModel.CampusLogicSection.FileStoreSettings.FileStoreMappingCollection)
                 {
                     campusLogicSection.FileStoreSettings.FileStoreMappingCollectionConfig.Add(fieldMapSetting);
+                }
+
+                foreach (FileStoreSetting fileStoreSetting in configurationModel.CampusLogicSection.FileStoreSettings.FileStores)
+                {
+                    campusLogicSection.FileStoreSettings.FileStoresConfig.Add(fileStoreSetting);
                 }
 
                 campusLogicSection.DocumentSettings = configurationModel.CampusLogicSection.DocumentSettings;
@@ -647,6 +665,7 @@ namespace CampusLogicEvents.Web.WebAPI
                 if (response.DuplicateEvent || response.DuplicatePath
                     || !response.EnvironmentValid
                     || !response.ApiCredentialsValid
+                    || !response.ApplicationSettingsValid
                     || (response.SMTPValid != null && (bool)!response.SMTPValid)
                     || (response.ISIRUploadValid != null && (bool)!response.ISIRUploadValid)
                     || (response.AwardLetterUploadValid != null && (bool)!response.AwardLetterUploadValid)
@@ -662,11 +681,11 @@ namespace CampusLogicEvents.Web.WebAPI
                     || (response.StoredProcedureValid != null && (bool)!response.StoredProcedureValid)
                     || (response.FileDefinitionSettingsValid != null && (bool)!response.FileDefinitionSettingsValid)
                     || (response.PowerFaidsSettingsValid != null && (bool)!response.PowerFaidsSettingsValid)
-                    || !response.ApiCredentialsValid
                     || response.InvalidBatchName
                     || response.MissingBatchName
                     || response.MissingApiEndpointName
-                    || response.ImproperFileDefinitions)
+                    || response.ImproperFileDefinitions
+                    || response.MissingFileStore)
                 {
                     return Request.CreateResponse(HttpStatusCode.ExpectationFailed, response);
                 }

@@ -15,7 +15,7 @@
         An API Endpoint should be associated with an Event Notification, so when that event ID is handled, that integration's specified API will be called.
         For additional help on this page please see <a href="https://resources.elluciancloud.com/bundle/cl_integrations_acn_use/page/t_configure_event_notifications_and_apis.html" target="_blank">API Integration Help.</a>
     </section>
-    <button class="btn btn-light btn-lg pull-right" ng-click="vm.addApiIntegration()">Add</button>
+    <button type="button" id="addApiIntegration" class="btn btn-light btn-lg pull-right">Add</button>
     <div class="row"><div class="col-lg-12"><hr /></div></div>
 
     <div class="row">
@@ -24,50 +24,73 @@
         </div>
     </div>
 
-    <div ng-if="vm.apiIntegrationsList.length > 0">
-        <div class="row" ng-repeat="apiIntegration in vm.apiIntegrationsList" style="padding-right:15px;padding-left:15px;margin-bottom:8px;">
-            <div class="col-lg-12 padding-bottom-ten" ng-show="apiIntegration.authentication" style="border:1px solid #eee;border-radius: 4px;padding:20px;">
-                <div class="padding-bottom-ten">
-                    <div id="api_grid_{{apiIntegration.apiId}}" kendo-grid
-                         data-role="grid"
-                         data-editable="false"
-                         k-data-source="{{[apiIntegration]}}"
-                         k-options="vm.gridOptions['{{apiIntegration.authentication}}']">
-                    </div>
-                </div>
-                <div ng-show="vm.endpoints[apiIntegration.apiId].length > 0" class="padding-bottom-ten pull-right" style="width:98%;">
-                    <div id="api_endpoints_grid_{{apiIntegration.apiId}}" kendo-grid
-                         data-role="grid"
-                         data-editable="false"
-                         k-data-source="vm.endpoints[apiIntegration.apiId]"
-                         k-options="vm.gridOptions['endpoints']"
-                         class="pull-right">
-                    </div>
-                </div>
-                <span class="field-validation-error" ng-show="vm.endpoints[apiIntegration.apiId].length === 0 && !vm.pageValid">At least one endpoint is required.</span>
-                <div>
-                    <span class="field-validation-error" ng-show="apiIntegration.authentication === 'ethos' && (vm.endpoints[apiIntegration.apiId][0].parameterMappings === null || vm.endpoints[apiIntegration.apiId][0].parameterMappings === undefined) && !vm.pageValid">
-                        {{vm.endpoints[apiIntegration.apiId][0].name}}: At least one parameter is required.
-                    </span>
-                </div>
-                <button class="btn btn-light pull-right" ng-click="vm.addOrEditEndpoint(null, apiIntegration.apiId)" ng-if="apiIntegration.authentication !== 'ethos'">Add Endpoint</button>
-            </div>
-        </div>
+    <div id="apiIntegrationList"></div>
 
-    </div>
-    <div ng-if="vm.apiIntegrationsList.length === 0" class="text-center">
+    <div id="noApiIntegrations" class="text-center" hidden>
         <h3>Click 'Add' to create an API Integration</h3>
-        <span class="field-validation-error" ng-show="!vm.pageValid">At least one API Integration is required.</span>
+        <span class="field-validation-error" id="noApiIntegrationsRequired" hidden>At least one API Integration is required.</span>
     </div>
 
 </div>
 
-<script id="add-api-settings-template" type="text/x-kendo-template">
-    <button class="btn btn-light" ng-click="vm.editApiIntegration(apiIntegration)" title="Edit"><i class="fa fa-pencil"></i></button>
-    <button class="btn btn-light" ng-click="vm.deleteApiIntegration(apiIntegration)" title="Delete"><i class="fa fa-trash"></i></button>
-</script>
+<template id="apiIntegrationBlockTemplate">
+    <div class="row" data-api-index style="padding-right:15px;padding-left:15px;margin-bottom:8px;">
+        <div class="col-lg-12 padding-bottom-ten" style="border:1px solid #eee;border-radius: 4px;padding:20px;">
+            <div class="padding-bottom-ten">
+                <table class="cl-grid cl-api-grid">
+                    <thead>
+                        <tr></tr>
+                    </thead>
+                    <tbody>
+                        <tr></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="padding-bottom-ten pull-right cl-endpoints-wrapper" style="width:98%;" hidden>
+                <table class="cl-grid cl-endpoints-grid pull-right">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Endpoint</th>
+                            <th>Method</th>
+                            <th>MIME Type</th>
+                            <th>Parameter Mappings</th>
+                            <th class="cl-grid-commands"></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <span class="field-validation-error cl-no-endpoints" hidden>At least one endpoint is required.</span>
+            <div>
+                <span class="field-validation-error cl-ethos-parameters" hidden></span>
+            </div>
+            <button type="button" class="btn btn-light pull-right cl-add-endpoint" data-action="add-endpoint">Add Endpoint</button>
+        </div>
+    </div>
+</template>
 
-<script id="add-endpoint-template" type="text/x-kendo-template">
-    <button class="btn btn-light" ng-click="vm.addOrEditEndpoint(dataItem, apiIntegration.apiId)" title="Edit"><i class="fa fa-pencil"></i></button>
-    <button class="btn btn-light" ng-click="vm.deleteEndpoint(dataItem, apiIntegration.apiId)" title="Delete" ng-if="apiIntegration.authentication !== 'ethos'"><i class="fa fa-trash"></i></button>
-</script>
+<template id="apiIntegrationCommandsTemplate">
+    <td class="cl-grid-commands">
+        <button type="button" class="btn btn-light" data-action="edit-api" title="Edit"><i class="fa fa-pencil"></i></button>
+        <button type="button" class="btn btn-light" data-action="delete-api" title="Delete"><i class="fa fa-trash"></i></button>
+    </td>
+</template>
+
+<template id="apiEndpointRowTemplate">
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="cl-grid-commands">
+            <button type="button" class="btn btn-light" data-action="edit-endpoint" title="Edit"><i class="fa fa-pencil"></i></button>
+            <button type="button" class="btn btn-light cl-delete-endpoint" data-action="delete-endpoint" title="Delete"><i class="fa fa-trash"></i></button>
+        </td>
+    </tr>
+</template>
+
+<template id="apiParameterMappingTemplate">
+    <span><span class="cl-parameter"></span> <i class="fa fa-long-arrow-right"></i> <span class="cl-event-data"></span><br /></span>
+</template>

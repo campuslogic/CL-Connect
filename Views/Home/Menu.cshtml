@@ -18,7 +18,7 @@
             <li class="one">
                 <h5>Setup CL Connect</h5>
                 The wizard to set up or update your CL Connect options by
-                <a class="pointer" cl-link-to="/environment">Clicking Here…</a>
+                <a class="pointer" data-link="/environment">Clicking Here…</a>
             </li>
             <li class="two">
                 <h5>Processing Queues</h5>
@@ -38,14 +38,14 @@
             <li class="five">
                 <h5>Export Data</h5>
                 Export data from CL Connect to Secure File Transfer for support by
-                <a class="pointer" cl-link-to="/export">Clicking Here…</a>
+                <a class="pointer" data-link="/export">Clicking Here…</a>
             </li>
         </ol>
-        <div ng-controller="dbcontroller as vm">
-            <p ng-if="vm.isLocal">Size of database is {{vm.dbSize}}</p>
+        <div>
+            <p id="dbSizeLine" hidden>Size of database is <span id="dbSize"></span></p>
         </div>
     </section>
-    <div class="site-footer" ng-controller="versioncontroller as vm">
-        <div class="container">Version {{vm.version}}</div>
+    <div class="site-footer">
+        <div class="container">Version <span id="appVersion"></span></div>
     </div>
 </div>

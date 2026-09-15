@@ -1,16 +1,10 @@
-﻿<div class="modal-header">
-        <h4>Select Folder</h4>
-    </div>
-    <div class="modal-body">
-        <div class="jumbotron">
-            <div id="folderpicker-treeview" kendo-tree-view="tree" k-data-text-field="'name'" k-data-value-field="'path'" k-data-source="treeData" k-on-change="onSelectChange()">
-                <span k-template id="treeTemplate">
-                    {{dataItem.name}}
-                </span>
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <input type="button" class="btn btn-default" value="Cancel" ng-click="$dismiss()" />
-        <input type="button" class="btn btn-primary" value="Select" ng-click="selectFolderPath()" />
-    </div>
+<div class="modal-header">
+    <h4>Select Folder</h4>
+</div>
+<div class="modal-body">
+    <div class="cl-tree-frame"></div>
+</div>
+<div class="modal-footer">
+    <input type="button" class="btn btn-default" value="Cancel" data-action="cancel" />
+    <input type="button" class="btn btn-primary" value="Select" data-action="select" />
+</div>

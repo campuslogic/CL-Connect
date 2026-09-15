@@ -1,0 +1,47 @@
+
+<div class="modal-header"><h4 id="fileStoreModalTitle"></h4></div>
+<div class="modal-body">
+    <form id="fileStoreModalForm">
+        <div class="row padding-bottom-ten">
+            <div class="col-lg-4 text-right">
+                <label class="control-label">Name</label>
+            </div>
+            <div class="col-lg-8">
+                <input type="text" class="form-control" id="fileStoreName" name="fileStore.name" required />
+                <span class="field-validation-error" id="fileStoreNameRequired" hidden>Required</span>
+                <span class="field-validation-error" id="fileStoreNameDuplicate" hidden>No two file stores may have the same name</span>
+            </div>
+        </div>
+        <div class="row padding-bottom-ten">
+            <div class="col-lg-4 text-right">
+                <label class="control-label">File Store Path</label>
+            </div>
+            <div class="col-lg-8">
+                <cl-folder-picker class="col-lg-7" required data-path="fileStore.fileStorePath"></cl-folder-picker>
+                <span class="field-validation-error" id="fileStorePathRequired" hidden>Required</span>
+            </div>
+        </div>
+        <div class="row padding-bottom-ten">
+            <div class="col-lg-4 text-right">
+                <label class="control-label">File Store Minutes</label>
+            </div>
+            <div class="col-lg-8">
+                <input type="number" class="form-control" id="fileStoreMinutes" name="fileStore.fileStoreMinutes" min="1" step="1" required />
+                <span class="field-validation-error" id="fileStoreMinutesRequired" hidden>Required</span>
+            </div>
+        </div>
+        <div class="row padding-bottom-ten">
+            <div class="col-lg-4 text-right">
+                <label class="control-label">File Definition Name</label>
+            </div>
+            <div class="col-lg-8">
+                <input type="text" class="form-control" id="fileStoreFileDefinitionName" name="fileStore.fileDefinitionName" required />
+                <span class="field-validation-error" id="fileStoreFileDefinitionRequired" hidden>Required</span>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <input type="button" id="button-file-store-cancel" class="btn btn-light" value="Cancel" data-action="cancel" />
+    <input type="button" id="button-file-store-save" class="btn btn-primary" value="Save" data-action="save" />
+</div>

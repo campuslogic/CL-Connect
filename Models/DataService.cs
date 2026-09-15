@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Odbc;
+using System.Data.SqlClient;
 using System.Linq;
 using CampusLogicEvents.Implementation;
 using CampusLogicEvents.Implementation.Configurations;
@@ -247,12 +248,12 @@ namespace CampusLogicEvents.Web.Models
                         }
                         else if (eventHandler.HandleMethod == "AwardLetterPrint")
                         {
-                            LogManager.InfoLog("detect this is the AwardLetterPrint");
+                            LogManager.InfoLog("detect this is the Communication Print");
                             await AwardLetterDocumentRetrievalHandler(eventData, eventNotificationDefinition);
                         }
                         else if (eventHandler.HandleMethod == "BatchProcessingAwardLetterPrint")
                         {
-                            LogManager.InfoLog("detect this is the BatchProcessingAwardLetterPrint");
+                            LogManager.InfoLog("detect this is the BatchProcessingCommunicationPrint");
                             BatchProcessRetrievalHandler(ConfigConstants.AwardLetterPrintBatchType, eventHandler.BatchName, eventData);
                         }
                         else if (eventHandler.HandleMethod == "ApiIntegration")
@@ -348,12 +349,16 @@ namespace CampusLogicEvents.Web.Models
                     }
                     else
                     {
-                        var json = JsonConvert.SerializeObject(recordToProcess).Replace("'", "''");
+                        var json = JsonConvert.SerializeObject(recordToProcess);
 
                         using (var dbContext = new CampusLogicContext())
                         {
                             // Insert the record into the PowerFaidsRecord table so that it can be processed by the Automated PowerFAIDS job.
-                            dbContext.Database.ExecuteSqlCommand($"INSERT INTO [dbo].[PowerFaidsRecord]([Json], [ProcessGuid]) VALUES('{json}', NULL)");
+                            //The record is built from event data that came in on the request, so it is
+                            //passed as a parameter rather than written into the command text.
+                            dbContext.Database.ExecuteSqlCommand(
+                                "INSERT INTO [dbo].[PowerFaidsRecord]([Json], [ProcessGuid]) VALUES(@json, NULL)",
+                                new SqlParameter("@json", json));
                         }
                     }
                 }
@@ -492,12 +497,18 @@ namespace CampusLogicEvents.Web.Models
         /// <param name="eventData"></param>
         private static void BatchProcessRetrievalHandler(string type, string name, EventNotificationData eventData)
         {
-            var message = eventData.PropertyValues.ToString().Replace("'", "''");
+            var message = eventData.PropertyValues.ToString();
 
             using (var dbContext = new CampusLogicContext())
             {
                 //Insert the event into the BatchProcessRecord table so that it can be processed by the Automated Batch Process job.
-                dbContext.Database.ExecuteSqlCommand($"INSERT INTO [dbo].[BatchProcessRecord]([Type], [Name], [Message], [ProcessGuid], [RetryCount], [RetryUpdatedDate]) VALUES('{type}', '{name}', '{message}', NULL, NULL, NULL)");
+                //The event data comes in on the request, so it is passed as a parameter rather than
+                //written into the command text.
+                dbContext.Database.ExecuteSqlCommand(
+                    "INSERT INTO [dbo].[BatchProcessRecord]([Type], [Name], [Message], [ProcessGuid], [RetryCount], [RetryUpdatedDate]) VALUES(@type, @name, @message, NULL, NULL, NULL)",
+                    new SqlParameter("@type", type),
+                    new SqlParameter("@name", name),
+                    new SqlParameter("@message", message));
             }
         }
 
@@ -532,9 +543,14 @@ namespace CampusLogicEvents.Web.Models
             {
                 using (var dbContext = new CampusLogicContext())
                 {
-                    var dataToSerialize = eventData.PropertyValues.ToString().Replace("'", "''");
+                    var dataToSerialize = eventData.PropertyValues.ToString();
                     //Insert the event into the EventNotification table so that it can be processed by the Automated File Store job.
-                    dbContext.Database.ExecuteSqlCommand($"INSERT INTO [dbo].[EventNotification]([EventNotificationId], [Message], [CreatedDateTime], [ProcessGuid]) VALUES({eventData.PropertyValues[EventPropertyConstants.EventNotificationId].Value<int>()}, '{dataToSerialize}', GetUtcDate(), NULL)");
+                    //The event data comes in on the request, so it is passed as a parameter rather than
+                    //written into the command text.
+                    dbContext.Database.ExecuteSqlCommand(
+                        "INSERT INTO [dbo].[EventNotification]([EventNotificationId], [Message], [CreatedDateTime], [ProcessGuid]) VALUES(@eventNotificationId, @message, GetUtcDate(), NULL)",
+                        new SqlParameter("@eventNotificationId", eventData.PropertyValues[EventPropertyConstants.EventNotificationId].Value<int>()),
+                        new SqlParameter("@message", dataToSerialize));
                 }
             }
             catch (Exception ex)

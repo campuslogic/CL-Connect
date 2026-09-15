@@ -2,7 +2,7 @@
     Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
 }
 
-<form name="powerFaidsForm">
+<form name="powerFaidsForm" novalidate>
     <div>
         <h2>
             <b>PowerFAIDS</b>
@@ -17,56 +17,80 @@
         <div class="row">
             <div class="col-lg-12">
                 <label class="control-label">File Path</label>
-                <cl-folder-picker class="col-lg-7" isrequired="true" formvalid="vm.pageValid" uploadpath="vm.powerFaidsSettings.filePath"></cl-folder-picker>
+                <cl-folder-picker class="col-lg-7" required data-path="campusLogicSection.powerFaidsSettings.filePath"></cl-folder-picker>
             </div>
         </div>
         <!-- File type -->
         <div class="row" style="margin-top:16px;">
-            <div class="col-lg-4">
+            <div class="col-lg-4 cl-field">
                 <label class="control-label">Student(s) per file: </label><br />
                 <label class="control-label">
-                    <input type="radio" name="isBatch" required ng-value="false" ng-model="vm.powerFaidsSettings.isBatch" style="width: 20px">One
+                    <input type="radio" name="campusLogicSection.powerFaidsSettings.isBatch" required value="false" style="width: 20px">One
                 </label><br />
                 <label class="control-label">
-                    <input type="radio" name="isBatch" ng-value="true" ng-model="vm.powerFaidsSettings.isBatch" style="width: 20px">Multiple
+                    <input type="radio" name="campusLogicSection.powerFaidsSettings.isBatch" value="true" style="width: 20px">Multiple
                 </label><br />
-                <span class="field-validation-error" ng-show="!vm.pageValid && vm.powerFaidsSettings.isBatch == null">Required</span>
+                <span class="field-validation-error cl-required">Required</span>
             </div>
         </div>
         <!-- Batch Execution Minutes -->
-        <div class="row" ng-if="vm.powerFaidsSettings.isBatch" style="margin-top:16px;">
+        <div class="row" id="powerFaidsBatchMinutes" style="margin-top:16px;" hidden>
             <div class="col-lg-4">
                 <label class="control-label">Batch Execution Minutes:</label>
                 <input id="batchExecutionMinutes"
-                       name="batchExecutionMinutes"
-                       type="text"
-                       kendo-numeric-text-box k-format="'n0'"
-                       k-min="1"
-                       ng-model="vm.powerFaidsSettings.batchExecutionMinutes"
+                       name="campusLogicSection.powerFaidsSettings.batchExecutionMinutes"
+                       type="number"
+                       class="form-control"
+                       min="1"
+                       step="1"
                        required />
-                <span class="field-validation-error" ng-show="(!vm.pageValid || powerFaidsForm.batchExecutionMinutes.$dirty) && powerFaidsForm.batchExecutionMinutes.$error.required">Required</span>
+                <span class="field-validation-error cl-required">Required</span>
             </div>
         </div>
         <div class="row"><div class="col-lg-12"><hr /></div></div>
         <div class="row" style="margin-top:16px;">
             <div class="col-lg-12">
-                <div id="powerfaids-grid" kendo-grid
-                     data-role="grid"
-                     data-editable="false"
-                     k-data-source="vm.powerFaidsList"
-                     k-options="vm.gridOptions">
-                </div>
-                <span class="field-validation-error" ng-show="!vm.pageValid && (!vm.powerFaidsList || vm.powerFaidsList.length == 0)">At least one record is requried.</span>
-                <span class="field-validation-error" ng-show="!vm.pageValid && vm.powerFaidsList.length > 0">Please ensure all Event/Transaction Category pairings are defined and unique and Events are accounted for in Event Notifications.</span>
+                <table class="cl-grid" id="powerFaidsGrid">
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Transaction Category</th>
+                            <th>Outcome</th>
+                            <th>Short Name</th>
+                            <th>Required For</th>
+                            <th>Status</th>
+                            <th>Document Lock</th>
+                            <th>Verification Outcome</th>
+                            <th>Verification Outcome Lock</th>
+                            <th class="cl-grid-commands"></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <span class="field-validation-error" id="powerFaidsNoRecords" hidden>At least one record is required.</span>
+                <span class="field-validation-error" id="powerFaidsPairings" hidden>Please ensure all Event/Transaction Category pairings are defined and unique and Events are accounted for in Event Notifications.</span>
             </div>
             <div class="col-lg-12" style="margin-top:8px;">
-                <button class="btn btn-light" ng-click="vm.addPowerFaidsRecord()">Add</button>
+                <button type="button" id="addPowerFaidsRecord" class="btn btn-light">Add</button>
             </div>
         </div>
     </div>
-
-    <script id="powerfaids-collection-template" type="text/x-kendo-template">
-        <button class="btn btn-light" ng-click="vm.editPowerFaidsRecord(dataItem)" title="Edit"><i class="fa fa-pencil"></i></button>
-        <button class="btn btn-light" ng-click="vm.deletePowerFaidsRecord(dataItem)" title="Delete"><i class="fa fa-trash"></i></button>
-    </script>
 </form>
+
+<template id="powerFaidsRowTemplate">
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="cl-grid-commands">
+            <button type="button" class="btn btn-light" data-action="edit" title="Edit"><i class="fa fa-pencil"></i></button>
+            <button type="button" class="btn btn-light" data-action="delete" title="Delete"><i class="fa fa-trash"></i></button>
+        </td>
+    </tr>
+</template>
