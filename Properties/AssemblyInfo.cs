@@ -1,16 +1,15 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("CampusLogicEvents.Web")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("CampusLogicEvents.Web")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2015")]
+[assembly: AssemblyDescription("Build: 5.0.1.52002 - Commit: a60754abd1b4a276fb7831d77b751228a5a2b8f9")]
+[assembly: AssemblyConfiguration("release")]
+[assembly: AssemblyCompany("CampusLogic")]
+[assembly: AssemblyProduct("CL Connect")]
+[assembly: AssemblyCopyright("Copyright ©  2026")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -31,6 +30,6 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("2.6.5")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: log4net.Config.XmlConfigurator]
+[assembly: AssemblyVersion("5.0.1")]
+[assembly: AssemblyFileVersion("5.0.1.0")]
+[assembly: AssemblyInformationalVersion("5.0.1.0")]

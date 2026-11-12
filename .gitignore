@@ -41,8 +41,9 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-dotNetFx45_Full_setup.exe
-SqlLocalDB.MSI
-
-Views/Setup/AwardLetter.cshtml
-Views/Setup/EventNotification.cshtml
+Properties/AssemblyInfo.cs
+App_Data/CampusLogic.mdf
+App_Data/CampusLogic_log.ldf
+./bin/CampusLogicEvents.Web.dll.config
+*.bat
+$tf

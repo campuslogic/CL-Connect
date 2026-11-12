@@ -1,0 +1,137 @@
+﻿
+<div class="modal-header"><h4 id="powerFaidsModalTitle"></h4></div>
+<form id="powerFaidsModalForm" novalidate>
+    <div class="modal-body">
+        <div class="row">
+            <!-- Event -->
+            <div class="col-lg-4">
+                <label class="control-label">Event</label>
+                <input name="powerFaids.event"
+                       id="event"
+                       class="form-control"
+                       required />
+                <span class="field-validation-error cl-required">Required</span>
+            </div>
+            <!-- Transaction Category -->
+            <div class="col-lg-6">
+                <label class="control-label">Transaction Category</label>
+                <input name="powerFaids.transactionCategory"
+                       id="transactionCategory"
+                       class="form-control" />
+            </div>
+        </div>
+        <!-- Outcome -->
+        <div class="row" style="margin-top:16px;">
+            <div class="col-lg-12">
+                <label class="control-label">Outcome</label>
+                <select id="outcome"
+                        class="form-control input-lg "
+                        name="powerFaids.outcome"
+                        required>
+                    <option value="">Select an outcome...</option>
+                    <option value="documents">Documents</option>
+                    <option value="verification">Verification Information</option>
+                    <option value="both">Both Documents and Verification Information</option>
+                </select>
+                <span class="field-validation-error cl-required">Required</span>
+            </div>
+        </div>
+        <!-- Document Or Both -->
+        <div id="powerFaidsDocumentFields" hidden>
+            <div class="row" style="margin-top:16px">
+                <div class="col-lg-12">
+                    <label class="control-label">Short Name</label>
+                    <input name="powerFaids.shortName"
+                           id="shortName"
+                           class="form-control"
+                           required />
+                    <span class="field-validation-error cl-required">Required</span>
+                </div>
+            </div>
+            <div class="row" style="margin-top:16px">
+                <div class="col-lg-12">
+                    <label class="control-label">Required For</label>
+                    <select id="requiredFor"
+                            required
+                            class="form-control input-lg "
+                            name="powerFaids.requiredFor">
+                        <option value="">Select an option...</option>
+                        <option value="D">Disbursement</option>
+                        <option value="P">Packaging</option>
+                    </select>
+                    <span class="field-validation-error cl-required">Required</span>
+                </div>
+            </div>
+            <div class="row" style="margin-top:16px;">
+                <div class="col-lg-12">
+                    <label class="control-label">Status</label>
+                    <select id="status"
+                            required
+                            class="form-control input-lg "
+                            name="powerFaids.status">
+                        <option value="">Select a status...</option>
+                        <option value="1">Received</option>
+                        <option value="2">Not Reviewed</option>
+                        <option value="3">Approved</option>
+                        <option value="4">Incomplete</option>
+                        <option value="5">Not Received</option>
+                        <option value="6">Not Signed</option>
+                        <option value="7">Waived</option>
+                    </select>
+                    <span class="field-validation-error cl-required">Required</span>
+                </div>
+            </div>
+            <div class="row" style="margin-top:16px;">
+                <div class="col-lg-12">
+                    <label class="control-label">Document Lock</label>
+                    <select id="documentLock"
+                            required
+                            class="form-control input-lg "
+                            name="powerFaids.documentLock">
+                        <option value="">Select an option...</option>
+                        <option value="Y">Locked</option>
+                        <option value="N">Unlocked</option>
+                    </select>
+                    <span class="field-validation-error cl-required">Required</span>
+                </div>
+            </div>
+        </div>
+        <!-- Verification or Both -->
+        <div id="powerFaidsVerificationFields" hidden>
+            <div class="row" style="margin-top:16px">
+                <div class="col-lg-12">
+                    <label class="control-label">Verification Outcome</label>
+                    <select id="verificationOutcome"
+                            required
+                            class="form-control input-lg "
+                            name="powerFaids.verificationOutcome">
+                        <option value="">Select an option...</option>
+                        <option value="N">Not Performed</option>
+                        <option value="S">Selected; Not Verified</option>
+                        <option value="V">Verified</option>
+                        <option value="W">Without Documentation</option>
+                    </select>
+                    <span class="field-validation-error cl-required">Required</span>
+                </div>
+            </div>
+            <div class="row" style="margin-top:16px;">
+                <div class="col-lg-12">
+                    <label class="control-label">Verification Outcome Lock</label>
+                    <select id="verificationOutcomeLock"
+                            required
+                            class="form-control input-lg "
+                            name="powerFaids.verificationOutcomeLock">
+                        <option value="">Select an option...</option>
+                        <option value="Y">Locked</option>
+                        <option value="N">Unlocked</option>
+                    </select>
+                    <span class="field-validation-error cl-required">Required</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <input type="button" class="btn btn-light" value="Cancel" data-action="cancel" />
+        <input type="button" class="btn btn-primary" value="Save" data-action="save" />
+    </div>
+</form>

@@ -214,10 +214,9 @@ ul#menu {
     border-radius: 16px !important;
 }
 
-.nav > li > a:hover, .nav > li > a:focus {
+.nav > a:hover, .nav > a:focus {
     background-color: #ff7f03 !important;
-    -ms-border-radius: 10px;
-    border-radius: 10px;
+    color: #fff;
 }
 
 .border-radius-10 {
@@ -227,10 +226,6 @@ ul#menu {
 
 .font-size-x-large {
     font-size: large !important;
-}
-
-a:hover, a:focus {
-    color: white !important;
 }
 
 .padding-top-twenty {
@@ -491,6 +486,11 @@ aside {
     margin-bottom: 12px;
 }
 
+.btn-light:hover {
+    background-color: #e6e6e6;
+    border-color: #adadad;
+}
+
 #logoutForm {
     display: inline;
 }
@@ -546,7 +546,6 @@ input, textarea {
     font-size: 1.2em;
     margin: 5px 0 6px 0;
     padding: 5px;
-    width: 300px;
 }
 
 textarea {
@@ -554,15 +553,6 @@ textarea {
     width: 500px;
 }
 
-    input:focus, textarea:focus {
-        border: 1px solid #7ac0da;
-    }
-
-input[type="checkbox"] {
-    background: transparent;
-    border: inherit;
-    width: auto;
-}
 
 input[type="submit"],
 input[type="button"],
@@ -886,24 +876,26 @@ tr.pager td {
     margin-right: 10px;
 }
 
-.k-multiselect.wrap {
-    height: 50px;
-}
-
-.k-dropdown .k-dropdown-wrap {
-    height: 34px;
-}
-
-.k-multiselect-wrap .k-button {
-    height: 34px;
-}
-
-.k-timepicker .k-picker-wrap {
-    height: 34px;
-}
-
 .align-right {
     text-align: right;
 }
 
+.modal-wide .modal-dialog {
+    max-width: 90%;
+    width: 90%;
+}
 
+.modal-medium .modal-dialog {
+    max-width: 600px;
+    width: 600px;
+}
+
+.control-label.text-left {
+    text-align: left;
+}
+
+@media (min-width: 992px) {
+    .control-label {
+        text-align: right;
+    }
+}
